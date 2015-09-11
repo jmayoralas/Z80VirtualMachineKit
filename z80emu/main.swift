@@ -8,5 +8,6 @@
 
 import Foundation
 
-print("Hello, World!")
+let cpu = Z80()
 
+cpu.tic()

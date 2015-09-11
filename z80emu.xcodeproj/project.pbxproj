@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1D7482161B9F4078006082E6 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7482151B9F4078006082E6 /* main.swift */; };
+		1DDAD0A81BA2CA4200B03B8A /* z80core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDAD0A71BA2CA4200B03B8A /* z80core.swift */; settings = {ASSET_TAGS = (); }; };
+		1DDAD0B61BA2D69500B03B8A /* memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDAD0B51BA2D69500B03B8A /* memory.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,8 @@
 /* Begin PBXFileReference section */
 		1D7482121B9F4078006082E6 /* z80emu */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = z80emu; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D7482151B9F4078006082E6 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		1DDAD0A71BA2CA4200B03B8A /* z80core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = z80core.swift; path = Cpu/z80core.swift; sourceTree = "<group>"; };
+		1DDAD0B51BA2D69500B03B8A /* memory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = memory.swift; path = Cpu/memory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +45,7 @@
 		1D7482091B9F4078006082E6 = {
 			isa = PBXGroup;
 			children = (
+				1DDAD0A61BA2C9C300B03B8A /* Cpu */,
 				1D7482141B9F4078006082E6 /* z80emu */,
 				1D7482131B9F4078006082E6 /* Products */,
 			);
@@ -60,6 +65,15 @@
 				1D7482151B9F4078006082E6 /* main.swift */,
 			);
 			path = z80emu;
+			sourceTree = "<group>";
+		};
+		1DDAD0A61BA2C9C300B03B8A /* Cpu */ = {
+			isa = PBXGroup;
+			children = (
+				1DDAD0B51BA2D69500B03B8A /* memory.swift */,
+				1DDAD0A71BA2CA4200B03B8A /* z80core.swift */,
+			);
+			name = Cpu;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -118,6 +132,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DDAD0A81BA2CA4200B03B8A /* z80core.swift in Sources */,
+				1DDAD0B61BA2D69500B03B8A /* memory.swift in Sources */,
 				1D7482161B9F4078006082E6 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -236,6 +252,7 @@
 				1D74821B1B9F4078006082E6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
