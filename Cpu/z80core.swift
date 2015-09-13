@@ -80,6 +80,7 @@ private enum AddressingMode {
 
 class Z80 {
     let pins = Pins()
+    var program_end: Bool = false
     
     private var opcodes: Array<Void -> Void>!
     private var regs = Registers()
@@ -100,17 +101,23 @@ class Z80 {
         old_busreq = pins.busreq
         opcodes = Array<Void -> Void>(count: 0x100, repeatedValue: op00)
         
+        for n in 0x40...0x7F {
+            opcodes[n] = opLd
+        }
         opcodes[0x00] = op00
-        opcodes[0x01] = op01
-        
+        opcodes[0x01] = opLd
         opcodes[0x3A] = opLd
         opcodes[0x3E] = opLd
-        for n in 0x40...0x7F {
-            opcodes[n] = opLdr
-        }
+        opcodes[0x76] = op76
+        
+        regs.h = 0x11
+        regs.l = 0x77
     }
     
     func clk() {
+        // program ended ?
+        if program_end { return }
+        
         // waits until bus is available
         if pins.busreq || old_busreq != pins.busreq {
             old_busreq = pins.busreq
@@ -327,11 +334,12 @@ class Z80 {
     
     // Opcodes implementation
     private func op00() { // NOP
-        print("opcode 00")
+        print("NOP")
     }
     
-    private func op01() {
-        print("opcode from \(pins.address_bus.hexStr()): \(pins.data_bus.hexStr())")
+    private func op76() {
+        print("HALT !!")
+        program_end = true
     }
     
     private func op3F() {
@@ -339,51 +347,17 @@ class Z80 {
     }
     
     private func opLd() {
-        if let opcode = running_opcode {
-            switch opcode {
-            case 0x3A:
-                regs.a = pins.data_bus
-            case 0x3E:
-                regs.a = params[1]
-            default:
-                break
-            }
-            
-            // we are done with this opcode, next one please...
-            machine_cycle = MachineCycle.OpcodeFetch
-            
-            return
-        }
-        
-        // new opcode decoded
-        running_opcode = pins.data_bus
-        
-        // start param counter
-        param = 1
-        
-        switch running_opcode! {
-        case 0x3A:
-            addressing_mode = AddressingMode.Indirect
-            num_params = 2
-
-        case 0x3E:
-            addressing_mode = AddressingMode.Direct
-            num_params = 1
-    
-        default:
-            break
-        }
-        
-        // read parameter from PC + 1 and increment PC
-        pins.address_bus = regs.pc++
-        machine_cycle = MachineCycle.MemoryRead
-    }
-    
-    private func opLdr() {
         // Are we already executing an opcode ?
         if let opcode = running_opcode {
             // if so get data from data bus and store in corresponding register
             switch opcode {
+            case 0x01:
+                regs.b = params[1]
+                regs.c = params[0]
+            case 0x3A:
+                regs.a = pins.data_bus
+            case 0x3E:
+                regs.a = params[0]
             case 0x46:
                 regs.b = pins.data_bus
             case 0x4E:
@@ -409,8 +383,21 @@ class Z80 {
         }
         // new opcode decoded
         running_opcode = pins.data_bus
+        num_params = 0
+        param = 1
         
         switch running_opcode! {
+        case 0x01:
+            addressing_mode = AddressingMode.Direct
+            num_params = 2
+        case 0x3A:
+            addressing_mode = AddressingMode.Indirect
+            num_params = 2
+            
+        case 0x3E:
+            addressing_mode = AddressingMode.Direct
+            num_params = 1
+            
         case 0x40:
             regs.b = regs.b
         case 0x41:
@@ -548,6 +535,12 @@ class Z80 {
             machine_cycle = MachineCycle.MemoryWrite
             
             return
+        }
+        
+        if num_params > 0 {
+            // read parameter from PC and increment PC
+            pins.address_bus = regs.pc++
+            machine_cycle = MachineCycle.MemoryRead
         }
     }
 }
