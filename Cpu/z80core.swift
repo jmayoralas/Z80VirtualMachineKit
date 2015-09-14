@@ -8,6 +8,24 @@
 
 import Foundation
 
+class Pins {
+    var address_bus: UInt16 = 0
+    var data_bus: UInt8 = 0
+    var busack: Bool = false
+    var busreq: Bool = false
+    var halt: Bool = false
+    var int: Bool = false
+    var iorq: Bool = false
+    var m1: Bool = false
+    var mreq: Bool = false
+    var nmi: Bool = false // positive edge triggered (false -> true)
+    var rd: Bool = false
+    var reset: Bool = false
+    var rfsh: Bool = false
+    var wait: Bool = false
+    var wr: Bool = false
+}
+
 private struct Registers {
     // Main Register Set
     // accumulator
@@ -52,30 +70,8 @@ private struct Registers {
     var pc: UInt16 = 0
 }
 
-class Pins {
-    var address_bus: UInt16 = 0
-    var data_bus: UInt8 = 0
-    var busack: Bool = false
-    var busreq: Bool = false
-    var halt: Bool = false
-    var int: Bool = false
-    var iorq: Bool = false
-    var m1: Bool = false
-    var mreq: Bool = false
-    var nmi: Bool = false // positive edge triggered (false -> true)
-    var rd: Bool = false
-    var reset: Bool = false
-    var rfsh: Bool = false
-    var wait: Bool = false
-    var wr: Bool = false
-}
-
 private enum MachineCycle: Int {
     case OpcodeFetch = 1, MemoryRead, MemoryWrite
-}
-
-private enum AddressingMode {
-    case Direct, Indirect
 }
 
 class Z80 {
@@ -86,16 +82,15 @@ class Z80 {
     private var regs = Registers()
     private var machine_cycle = MachineCycle.OpcodeFetch // Always start in OpcodeFetch mode
     private var t_cycle = 0
+    private var m_cycle = 0
     private var old_busreq: Bool!
     
     private var int_request: Bool = false // interruption requested
     private var int_attended: Bool = false // interruption processed
     private var running_opcode: UInt8? // current running opcode
-    private var num_params: Int = 0 // number of params in multi params opcodes
-    private var params: [UInt8] = [0, 0] // array of posible params in multi params opcodes
-    private var param: Int = 0 // param number in multi params opcodes decode
-    private var addressing_mode = AddressingMode.Direct
     
+    private var buffer: [UInt8]?
+    private var num_bytes = 0
     
     init() {
         old_busreq = pins.busreq
@@ -105,13 +100,31 @@ class Z80 {
             opcodes[n] = opLd
         }
         opcodes[0x00] = op00
+        
         opcodes[0x01] = opLd
+        opcodes[0x02] = opLd
+        opcodes[0x06] = opLd
+        opcodes[0x0A] = opLd
+        opcodes[0x0E] = opLd
+        opcodes[0x11] = opLd
+        opcodes[0x12] = opLd
+        opcodes[0x16] = opLd
+        opcodes[0x1A] = opLd
+        opcodes[0x1E] = opLd
+        opcodes[0x21] = opLd
+        opcodes[0x22] = opLd
+        opcodes[0x26] = opLd
+        opcodes[0x2A] = opLd
+        opcodes[0x2E] = opLd
+        opcodes[0x31] = opLd
+        opcodes[0x32] = opLd
+        opcodes[0x36] = opLd
         opcodes[0x3A] = opLd
         opcodes[0x3E] = opLd
+        opcodes[0xF9] = opLd
+        
         opcodes[0x76] = op76
         
-        regs.h = 0x11
-        regs.l = 0x77
     }
     
     func clk() {
@@ -140,7 +153,7 @@ class Z80 {
             memoryWrite()
         }
     }
-    
+
     private func endMachineCycle() {
         print("address_bus: \(pins.address_bus.hexStr()) - data_bus: \(pins.data_bus.hexStr())")
         
@@ -151,28 +164,25 @@ class Z80 {
             opcodes[Int(pins.data_bus)]()
             
         case .MemoryRead:
-            if num_params > 0 {
-                params[param - 1] = pins.data_bus
-                if param < num_params {
-                    // read next param
-                    param++
-                    pins.address_bus = regs.pc++
-                    break
-                } else if addressing_mode == AddressingMode.Indirect {
-                    num_params = 0
-                    // we have to read memory at params address
-                    pins.address_bus = UInt16(Int(Int(params[1]) * 0x100) + Int(params[0]))
-                    break
-                }
+            buffer!.append(pins.data_bus)
+            num_bytes--
+            if num_bytes > 0 {
+                pins.address_bus++
+                break
             }
-            
             
             // continue execution of current opcode
             if let opcode = running_opcode {
                 opcodes[Int(opcode)]()
             }
-            
         case .MemoryWrite:
+            if buffer!.count > 0 {
+                pins.data_bus = buffer![0]
+                buffer!.removeFirst()
+                pins.address_bus++
+                break
+            }
+            
             // continue execution of current opcode
             if let opcode = running_opcode {
                 opcodes[Int(opcode)]()
@@ -180,6 +190,7 @@ class Z80 {
         }
         
         t_cycle = 0
+        m_cycle++
         pins.busack = pins.busreq // Acknowledge bus requests
         int_request = pins.int // samples INT signal
         int_attended = false
@@ -201,6 +212,7 @@ class Z80 {
             
             // we are in M1 machine cycle
             pins.m1 = true
+            m_cycle = 1
             
         case 2:
             // mreq goes active to wake up the memory
@@ -330,7 +342,9 @@ class Z80 {
         }
     }
     
-    
+    private func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
+        return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
+    }
     
     // Opcodes implementation
     private func op00() { // NOP
@@ -352,12 +366,91 @@ class Z80 {
             // if so get data from data bus and store in corresponding register
             switch opcode {
             case 0x01:
-                regs.b = params[1]
-                regs.c = params[0]
+                regs.b = buffer![1]
+                regs.c = buffer![0]
+            case 0x06:
+                regs.b = buffer![0]
+            case 0x0A:
+                if m_cycle == 3 {
+                    pins.address_bus = addressFromPair(buffer![1], buffer![0])
+                    num_bytes = 1
+                    buffer = []
+                    return
+                }
+                regs.a = pins.data_bus
+            case 0x0E:
+                regs.c = buffer![0]
+            case 0x11:
+                regs.d = buffer![1]
+                regs.e = buffer![0]
+            case 0x16:
+                regs.d = buffer![0]
+            case 0x1A:
+                if m_cycle == 3 {
+                    pins.address_bus = addressFromPair(buffer![1], buffer![0])
+                    num_bytes = 1
+                    buffer = []
+                    return
+                }
+                regs.a = pins.data_bus
+            case 0x1E:
+                regs.e = buffer![0]
+            case 0x21:
+                regs.h = buffer![1]
+                regs.l = buffer![0]
+            case 0x22:
+                if m_cycle == 3 {
+                    pins.address_bus = addressFromPair(buffer![1], buffer![0])
+                    pins.data_bus = regs.l
+                    buffer = [regs.h]
+                    machine_cycle = MachineCycle.MemoryWrite
+                    
+                    return
+                }
+            case 0x26:
+                regs.h = buffer![0]
+            case 0x2A:
+                if m_cycle == 3 {
+                    pins.address_bus = addressFromPair(buffer![1], buffer![0])
+                    num_bytes = 2
+                    buffer = []
+                    return
+                }
+                
+                regs.l = buffer![0]
+                regs.h = buffer![1]
+            case 0x2E:
+                regs.l = buffer![0]
+            case 0x31:
+                regs.sp = addressFromPair(buffer![1], buffer![0])
+            case 0x32:
+                if m_cycle == 3 {
+                    pins.address_bus = addressFromPair(buffer![1], buffer![0])
+                    pins.data_bus = regs.a
+                    buffer = []
+                    machine_cycle = MachineCycle.MemoryWrite
+                    
+                    return
+                }
+            case 0x36:
+                if m_cycle == 2 {
+                    pins.address_bus = addressFromPair(regs.h, regs.l)
+                    pins.data_bus = buffer![0]
+                    buffer = []
+                    machine_cycle = MachineCycle.MemoryWrite
+                    
+                    return
+                }
             case 0x3A:
+                if m_cycle == 3 {
+                    pins.address_bus = addressFromPair(buffer![1], buffer![0])
+                    num_bytes = 1
+                    buffer = []
+                    return
+                }
                 regs.a = pins.data_bus
             case 0x3E:
-                regs.a = params[0]
+                regs.a = buffer![0]
             case 0x46:
                 regs.b = pins.data_bus
             case 0x4E:
@@ -383,21 +476,46 @@ class Z80 {
         }
         // new opcode decoded
         running_opcode = pins.data_bus
-        num_params = 0
-        param = 1
+        num_bytes = 0
+        buffer = []
         
         switch running_opcode! {
         case 0x01:
-            addressing_mode = AddressingMode.Direct
-            num_params = 2
+            num_bytes = 2
+        case 0x02:
+            pins.data_bus = regs.a
+        case 0x06:
+            num_bytes = 1
+        case 0x0E:
+            num_bytes = 1
+        case 0x11:
+            num_bytes = 2
+        case 0x12:
+            pins.data_bus = regs.a
+        case 0x16:
+            num_bytes = 1
+        case 0x1E:
+            num_bytes = 1
+        case 0x21:
+            num_bytes = 2
+        case 0x22:
+            num_bytes = 2
+        case 0x26:
+            num_bytes = 1
+        case 0x2A:
+            num_bytes = 2
+        case 0x2E:
+            num_bytes = 1
+        case 0x31:
+            num_bytes = 2
+        case 0x32:
+            num_bytes = 2
+        case 0x36:
+            num_bytes = 1
         case 0x3A:
-            addressing_mode = AddressingMode.Indirect
-            num_params = 2
-            
+            num_bytes = 2
         case 0x3E:
-            addressing_mode = AddressingMode.Direct
-            num_params = 1
-            
+            num_bytes = 1
         case 0x40:
             regs.b = regs.b
         case 0x41:
@@ -412,7 +530,7 @@ class Z80 {
             regs.b = regs.l
         case 0x47:
             regs.b = regs.a
-            
+
         case 0x48:
             regs.c = regs.b
         case 0x49:
@@ -517,29 +635,54 @@ class Z80 {
             regs.a = regs.l
         case 0x7F:
             regs.a = regs.a
+        case 0xF9:
+            regs.sp = addressFromPair(regs.h, regs.l)
         default:
             // test for opcodes that read from memory pointed to by HL
             let opcodes_rd_hl: [UInt8] = [0x46, 0x4E, 0x56, 0x5E, 0x66, 0x6E, 0x7E]
             if opcodes_rd_hl.contains(running_opcode!) {
-                pins.address_bus = UInt16(Int(Int(regs.h) * 0x100) + Int(regs.l))
+                pins.address_bus = addressFromPair(regs.h, regs.l)
                 machine_cycle = MachineCycle.MemoryRead
-                
-                return
+            } else {
+                switch running_opcode! {
+                case 0x0A:
+                    pins.address_bus = addressFromPair(regs.b, regs.c)
+                    machine_cycle = MachineCycle.MemoryRead
+                case 0x1A:
+                    pins.address_bus = addressFromPair(regs.d, regs.e)
+                    machine_cycle = MachineCycle.MemoryRead
+                default:
+                    break
+                }
             }
         }
         
         // test for opcodes that write to memory pointed to by HL
         let opcodes_wr_hl: [UInt8] = [0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x77]
         if opcodes_wr_hl.contains(running_opcode!) {
-            pins.address_bus = UInt16(Int(Int(regs.h) * 0x100) + Int(regs.l))
+            pins.address_bus = addressFromPair(regs.h, regs.l)
             machine_cycle = MachineCycle.MemoryWrite
             
             return
+        } else {
+            // test for opcodes that write to memory pointed to by several pair of regs
+            switch running_opcode! {
+            case 0x02:
+                pins.address_bus = addressFromPair(regs.b, regs.c)
+                machine_cycle = MachineCycle.MemoryWrite
+            case 0x12:
+                pins.address_bus = addressFromPair(regs.d, regs.e)
+                machine_cycle = MachineCycle.MemoryWrite
+            default:
+                break
+            }
         }
         
-        if num_params > 0 {
+        if num_bytes > 0 {
             // read parameter from PC and increment PC
-            pins.address_bus = regs.pc++
+            pins.address_bus = regs.pc
+            // increment pc by num_bytes
+            regs.pc += UInt16(num_bytes)
             machine_cycle = MachineCycle.MemoryRead
         }
     }
