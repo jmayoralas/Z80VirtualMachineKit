@@ -60,8 +60,10 @@ private struct Registers {
     var r: UInt8 = 0
     
     // Index Registers
-    var ix: UInt16 = 0
-    var iy: UInt16 = 0
+    var ixh: UInt8 = 0
+    var ixl: UInt8 = 0
+    var iyh: UInt8 = 0
+    var iyl: UInt8 = 0
     
     // Stack Pointer
     var sp: UInt16 = 0
@@ -92,6 +94,8 @@ class Z80 {
     private var buffer: [UInt8]?
     private var num_bytes = 0
     
+    private var prefix: UInt8?
+    
     init() {
         old_busreq = pins.busreq
         opcodes = Array<Void -> Void>(count: 0x100, repeatedValue: op00)
@@ -121,6 +125,8 @@ class Z80 {
         opcodes[0x36] = opLd
         opcodes[0x3A] = opLd
         opcodes[0x3E] = opLd
+        opcodes[0xDD] = opPrefix
+        opcodes[0xED] = opPrefix
         opcodes[0xF9] = opLd
         
         opcodes[0x76] = op76
@@ -140,7 +146,7 @@ class Z80 {
         
         t_cycle++
         
-        print("Cpu CLK! \(machine_cycle) - T\(t_cycle)")
+        print("Cpu CLK! \(machine_cycle) - M\(m_cycle) - T\(t_cycle)")
         
         switch machine_cycle {
         case .OpcodeFetch:
@@ -212,7 +218,9 @@ class Z80 {
             
             // we are in M1 machine cycle
             pins.m1 = true
-            m_cycle = 1
+            if prefix == nil {
+                m_cycle = 1
+            }
             
         case 2:
             // mreq goes active to wake up the memory
@@ -342,8 +350,20 @@ class Z80 {
         }
     }
     
+    private func writeToMemoryIX(byte: UInt8) {
+        pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
+        pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
+        pins.data_bus = byte
+        buffer = []
+        machine_cycle = MachineCycle.MemoryWrite
+    }
+    
     private func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
         return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
+    }
+    
+    private func pairFromAddress(address: UInt16) -> (h: UInt8, l: UInt8) {
+        return (UInt8(address / 0x100), UInt8(address % 0x100))
     }
     
     // Opcodes implementation
@@ -360,7 +380,17 @@ class Z80 {
         print("opcode from \(pins.address_bus): \(pins.data_bus)")
     }
     
+    private func opPrefix() {
+        prefix = pins.data_bus
+    }
+    
     private func opLd() {
+        // fix the m_cycle if we are executing prefixed opcodes
+        var my_m_cycle = m_cycle
+        if prefix != nil {
+            my_m_cycle--
+        }
+        
         // Are we already executing an opcode ?
         if let opcode = running_opcode {
             // if so get data from data bus and store in corresponding register
@@ -371,7 +401,7 @@ class Z80 {
             case 0x06:
                 regs.b = buffer![0]
             case 0x0A:
-                if m_cycle == 3 {
+                if my_m_cycle == 3 {
                     pins.address_bus = addressFromPair(buffer![1], buffer![0])
                     num_bytes = 1
                     buffer = []
@@ -386,7 +416,7 @@ class Z80 {
             case 0x16:
                 regs.d = buffer![0]
             case 0x1A:
-                if m_cycle == 3 {
+                if my_m_cycle == 3 {
                     pins.address_bus = addressFromPair(buffer![1], buffer![0])
                     num_bytes = 1
                     buffer = []
@@ -396,35 +426,75 @@ class Z80 {
             case 0x1E:
                 regs.e = buffer![0]
             case 0x21:
-                regs.h = buffer![1]
-                regs.l = buffer![0]
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        regs.ixh = buffer![1]
+                        regs.ixl = buffer![0]
+                    }
+                    
+                    prefix = nil
+                } else {
+                    regs.h = buffer![1]
+                    regs.l = buffer![0]
+                }
             case 0x22:
-                if m_cycle == 3 {
+                if my_m_cycle == 3 {
                     pins.address_bus = addressFromPair(buffer![1], buffer![0])
-                    pins.data_bus = regs.l
-                    buffer = [regs.h]
                     machine_cycle = MachineCycle.MemoryWrite
+                    if let pr = prefix {
+                        if pr == 0xDD {
+                            pins.data_bus = regs.ixl
+                            buffer = [regs.ixh]
+                        }
+                        
+                        prefix = nil
+                    } else {
+                        pins.data_bus = regs.l
+                        buffer = [regs.h]
+                    }
                     
                     return
                 }
             case 0x26:
-                regs.h = buffer![0]
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        regs.ixh = buffer![0]
+                    }
+                    prefix = nil
+                } else {
+                    regs.h = buffer![0]
+                }
             case 0x2A:
-                if m_cycle == 3 {
+                if my_m_cycle == 3 {
                     pins.address_bus = addressFromPair(buffer![1], buffer![0])
                     num_bytes = 2
                     buffer = []
                     return
                 }
                 
-                regs.l = buffer![0]
-                regs.h = buffer![1]
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        regs.ixl = buffer![0]
+                        regs.ixh = buffer![1]
+                    }
+                    prefix = nil
+                } else {
+                    regs.l = buffer![0]
+                    regs.h = buffer![1]
+                }
             case 0x2E:
-                regs.l = buffer![0]
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        regs.ixl = buffer![0]
+                    }
+                    prefix = nil
+                } else {
+                    regs.l = buffer![0]
+                }
             case 0x31:
                 regs.sp = addressFromPair(buffer![1], buffer![0])
             case 0x32:
-                if m_cycle == 3 {
+                if my_m_cycle == 3 {
                     pins.address_bus = addressFromPair(buffer![1], buffer![0])
                     pins.data_bus = regs.a
                     buffer = []
@@ -433,16 +503,28 @@ class Z80 {
                     return
                 }
             case 0x36:
-                if m_cycle == 2 {
-                    pins.address_bus = addressFromPair(regs.h, regs.l)
-                    pins.data_bus = buffer![0]
-                    buffer = []
-                    machine_cycle = MachineCycle.MemoryWrite
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        if my_m_cycle == 3 {
+                            writeToMemoryIX(buffer![1])
+                            
+                            return
+                        }
+                    }
                     
-                    return
+                    prefix = nil
+                } else {
+                    if my_m_cycle == 2 {
+                        pins.address_bus = addressFromPair(regs.h, regs.l)
+                        pins.data_bus = buffer![0]
+                        buffer = []
+                        machine_cycle = MachineCycle.MemoryWrite
+                        
+                        return
+                    }
                 }
             case 0x3A:
-                if m_cycle == 3 {
+                if my_m_cycle == 3 {
                     pins.address_bus = addressFromPair(buffer![1], buffer![0])
                     num_bytes = 1
                     buffer = []
@@ -451,19 +533,196 @@ class Z80 {
                 regs.a = pins.data_bus
             case 0x3E:
                 regs.a = buffer![0]
+            case 0x43:
+                if let pr = prefix {
+                    switch pr {
+                    case 0xED:
+                        pins.address_bus = addressFromPair(buffer![1], buffer![0])
+                        machine_cycle = .MemoryWrite
+                        pins.data_bus = regs.c
+                        buffer = [regs.b]
+                        
+                    default:
+                        break
+                    }
+                    prefix = nil
+                    
+                    return
+                }
             case 0x46:
+                if let pr = prefix {
+                    if pr == 0xDD && my_m_cycle == 2 {
+                        pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
+                        pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
+                        
+                        return
+                    }
+                    
+                    prefix = nil
+                    
+                }
                 regs.b = pins.data_bus
             case 0x4E:
+                if let pr = prefix {
+                    if pr == 0xDD && my_m_cycle == 2 {
+                        pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
+                        pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
+                        
+                        return
+                    }
+                    
+                    prefix = nil
+                    
+                }
                 regs.c = pins.data_bus
             case 0x56:
+                if let pr = prefix {
+                    if pr == 0xDD && my_m_cycle == 2 {
+                        pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
+                        pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
+                        
+                        return
+                    }
+                    
+                    prefix = nil
+                    
+                }
                 regs.d = pins.data_bus
             case 0x5E:
+                if let pr = prefix {
+                    if pr == 0xDD && my_m_cycle == 2 {
+                        pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
+                        pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
+                        
+                        return
+                    }
+                    
+                    prefix = nil
+                    
+                }
                 regs.e = pins.data_bus
             case 0x66:
+                if let pr = prefix {
+                    if pr == 0xDD && my_m_cycle == 2 {
+                        pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
+                        pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
+                        
+                        return
+                    }
+                    
+                    prefix = nil
+                    
+                }
                 regs.h = pins.data_bus
             case 0x6E:
+                if let pr = prefix {
+                    if pr == 0xDD && my_m_cycle == 2 {
+                        pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
+                        pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
+                        
+                        return
+                    }
+                    
+                    prefix = nil
+                    
+                }
                 regs.l = pins.data_bus
+            case 0x70:
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        if my_m_cycle == 2 {
+                            writeToMemoryIX(regs.b)
+                            
+                            return
+                        }
+                    }
+                    
+                    prefix = nil
+                }
+            case 0x71:
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        if my_m_cycle == 2 {
+                            writeToMemoryIX(regs.c)
+                            
+                            return
+                        }
+                    }
+                    
+                    prefix = nil
+                }
+            case 0x72:
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        if my_m_cycle == 2 {
+                            writeToMemoryIX(regs.d)
+                            
+                            return
+                        }
+                    }
+                    
+                    prefix = nil
+                }
+            case 0x73:
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        if my_m_cycle == 2 {
+                            writeToMemoryIX(regs.e)
+                            
+                            return
+                        }
+                    }
+                    
+                    prefix = nil
+                }
+            case 0x74:
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        if my_m_cycle == 2 {
+                            writeToMemoryIX(regs.h)
+                            
+                            return
+                        }
+                    }
+                    
+                    prefix = nil
+                }
+            case 0x75:
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        if my_m_cycle == 2 {
+                            writeToMemoryIX(regs.l)
+                            
+                            return
+                        }
+                    }
+                    
+                    prefix = nil
+                }
+            case 0x77:
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        if my_m_cycle == 2 {
+                            writeToMemoryIX(regs.a)
+                            
+                            return
+                        }
+                    }
+                    
+                    prefix = nil
+                }
             case 0x7E:
+                if let pr = prefix {
+                    if pr == 0xDD && my_m_cycle == 2 {
+                        pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
+                        pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
+                        
+                        return
+                    }
+                    
+                    prefix = nil
+                    
+                }
                 regs.a = pins.data_bus
             default:
                 break
@@ -511,7 +770,14 @@ class Z80 {
         case 0x32:
             num_bytes = 2
         case 0x36:
-            num_bytes = 1
+            if let pr = prefix {
+                if pr == 0xDD {
+                    num_bytes = 2
+                }
+            } else {
+                num_bytes = 1
+            }
+            
         case 0x3A:
             num_bytes = 2
         case 0x3E:
@@ -523,14 +789,43 @@ class Z80 {
         case 0x42:
             regs.b = regs.d
         case 0x43:
-            regs.b = regs.e
+            if let pr = prefix {
+                if pr == 0xED {
+                    num_bytes = 2
+                }
+            } else {
+                regs.b = regs.e
+            }
         case 0x44:
-            regs.b = regs.f
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.b = regs.ixh
+                }
+                
+                prefix = nil
+            } else {
+                regs.b = regs.h
+            }
         case 0x45:
-            regs.b = regs.l
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.b = regs.ixl
+                }
+                
+                prefix = nil
+            } else {
+                regs.b = regs.l
+            }
         case 0x47:
-            regs.b = regs.a
-
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.i = regs.a
+                }
+                
+                prefix = nil
+            } else {
+                regs.b = regs.a
+            }
         case 0x48:
             regs.c = regs.b
         case 0x49:
@@ -540,9 +835,25 @@ class Z80 {
         case 0x4B:
             regs.c = regs.e
         case 0x4C:
-            regs.c = regs.f
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.c = regs.ixh
+                }
+                
+                prefix = nil
+            } else {
+                regs.c = regs.h
+            }
         case 0x4D:
-            regs.c = regs.l
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.c = regs.ixl
+                }
+                
+                prefix = nil
+            } else {
+                regs.c = regs.l
+            }
         case 0x4F:
             regs.c = regs.a
             
@@ -555,9 +866,25 @@ class Z80 {
         case 0x53:
             regs.d = regs.e
         case 0x54:
-            regs.d = regs.f
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.d = regs.ixh
+                }
+                
+                prefix = nil
+            } else {
+                regs.d = regs.h
+            }
         case 0x55:
-            regs.d = regs.l
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.d = regs.ixl
+                }
+                
+                prefix = nil
+            } else {
+                regs.d = regs.l
+            }
         case 0x57:
             regs.d = regs.a
             
@@ -570,41 +897,169 @@ class Z80 {
         case 0x5B:
             regs.e = regs.e
         case 0x5C:
-            regs.e = regs.f
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.e = regs.ixh
+                }
+                
+                prefix = nil
+            } else {
+                regs.e = regs.h
+            }
         case 0x5D:
-            regs.e = regs.l
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.e = regs.ixl
+                }
+                
+                prefix = nil
+            } else {
+                regs.e = regs.l
+            }
         case 0x5F:
             regs.e = regs.a
             
         case 0x60:
-            regs.h = regs.b
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixh = regs.b
+                }
+                
+                prefix = nil
+            } else {
+                regs.h = regs.b
+            }
         case 0x61:
-            regs.h = regs.c
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixh = regs.c
+                }
+                
+                prefix = nil
+            } else {
+                regs.h = regs.c
+            }
         case 0x62:
-            regs.h = regs.d
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixh = regs.d
+                }
+                
+                prefix = nil
+            } else {
+                regs.h = regs.d
+            }
         case 0x63:
-            regs.h = regs.e
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixh = regs.e
+                }
+                
+                prefix = nil
+            } else {
+                regs.h = regs.e
+            }
         case 0x64:
-            regs.h = regs.f
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixh = regs.ixh
+                }
+                
+                prefix = nil
+            } else {
+                regs.h = regs.h
+            }
         case 0x65:
-            regs.h = regs.l
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixh = regs.ixl
+                }
+                
+                prefix = nil
+            } else {
+                regs.h = regs.l
+            }
         case 0x67:
-            regs.h = regs.a
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixh = regs.a
+                }
+                
+                prefix = nil
+            } else {
+                regs.h = regs.a
+            }
             
         case 0x68:
-            regs.l = regs.b
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixl = regs.b
+                }
+                
+                prefix = nil
+            } else {
+                regs.l = regs.b
+            }
         case 0x69:
-            regs.l = regs.c
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixl = regs.c
+                }
+                
+                prefix = nil
+            } else {
+                regs.l = regs.c
+            }
         case 0x6A:
-            regs.l = regs.d
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixl = regs.d
+                }
+                
+                prefix = nil
+            } else {
+                regs.l = regs.d
+            }
         case 0x6B:
-            regs.l = regs.e
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixl = regs.e
+                }
+                
+                prefix = nil
+            } else {
+                regs.l = regs.e
+            }
         case 0x6C:
-            regs.l = regs.f
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixl = regs.ixh
+                }
+                
+                prefix = nil
+            } else {
+                regs.l = regs.h
+            }
         case 0x6D:
-            regs.l = regs.l
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixl = regs.ixl
+                }
+                
+                prefix = nil
+            } else {
+                regs.l = regs.l
+            }
         case 0x6F:
-            regs.l = regs.a
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.ixl = regs.a
+                }
+                
+                prefix = nil
+            } else {
+                regs.l = regs.a
+            }
 
         case 0x70:
             pins.data_bus = regs.b
@@ -615,7 +1070,7 @@ class Z80 {
         case 0x73:
             pins.data_bus = regs.e
         case 0x74:
-            pins.data_bus = regs.f
+            pins.data_bus = regs.h
         case 0x75:
             pins.data_bus = regs.l
         case 0x77:
@@ -630,9 +1085,25 @@ class Z80 {
         case 0x7B:
             regs.a = regs.e
         case 0x7C:
-            regs.a = regs.f
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.a = regs.ixh
+                }
+                
+                prefix = nil
+            } else {
+                regs.a = regs.h
+            }
         case 0x7D:
-            regs.a = regs.l
+            if let pr = prefix {
+                if pr == 0xDD {
+                    regs.a = regs.ixl
+                }
+                
+                prefix = nil
+            } else {
+                regs.a = regs.l
+            }
         case 0x7F:
             regs.a = regs.a
         case 0xF9:
@@ -641,8 +1112,14 @@ class Z80 {
             // test for opcodes that read from memory pointed to by HL
             let opcodes_rd_hl: [UInt8] = [0x46, 0x4E, 0x56, 0x5E, 0x66, 0x6E, 0x7E]
             if opcodes_rd_hl.contains(running_opcode!) {
-                pins.address_bus = addressFromPair(regs.h, regs.l)
-                machine_cycle = MachineCycle.MemoryRead
+                if let pr = prefix {
+                    if pr == 0xDD {
+                        num_bytes = 1
+                    }
+                } else {
+                    pins.address_bus = addressFromPair(regs.h, regs.l)
+                    machine_cycle = MachineCycle.MemoryRead
+                }
             } else {
                 switch running_opcode! {
                 case 0x0A:
@@ -660,10 +1137,17 @@ class Z80 {
         // test for opcodes that write to memory pointed to by HL
         let opcodes_wr_hl: [UInt8] = [0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x77]
         if opcodes_wr_hl.contains(running_opcode!) {
-            pins.address_bus = addressFromPair(regs.h, regs.l)
-            machine_cycle = MachineCycle.MemoryWrite
+            if let pr = prefix {
+                if pr == 0xDD {
+                    num_bytes = 1
+                }
+            } else {
+                pins.address_bus = addressFromPair(regs.h, regs.l)
+                machine_cycle = MachineCycle.MemoryWrite
+                return
+            }
             
-            return
+            
         } else {
             // test for opcodes that write to memory pointed to by several pair of regs
             switch running_opcode! {
