@@ -15,6 +15,10 @@ extension UInt16 {
 }
 
 extension UInt8 {
+    var comp2: Int {
+        return self > 0x7F ? Int(Int(self) - 0xFF - 1) : Int(self)
+    }
+    
     func hexStr() -> String {
         return "0x" + (String(NSString(format:"%02X", self)))
     }
