@@ -22,5 +22,35 @@ extension UInt8 {
     func hexStr() -> String {
         return "0x" + (String(NSString(format:"%02X", self)))
     }
+    
+    var binStr: String {
+        return String(self, radix: 2)
+    }
+    
+    var binArray: Array<String> {
+        var res = [String]()
+        for caracter in self.binStr.characters {
+            res.append(String(caracter))
+        }
+        
+        while res.count < 8 {
+            res.insert("0", atIndex: 0)
+        }
+        
+        return res
+    }
+    
+    var high: UInt8 {
+        return self & 0b11110000
+    }
+    
+    var low: UInt8 {
+        return self & 0b00001111
+    }
 }
 
+extension String {
+    var binaryToDecimal: Int {
+        return Int(strtoul(self, nil, 2))
+    }
+}
