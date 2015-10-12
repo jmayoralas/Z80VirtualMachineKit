@@ -73,7 +73,11 @@ private struct Registers {
 }
 
 private enum MachineCycle: Int {
-    case OpcodeFetch = 1, MemoryRead, MemoryWrite
+    case OpcodeFetch = 1, MemoryRead, MemoryWrite, UlaOperation
+}
+
+private enum UlaOp {
+    case Add, Sub, And, Or, Xor
 }
 
 class Z80 {
@@ -107,23 +111,44 @@ class Z80 {
         
         opcodes[0x01] = opLd
         opcodes[0x02] = opLd
+        opcodes[0x03] = opIncDec
+        opcodes[0x04] = opIncDec
+        opcodes[0x05] = opIncDec
         opcodes[0x06] = opLd
         opcodes[0x0A] = opLd
+        opcodes[0x0B] = opIncDec
+        opcodes[0x0C] = opIncDec
+        opcodes[0x0D] = opIncDec
         opcodes[0x0E] = opLd
         opcodes[0x11] = opLd
         opcodes[0x12] = opLd
+        opcodes[0x13] = opIncDec
+        opcodes[0x14] = opIncDec
+        opcodes[0x15] = opIncDec
         opcodes[0x16] = opLd
         opcodes[0x1A] = opLd
+        opcodes[0x1B] = opIncDec
+        opcodes[0x1C] = opIncDec
+        opcodes[0x1D] = opIncDec
         opcodes[0x1E] = opLd
         opcodes[0x21] = opLd
         opcodes[0x22] = opLd
+        opcodes[0x23] = opIncDec
+        opcodes[0x24] = opIncDec
+        opcodes[0x25] = opIncDec
         opcodes[0x26] = opLd
         opcodes[0x2A] = opLd
+        opcodes[0x2B] = opIncDec
+        opcodes[0x2C] = opIncDec
+        opcodes[0x2D] = opIncDec
         opcodes[0x2E] = opLd
         opcodes[0x31] = opLd
         opcodes[0x32] = opLd
+        opcodes[0x33] = opIncDec
+        opcodes[0x34] = opIncDec
         opcodes[0x36] = opLd
         opcodes[0x3A] = opLd
+        opcodes[0x3B] = opIncDec
         opcodes[0x3E] = opLd
         opcodes[0xDD] = opPrefix
         opcodes[0xED] = opPrefix
@@ -158,11 +183,14 @@ class Z80 {
             
         case .MemoryWrite:
             memoryWrite()
+            
+        case .UlaOperation:
+            endMachineCycle()
         }
     }
 
     private func endMachineCycle() {
-        print("address_bus: \(pins.address_bus.hexStr()) - data_bus: \(pins.data_bus.hexStr())")
+        print("address_bus: \(pins.address_bus.hexStr()) - data_bus: \(pins.data_bus.hexStr()) - flags: \(regs.f.binArray)")
         
         switch machine_cycle {
         case .OpcodeFetch:
@@ -194,13 +222,20 @@ class Z80 {
             if let opcode = running_opcode {
                 opcodes[Int(opcode)]()
             }
+        case .UlaOperation:
+            // continue execution of current opcode
+            if let opcode = running_opcode {
+                opcodes[Int(opcode)]()
+            }
         }
         
-        t_cycle = 0
-        m_cycle++
-        pins.busack = pins.busreq // Acknowledge bus requests
-        int_request = pins.int // samples INT signal
-        int_attended = false
+        if machine_cycle != .UlaOperation {
+            t_cycle = 0
+            m_cycle++
+            pins.busack = pins.busreq // Acknowledge bus requests
+            int_request = pins.int // samples INT signal
+            int_attended = false
+        }
         
         print(regs)
     }
@@ -1596,5 +1631,177 @@ class Z80 {
             regs.pc += UInt16(num_bytes)
             machine_cycle = MachineCycle.MemoryRead
         }
+    }
+    
+    private func opIncDec() {
+        // Are we already executing an opcode ?
+        if let opcode = running_opcode {
+            // if so get data from data bus and store in corresponding register
+            switch opcode {
+            case 0x34:
+                if m_cycle == 2 {
+                    // data is in data bus
+                    pins.data_bus = ulaCall(pins.data_bus, 1, ulaOp: .Add, ignoreCarry: true)
+                    machine_cycle = .MemoryWrite
+                    num_bytes = 1
+                    buffer = []
+                    
+                    return
+                }
+            default:
+                break
+            }
+            
+            // we are done with this opcode, next one please...
+            machine_cycle = MachineCycle.OpcodeFetch
+            
+            return
+            
+        }
+        
+        // new opcode decoded
+        running_opcode = pins.data_bus
+        num_bytes = 0
+        buffer = []
+        machine_cycle = .UlaOperation
+        
+        switch running_opcode! {
+        case 0x03:
+            if t_cycle == 6 {
+                regs.c = regs.c &+ 1
+                regs.b = regs.c == 0 ? regs.b &+ 1 : regs.b
+                machine_cycle = .OpcodeFetch
+            }
+        case 0x04:
+            regs.b = ulaCall(regs.b, 1, ulaOp: .Add, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x05:
+            regs.b = ulaCall(regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x0B:
+            if t_cycle == 6 {
+                regs.c = regs.c &- 1
+                regs.b = regs.c == 0xFF ? regs.b &- 1 : regs.b
+                machine_cycle = .OpcodeFetch
+            }
+        case 0x0C:
+            regs.c = ulaCall(regs.c, 1, ulaOp: .Add, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x0D:
+            regs.c = ulaCall(regs.c, 1, ulaOp: .Sub, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x13:
+            if t_cycle == 6 {
+                regs.e = regs.e &+ 1
+                regs.d = regs.e == 0 ? regs.d &+ 1 : regs.d
+                machine_cycle = .OpcodeFetch
+            }
+        case 0x14:
+            regs.d = ulaCall(regs.d, 1, ulaOp: .Add, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x15:
+            regs.d = ulaCall(regs.d, 1, ulaOp: .Sub, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x1B:
+            if t_cycle == 6 {
+                regs.e = regs.e &- 1
+                regs.d = regs.e == 0xFF ? regs.d &- 1 : regs.d
+                machine_cycle = .OpcodeFetch
+            }
+        case 0x1C:
+            regs.e = ulaCall(regs.e, 1, ulaOp: .Add, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x1D:
+            regs.e = ulaCall(regs.e, 1, ulaOp: .Sub, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x23:
+            if t_cycle == 6 {
+                regs.l = regs.l &+ 1
+                regs.h = regs.l == 0 ? regs.h &+ 1 : regs.h
+                machine_cycle = .OpcodeFetch
+            }
+        case 0x24:
+            regs.h = ulaCall(regs.h, 1, ulaOp: .Add, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x25:
+            regs.h = ulaCall(regs.h, 1, ulaOp: .Sub, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x2B:
+            if t_cycle == 6 {
+                regs.l = regs.l &- 1
+                regs.h = regs.l == 0xFF ? regs.h &- 1 : regs.h
+                machine_cycle = .OpcodeFetch
+            }
+        case 0x2C:
+            regs.l = ulaCall(regs.l, 1, ulaOp: .Add, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x2D:
+            regs.l = ulaCall(regs.l, 1, ulaOp: .Sub, ignoreCarry: true)
+            machine_cycle = .OpcodeFetch
+        case 0x33:
+            if t_cycle == 6 {
+                regs.sp = regs.sp &+ 1
+                machine_cycle = .OpcodeFetch
+            }
+        case 0x34:
+            // get data pointed to by hl from memory
+            pins.address_bus = addressFromPair(regs.h, regs.l)
+            machine_cycle = .MemoryRead
+        case 0x3B:
+            if t_cycle == 6 {
+                regs.sp = regs.sp &- 1
+                machine_cycle = .OpcodeFetch
+            }
+        default:
+            break
+        }
+        
+        if num_bytes > 0 {
+            // read parameter from PC and increment PC
+            pins.address_bus = regs.pc
+            // increment pc by num_bytes
+            regs.pc += UInt16(num_bytes)
+            machine_cycle = .MemoryRead
+        }
+    }
+    
+    private func ulaCall(operandA: UInt8, _ operandB: UInt8, ulaOp: UlaOp, ignoreCarry: Bool) -> UInt8 {
+        /*
+        Bit      0 1 2 3 4  5  6 7
+        ￼￼Position S Z X H X P/V N C
+        */
+        var flags = regs.f.binArray
+        var result: UInt8?
+        
+        switch ulaOp {
+        case .Add:
+            result = operandA &+ operandB
+            flags[3] = result!.low < operandA.low ? "1" : "0"   // H (Half Carry)
+            flags[5] = result! > 0x7F ? "1" : "0"               // P/V (Overflow)
+            flags[6] = "0"                                      // N (Add)
+            if !ignoreCarry {
+                flags[7] = result! < operandA ? "1" : "0"       // C (Carry)
+            }
+            
+        case .Sub:
+            result = operandA &- operandB
+            flags[3] = result!.low > operandA.low ? "1" : "0"   // H (Half Carry)
+            flags[5] = result! < 0x80 ? "1" : "0"               // P/V (Overflow)
+            flags[6] = "1"                                      // N (Substract)
+            if !ignoreCarry {
+                flags[7] = result! > operandA ? "1" : "0"       // C (Carry)
+            }
+            
+            
+        default:
+            break
+        }
+        
+        flags[0] = (result! > 0x7F) ?  "1" : "0"                // S (Sign)
+        flags[1] = (result! == 0) ?  "1" : "0"                  // Z (Zero)
+        
+        regs.f = UInt8(flags.joinWithSeparator("").binaryToDecimal)
+        
+        return result!
     }
 }
