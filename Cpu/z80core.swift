@@ -1638,6 +1638,46 @@ class Z80 {
         if let opcode = running_opcode {
             // if so get data from data bus and store in corresponding register
             switch opcode {
+            case 0x03:
+                if t_cycle != 6 { return }
+                regs.c = regs.c &+ 1
+                regs.b = regs.c == 0 ? regs.b &+ 1 : regs.b
+            case 0x0B:
+                if t_cycle != 6 { return }
+                regs.c = regs.c &- 1
+                regs.b = regs.c == 0xFF ? regs.b &- 1 : regs.b
+            case 0x13:
+                if t_cycle != 6 { return }
+                regs.e = regs.e &+ 1
+                regs.d = regs.e == 0 ? regs.d &+ 1 : regs.d
+            case 0x1B:
+                if t_cycle != 6 { return }
+                regs.e = regs.e &- 1
+                regs.d = regs.e == 0xFF ? regs.d &- 1 : regs.d
+            case 0x23:
+                if t_cycle != 6 { return }
+                if let pr = prefix {
+                    switch pr {
+                    case 0xDD:
+                        regs.ixl = regs.ixl &+ 1
+                        regs.ixh = regs.ixl == 0 ? regs.ixh &+ 1 : regs.ixh
+                    case 0xFD:
+                        regs.iyl = regs.iyl &+ 1
+                        regs.iyh = regs.iyl == 0 ? regs.iyh &+ 1 : regs.iyh
+                    default:
+                        break
+                    }
+                } else {
+                    regs.l = regs.l &+ 1
+                    regs.h = regs.l == 0 ? regs.h &+ 1 : regs.h
+                }
+            case 0x2B:
+                if t_cycle != 6 { return }
+                regs.l = regs.l &- 1
+                regs.h = regs.l == 0xFF ? regs.h &- 1 : regs.h
+            case 0x33:
+                if t_cycle != 6 { return }
+                regs.sp = regs.sp &+ 1
             case 0x34:
                 if m_cycle == 2 {
                     // data is in data bus
@@ -1648,6 +1688,9 @@ class Z80 {
                     
                     return
                 }
+            case 0x3B:
+                if t_cycle != 6 { return }
+                regs.sp = regs.sp &- 1
             default:
                 break
             }
@@ -1666,92 +1709,68 @@ class Z80 {
         machine_cycle = .UlaOperation
         
         switch running_opcode! {
-        case 0x03:
-            if t_cycle == 6 {
-                regs.c = regs.c &+ 1
-                regs.b = regs.c == 0 ? regs.b &+ 1 : regs.b
-                machine_cycle = .OpcodeFetch
-            }
         case 0x04:
             regs.b = ulaCall(regs.b, 1, ulaOp: .Add, ignoreCarry: true)
             machine_cycle = .OpcodeFetch
         case 0x05:
             regs.b = ulaCall(regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
             machine_cycle = .OpcodeFetch
-        case 0x0B:
-            if t_cycle == 6 {
-                regs.c = regs.c &- 1
-                regs.b = regs.c == 0xFF ? regs.b &- 1 : regs.b
-                machine_cycle = .OpcodeFetch
-            }
         case 0x0C:
             regs.c = ulaCall(regs.c, 1, ulaOp: .Add, ignoreCarry: true)
             machine_cycle = .OpcodeFetch
         case 0x0D:
             regs.c = ulaCall(regs.c, 1, ulaOp: .Sub, ignoreCarry: true)
             machine_cycle = .OpcodeFetch
-        case 0x13:
-            if t_cycle == 6 {
-                regs.e = regs.e &+ 1
-                regs.d = regs.e == 0 ? regs.d &+ 1 : regs.d
-                machine_cycle = .OpcodeFetch
-            }
         case 0x14:
             regs.d = ulaCall(regs.d, 1, ulaOp: .Add, ignoreCarry: true)
             machine_cycle = .OpcodeFetch
         case 0x15:
             regs.d = ulaCall(regs.d, 1, ulaOp: .Sub, ignoreCarry: true)
             machine_cycle = .OpcodeFetch
-        case 0x1B:
-            if t_cycle == 6 {
-                regs.e = regs.e &- 1
-                regs.d = regs.e == 0xFF ? regs.d &- 1 : regs.d
-                machine_cycle = .OpcodeFetch
-            }
         case 0x1C:
             regs.e = ulaCall(regs.e, 1, ulaOp: .Add, ignoreCarry: true)
             machine_cycle = .OpcodeFetch
         case 0x1D:
             regs.e = ulaCall(regs.e, 1, ulaOp: .Sub, ignoreCarry: true)
             machine_cycle = .OpcodeFetch
-        case 0x23:
-            if t_cycle == 6 {
-                regs.l = regs.l &+ 1
-                regs.h = regs.l == 0 ? regs.h &+ 1 : regs.h
-                machine_cycle = .OpcodeFetch
-            }
         case 0x24:
-            regs.h = ulaCall(regs.h, 1, ulaOp: .Add, ignoreCarry: true)
+            if let pr = prefix {
+                switch pr {
+                case 0xDD:
+                    regs.ixh = ulaCall(regs.ixh, 1, ulaOp: .Add, ignoreCarry: true)
+                case 0xFD:
+                    regs.iyh = ulaCall(regs.iyh, 1, ulaOp: .Add, ignoreCarry: true)
+                default:
+                    break
+                }
+            } else {
+                regs.h = ulaCall(regs.h, 1, ulaOp: .Add, ignoreCarry: true)
+            }
             machine_cycle = .OpcodeFetch
         case 0x25:
-            regs.h = ulaCall(regs.h, 1, ulaOp: .Sub, ignoreCarry: true)
-            machine_cycle = .OpcodeFetch
-        case 0x2B:
-            if t_cycle == 6 {
-                regs.l = regs.l &- 1
-                regs.h = regs.l == 0xFF ? regs.h &- 1 : regs.h
-                machine_cycle = .OpcodeFetch
+            if let pr = prefix {
+                switch pr {
+                case 0xDD:
+                    regs.ixh = ulaCall(regs.ixh, 1, ulaOp: .Sub, ignoreCarry: true)
+                case 0xFD:
+                    regs.iyh = ulaCall(regs.iyh, 1, ulaOp: .Sub, ignoreCarry: true)
+                default:
+                    break
+                }
+            } else {
+                regs.h = ulaCall(regs.h, 1, ulaOp: .Sub, ignoreCarry: true)
             }
+            machine_cycle = .OpcodeFetch
         case 0x2C:
             regs.l = ulaCall(regs.l, 1, ulaOp: .Add, ignoreCarry: true)
             machine_cycle = .OpcodeFetch
         case 0x2D:
             regs.l = ulaCall(regs.l, 1, ulaOp: .Sub, ignoreCarry: true)
             machine_cycle = .OpcodeFetch
-        case 0x33:
-            if t_cycle == 6 {
-                regs.sp = regs.sp &+ 1
-                machine_cycle = .OpcodeFetch
-            }
         case 0x34:
             // get data pointed to by hl from memory
             pins.address_bus = addressFromPair(regs.h, regs.l)
             machine_cycle = .MemoryRead
-        case 0x3B:
-            if t_cycle == 6 {
-                regs.sp = regs.sp &- 1
-                machine_cycle = .OpcodeFetch
-            }
         default:
             break
         }
