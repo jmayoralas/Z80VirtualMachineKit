@@ -1696,7 +1696,7 @@ class Z80 {
             }
             
             // we are done with this opcode, next one please...
-            machine_cycle = MachineCycle.OpcodeFetch
+            machine_cycle = .OpcodeFetch
             
             return
             
@@ -1762,10 +1762,32 @@ class Z80 {
             }
             machine_cycle = .OpcodeFetch
         case 0x2C:
-            regs.l = ulaCall(regs.l, 1, ulaOp: .Add, ignoreCarry: true)
+            if let pr = prefix {
+                switch pr {
+                case 0xDD:
+                    regs.ixl = ulaCall(regs.ixl, 1, ulaOp: .Sub, ignoreCarry: true)
+                case 0xFD:
+                    regs.iyl = ulaCall(regs.iyl, 1, ulaOp: .Sub, ignoreCarry: true)
+                default:
+                    break
+                }
+            } else {
+                regs.l = ulaCall(regs.l, 1, ulaOp: .Add, ignoreCarry: true)
+            }
             machine_cycle = .OpcodeFetch
         case 0x2D:
-            regs.l = ulaCall(regs.l, 1, ulaOp: .Sub, ignoreCarry: true)
+            if let pr = prefix {
+                switch pr {
+                case 0xDD:
+                    regs.ixl = ulaCall(regs.ixl, 1, ulaOp: .Sub, ignoreCarry: true)
+                case 0xFD:
+                    regs.iyl = ulaCall(regs.iyl, 1, ulaOp: .Sub, ignoreCarry: true)
+                default:
+                    break
+                }
+            } else {
+                regs.l = ulaCall(regs.l, 1, ulaOp: .Sub, ignoreCarry: true)
+            }
             machine_cycle = .OpcodeFetch
         case 0x34:
             // get data pointed to by hl from memory
