@@ -89,7 +89,7 @@ class Z80 {
     let pins = Pins()
     var program_end: Bool = false
     
-    private var opcodes: Array<Void -> Bool>!
+    private var opcodes: Array<Void -> Void>!
     private var regs = Registers()
     private var machine_cycle = MachineCycle.OpcodeFetch // Always start in OpcodeFetch mode
     private var t_cycle = 0
@@ -194,7 +194,7 @@ class Z80 {
             buffer = []
         }
         
-        let eox = opcodes[Int(running_opcode!)]()
+        opcodes[Int(running_opcode!)]()
         
         // if we are in OpcodeFetch state and have to read bytes from memory
         // must be for parameters read
@@ -401,951 +401,9 @@ class Z80 {
         print("opcode from \(pins.address_bus): \(pins.data_bus)")
     }
     
-    private func opPrefix() -> Bool {
-        prefix = pins.data_bus
-        
-        return true
-    }
-    
     private func fixMCycle() -> Int {
         // fix the m_cycle if we are executing prefixed opcodes
         return prefix != nil ? m_cycle - 1 : m_cycle
-    }
-    
-    private func opLd() -> Bool {
-        let my_m_cycle = fixMCycle()
-        
-        // Are we already executing an opcode ?
-        if let opcode = running_opcode {
-            // if so get data from data bus and store in corresponding register
-            switch opcode {
-            case 0x46:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            return false
-                        case 0xFD:
-                            pins.address_bus = addressFromPair(regs.iyh, regs.iyl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    
-                    prefix = nil
-                }
-                regs.b = pins.data_bus
-            case 0x4B:
-                if my_m_cycle == 3 {
-                    pins.address_bus = addressFromPair(buffer![1], buffer![0])
-                    num_bytes = 2
-                    buffer = []
-                    return false
-                }
-                
-                if let pr = prefix {
-                    if pr == 0xED {
-                        regs.c = buffer![0]
-                        regs.b = buffer![1]
-                    }
-                    prefix = nil
-                }
-            case 0x4E:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        case 0xFD:
-                            pins.address_bus = addressFromPair(regs.iyh, regs.iyl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    
-                    prefix = nil
-                    
-                }
-                regs.c = pins.data_bus
-            case 0x53:
-                if let pr = prefix {
-                    switch pr {
-                    case 0xED:
-                        pins.address_bus = addressFromPair(buffer![1], buffer![0])
-                        machine_cycle = .MemoryWrite
-                        pins.data_bus = regs.e
-                        buffer = [regs.d]
-                        
-                    default:
-                        break
-                    }
-                    prefix = nil
-                    
-                    return false
-                }
-            case 0x56:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        case 0xFD:
-                            pins.address_bus = addressFromPair(regs.iyh, regs.iyl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    
-                    prefix = nil
-                    
-                }
-                regs.d = pins.data_bus
-            case 0x5B:
-                if my_m_cycle == 3 {
-                    pins.address_bus = addressFromPair(buffer![1], buffer![0])
-                    num_bytes = 2
-                    buffer = []
-                    return false
-                }
-                
-                if let pr = prefix {
-                    if pr == 0xED {
-                        regs.e = buffer![0]
-                        regs.d = buffer![1]
-                    }
-                    prefix = nil
-                }
-            case 0x5E:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        case 0xFD:
-                            pins.address_bus = addressFromPair(regs.iyh, regs.iyl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    prefix = nil
-                    
-                }
-                regs.e = pins.data_bus
-            case 0x63:
-                if let pr = prefix {
-                    switch pr {
-                    case 0xED:
-                        pins.address_bus = addressFromPair(buffer![1], buffer![0])
-                        machine_cycle = .MemoryWrite
-                        pins.data_bus = regs.l
-                        buffer = [regs.h]
-                        
-                    default:
-                        break
-                    }
-                    prefix = nil
-                    
-                    return false
-                }
-
-            case 0x66:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        case 0xFD:
-                            pins.address_bus = addressFromPair(regs.iyh, regs.iyl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    
-                    prefix = nil
-                    
-                }
-                regs.h = pins.data_bus
-            case 0x6B:
-                if my_m_cycle == 3 {
-                    pins.address_bus = addressFromPair(buffer![1], buffer![0])
-                    num_bytes = 2
-                    buffer = []
-                    return false
-                }
-                
-                if let pr = prefix {
-                    if pr == 0xED {
-                        regs.l = buffer![0]
-                        regs.h = buffer![1]
-                    }
-                    prefix = nil
-                }
-
-            case 0x6E:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        case 0xFD:
-                            pins.address_bus = addressFromPair(regs.iyh, regs.iyl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    
-                    prefix = nil
-                    
-                }
-                regs.l = pins.data_bus
-            case 0x70:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            writeToMemoryIX(regs.b)
-                            return false
-                        case 0xFD:
-                            writeToMemoryIY(regs.b)
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    
-                    prefix = nil
-                }
-            case 0x71:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            writeToMemoryIX(regs.c)
-                            return false
-                        case 0xFD:
-                            writeToMemoryIY(regs.c)
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    
-                    prefix = nil
-                }
-            case 0x72:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            writeToMemoryIX(regs.d)
-                            return false
-                        case 0xFD:
-                            writeToMemoryIY(regs.d)
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    
-                    prefix = nil
-                }
-            case 0x73:
-                if let pr = prefix {
-                    switch pr {
-                    case 0xDD:
-                        if my_m_cycle == 2 {
-                            writeToMemoryIX(regs.e)
-                            
-                            return false
-                        }
-                    case 0xFD:
-                        if my_m_cycle == 2 {
-                            writeToMemoryIY(regs.e)
-                            
-                            return false
-                        }
-                    case 0xED:
-                        if my_m_cycle == 3 {
-                            pins.address_bus = addressFromPair(buffer![1], buffer![0])
-                            machine_cycle = .MemoryWrite
-                            pins.data_bus = pairFromAddress(regs.sp).l
-                            buffer = [pairFromAddress(regs.sp).h]
-                            
-                            return false
-                        }
-                    default:
-                        break
-                    }
-                    
-                    prefix = nil
-                }
-            case 0x74:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            writeToMemoryIX(regs.h)
-                            return false
-                        case 0xFD:
-                            writeToMemoryIY(regs.h)
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    
-                    prefix = nil
-                }
-            case 0x75:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            writeToMemoryIX(regs.l)
-                            return false
-                        case 0xFD:
-                            writeToMemoryIY(regs.l)
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    
-                    prefix = nil
-                }
-            case 0x77:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            writeToMemoryIX(regs.a)
-                            return false
-                        case 0xFD:
-                            writeToMemoryIY(regs.a)
-                            return false
-                        default:
-                            break
-                        }
-                    }
-                    
-                    prefix = nil
-                }
-            case 0x7B:
-                if my_m_cycle == 3 {
-                    pins.address_bus = addressFromPair(buffer![1], buffer![0])
-                    num_bytes = 2
-                    buffer = []
-                    return false
-                }
-                
-                if let pr = prefix {
-                    if pr == 0xED {
-                        regs.sp = addressFromPair(buffer![1], buffer![0])
-                    }
-                    prefix = nil
-                }
-            case 0x7E:
-                if let pr = prefix {
-                    if my_m_cycle == 2 {
-                        switch pr {
-                        case 0xDD:
-                            pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        case 0xFD:
-                            pins.address_bus = addressFromPair(regs.iyh, regs.iyl)
-                            pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
-                            
-                            return false
-                        default:
-                            break
-                        }
-                        
-                    }
-                    
-                    prefix = nil
-                    
-                }
-                regs.a = pins.data_bus
-            default:
-                break
-            }
-            
-            // we are done with this opcode, next one please...
-            machine_cycle = MachineCycle.OpcodeFetch
-            
-            return true
-        }
-        // new opcode decoded
-        running_opcode = pins.data_bus
-        num_bytes = 0
-        buffer = []
-        
-        switch running_opcode! {
-        case 0x44:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.b = regs.ixh
-                case 0xFD:
-                    regs.b = regs.iyh
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.b = regs.h
-            }
-        case 0x45:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.b = regs.ixl
-                case 0xFD:
-                    regs.b = regs.iyl
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.b = regs.l
-            }
-        case 0x47:
-            if let pr = prefix {
-                if pr == 0xDD {
-                    regs.i = regs.a
-                }
-                
-                prefix = nil
-            } else {
-                regs.b = regs.a
-            }
-        case 0x48:
-            regs.c = regs.b
-        case 0x49:
-            regs.c = regs.c
-        case 0x4A:
-            regs.c = regs.d
-        case 0x4B:
-            if let pr = prefix {
-                if pr == 0xED {
-                    num_bytes = 2
-                }
-            } else {
-                regs.c = regs.e
-            }
-        case 0x4C:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.c = regs.ixh
-                case 0xFD:
-                    regs.c = regs.iyh
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.c = regs.h
-            }
-        case 0x4D:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.c = regs.ixl
-                case 0xFD:
-                    regs.c = regs.iyl
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.c = regs.l
-            }
-        case 0x4F:
-            if let pr = prefix {
-                if pr == 0xDD {
-                    regs.r = regs.a
-                }
-                
-                prefix = nil
-            } else {
-                regs.c = regs.a
-            }
-        case 0x50:
-            regs.d = regs.b
-        case 0x51:
-            regs.d = regs.c
-        case 0x52:
-            regs.d = regs.d
-        case 0x53:
-            if let pr = prefix {
-                if pr == 0xED {
-                    num_bytes = 2
-                }
-            } else {
-                regs.d = regs.e
-            }
-        case 0x54:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.d = regs.ixh
-                case 0xFD:
-                    regs.d = regs.iyh
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.d = regs.h
-            }
-        case 0x55:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.d = regs.ixl
-                case 0xFD:
-                    regs.d = regs.iyl
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.d = regs.l
-            }
-        case 0x57:
-            if let pr = prefix {
-                if pr == 0xED {
-                    regs.a = regs.i
-                }
-                
-                prefix = nil
-            } else {
-                regs.d = regs.a
-            }
-        case 0x58:
-            regs.e = regs.b
-        case 0x59:
-            regs.e = regs.c
-        case 0x5A:
-            regs.e = regs.d
-        case 0x5B:
-            if let pr = prefix {
-                if pr == 0xED {
-                    num_bytes = 2
-                }
-            } else {
-                regs.e = regs.e
-            }
-        case 0x5C:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.e = regs.ixh
-                case 0xFD:
-                    regs.e = regs.iyh
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.e = regs.h
-            }
-        case 0x5D:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.e = regs.ixl
-                case 0xFD:
-                    regs.e = regs.iyl
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.e = regs.l
-            }
-        case 0x5F:
-            if let pr = prefix {
-                if pr == 0xED {
-                    regs.a = regs.r
-                }
-                
-                prefix = nil
-            } else {
-                regs.e = regs.a
-            }
-        case 0x60:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixh = regs.b
-                case 0xFD:
-                    regs.iyh = regs.b
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.h = regs.b
-            }
-        case 0x61:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixh = regs.c
-                case 0xFD:
-                    regs.iyh = regs.c
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.h = regs.c
-            }
-        case 0x62:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixh = regs.d
-                case 0xFD:
-                    regs.iyh = regs.d
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.h = regs.d
-            }
-        case 0x63:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixh = regs.e
-                    prefix = nil
-                case 0xFD:
-                    regs.iyh = regs.e
-                    prefix = nil
-                case 0xED:
-                    num_bytes = 2
-                default:
-                    prefix = nil
-                }
-            } else {
-                regs.h = regs.e
-            }
-        case 0x64:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixh = regs.ixh
-                case 0xFD:
-                    regs.iyh = regs.iyh
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.h = regs.h
-            }
-        case 0x65:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixh = regs.ixl
-                case 0xFD:
-                    regs.iyh = regs.iyl
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.h = regs.l
-            }
-        case 0x67:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixh = regs.a
-                case 0xFD:
-                    regs.iyh = regs.a
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.h = regs.a
-            }
-            
-        case 0x68:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixl = regs.b
-                case 0xFD:
-                    regs.iyl = regs.b
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.l = regs.b
-            }
-        case 0x69:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixl = regs.c
-                case 0xFD:
-                    regs.iyl = regs.c
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.l = regs.c
-            }
-        case 0x6A:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixl = regs.d
-                case 0xFD:
-                    regs.iyl = regs.d
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.l = regs.d
-            }
-        case 0x6B:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixl = regs.e
-                    prefix = nil
-                case 0xFD:
-                    regs.iyl = regs.e
-                    prefix = nil
-                case 0xED:
-                    num_bytes = 2
-                default:
-                    prefix = nil
-                }
-            } else {
-                regs.l = regs.e
-            }
-        case 0x6C:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixl = regs.ixh
-                case 0xFD:
-                    regs.iyl = regs.iyh
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.l = regs.h
-            }
-        case 0x6D:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixl = regs.ixl
-                case 0xFD:
-                    regs.iyl = regs.iyl
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.l = regs.l
-            }
-        case 0x6F:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.ixl = regs.a
-                case 0xFD:
-                    regs.iyl = regs.a
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.l = regs.a
-            }
-
-        case 0x70:
-            pins.data_bus = regs.b
-        case 0x71:
-            pins.data_bus = regs.c
-        case 0x72:
-            pins.data_bus = regs.d
-        case 0x73:
-            if let pr = prefix {
-                if pr == 0xED {
-                    num_bytes = 2
-                }
-            } else {
-                pins.data_bus = regs.e
-            }
-        case 0x74:
-            pins.data_bus = regs.h
-        case 0x75:
-            pins.data_bus = regs.l
-        case 0x77:
-            pins.data_bus = regs.a
-            
-        case 0x78:
-            regs.a = regs.b
-        case 0x79:
-            regs.a = regs.c
-        case 0x7A:
-            regs.a = regs.d
-        case 0x7B:
-            if let pr = prefix {
-                if pr == 0xED {
-                    num_bytes = 2
-                }
-            } else {
-                regs.a = regs.e
-            }
-        case 0x7C:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.a = regs.ixh
-                case 0xFD:
-                    regs.a = regs.iyh
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.a = regs.h
-            }
-        case 0x7D:
-            if let pr = prefix {
-                switch pr {
-                case 0xDD:
-                    regs.a = regs.ixl
-                case 0xFD:
-                    regs.a = regs.iyl
-                default:
-                    break
-                }
-                
-                prefix = nil
-            } else {
-                regs.a = regs.l
-            }
-        case 0x7F:
-            regs.a = regs.a
-        case 0xF9:
-            regs.sp = addressFromPair(regs.h, regs.l)
-        default:
-            // test for opcodes that read from memory pointed to by HL
-            let opcodes_rd_hl: [UInt8] = [0x46, 0x4E, 0x56, 0x5E, 0x66, 0x6E, 0x7E]
-            if opcodes_rd_hl.contains(running_opcode!) {
-                if let pr = prefix {
-                    if pr == 0xDD || pr == 0xFD {
-                        num_bytes = 1
-                    }
-                } else {
-                    pins.address_bus = addressFromPair(regs.h, regs.l)
-                    machine_cycle = MachineCycle.MemoryRead
-                }
-            }
-        }
-        
-        // test for opcodes that write to memory pointed to by HL
-        let opcodes_wr_hl: [UInt8] = [0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x77]
-        if opcodes_wr_hl.contains(running_opcode!) {
-            if let pr = prefix {
-                if pr == 0xDD || pr == 0xFD {
-                    num_bytes = 1
-                }
-            } else {
-                pins.address_bus = addressFromPair(regs.h, regs.l)
-                machine_cycle = MachineCycle.MemoryWrite
-                return false
-            }
-            
-            
-        }
-        
-        if num_bytes > 0 {
-            // read parameter from PC and increment PC
-            pins.address_bus = regs.pc
-            // increment pc by num_bytes
-            regs.pc += UInt16(num_bytes)
-            machine_cycle = MachineCycle.MemoryRead
-            
-            return false
-        }
-        
-        return true
     }
     
     private func ulaCall(operandA: UInt8, _ operandB: UInt8, ulaOp: UlaOp, ignoreCarry: Bool) -> UInt8 {
@@ -1389,11 +447,11 @@ class Z80 {
     }
     
     private func initOpcodeTable() {
-        opcodes = Array<Void -> Bool>(count: 0x100, repeatedValue: { return true })
+        opcodes = Array<Void -> Void>(count: 0x100, repeatedValue: {})
         
         opcodes[0x00] = { // NOP
             print("NOP")
-            return true
+            
         }
         opcodes[0x01] = {
             switch self.fixMCycle() {
@@ -1405,7 +463,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x02] = {
             if self.fixMCycle() == 1 {
@@ -1414,7 +472,7 @@ class Z80 {
                 self.machine_cycle = .MemoryWrite
                 self.num_bytes = 1
             }
-            return true
+            
         }
         opcodes[0x03] = {
             self.machine_cycle = .UlaOperation
@@ -1423,15 +481,15 @@ class Z80 {
                 self.regs.b = self.regs.c == 0 ? self.regs.b &+ 1 : self.regs.b
                 self.machine_cycle = .OpcodeFetch
             }
-            return true
+            
         }
         opcodes[0x04] = {
             self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Add, ignoreCarry: true)
-            return true
+            
         }
         opcodes[0x05] = {
             self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
-            return true
+            
         }
         opcodes[0x06] = {
             switch self.fixMCycle() {
@@ -1442,7 +500,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x0A] = {
             switch self.fixMCycle() {
@@ -1456,7 +514,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x0B] = {
             self.machine_cycle = .UlaOperation
@@ -1465,15 +523,15 @@ class Z80 {
                 self.regs.b = self.regs.c == 0xFF ? self.regs.b &- 1 : self.regs.b
                 self.machine_cycle = .OpcodeFetch
             }
-            return true
+            
         }
         opcodes[0x0C] = {
             self.regs.c = self.ulaCall(self.regs.c, 1, ulaOp: .Add, ignoreCarry: true)
-            return true
+            
         }
         opcodes[0x0D] = {
             self.regs.c = self.ulaCall(self.regs.c, 1, ulaOp: .Sub, ignoreCarry: true)
-            return true
+            
         }
         opcodes[0x0E] = {
             switch self.fixMCycle() {
@@ -1484,7 +542,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x11] = {
             switch self.fixMCycle() {
@@ -1496,7 +554,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x12] = {
             if self.fixMCycle() == 1 {
@@ -1505,7 +563,7 @@ class Z80 {
                 self.machine_cycle = .MemoryWrite
                 self.num_bytes = 1
             }
-            return true
+            
         }
         opcodes[0x13] = {
             self.machine_cycle = .UlaOperation
@@ -1514,15 +572,15 @@ class Z80 {
                 self.regs.d = self.regs.e == 0 ? self.regs.d &+ 1 : self.regs.d
                 self.machine_cycle = .OpcodeFetch
             }
-            return true
+            
         }
         opcodes[0x14] = {
             self.regs.d = self.ulaCall(self.regs.d, 1, ulaOp: .Add, ignoreCarry: true)
-            return true
+            
         }
         opcodes[0x15] = {
             self.regs.d = self.ulaCall(self.regs.d, 1, ulaOp: .Sub, ignoreCarry: true)
-            return true
+            
         }
         opcodes[0x16] = {
             switch self.fixMCycle() {
@@ -1533,7 +591,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x1A] = {
             switch self.fixMCycle() {
@@ -1547,7 +605,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x1B] = {
             self.machine_cycle = .UlaOperation
@@ -1556,15 +614,15 @@ class Z80 {
                 self.regs.d = self.regs.e == 0xFF ? self.regs.d &- 1 : self.regs.d
                 self.machine_cycle = .OpcodeFetch
             }
-            return true
+            
         }
         opcodes[0x1C] = {
             self.regs.e = self.ulaCall(self.regs.e, 1, ulaOp: .Add, ignoreCarry: true)
-            return true
+            
         }
         opcodes[0x1D] = {
             self.regs.e = self.ulaCall(self.regs.e, 1, ulaOp: .Sub, ignoreCarry: true)
-            return true
+            
         }
         opcodes[0x1E] = {
             switch self.fixMCycle() {
@@ -1575,7 +633,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x21] = {
             switch self.fixMCycle() {
@@ -1601,7 +659,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x22] = {
             switch self.fixMCycle() {
@@ -1630,7 +688,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x23] = {
             self.machine_cycle = .UlaOperation
@@ -1652,7 +710,7 @@ class Z80 {
                 }
                 self.machine_cycle = .OpcodeFetch
             }
-            return true
+            
         }
         opcodes[0x24] = {
             if let pr = self.prefix {
@@ -1668,7 +726,7 @@ class Z80 {
             } else {
                 self.regs.h = self.ulaCall(self.regs.h, 1, ulaOp: .Add, ignoreCarry: true)
             }
-            return true
+            
         }
         opcodes[0x25] = {
             if let pr = self.prefix {
@@ -1684,13 +742,12 @@ class Z80 {
             } else {
                 self.regs.h = self.ulaCall(self.regs.h, 1, ulaOp: .Sub, ignoreCarry: true)
             }
-            return true
+            
         }
         opcodes[0x26] = {
             switch self.fixMCycle() {
             case 1:
                 self.num_bytes = 1
-                return false
             case 2:
                 if let pr = self.prefix {
                     switch pr {
@@ -1708,18 +765,16 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x2A] = {
             switch self.fixMCycle() {
             case 1:
                 self.num_bytes = 2
-                return false
             case 3:
                 self.pins.address_bus = self.addressFromPair(self.buffer![1], self.buffer![0])
                 self.num_bytes = 2
                 self.buffer = []
-                return false
             case 5:
                 if let pr = self.prefix {
                     switch pr {
@@ -1738,9 +793,9 @@ class Z80 {
                     self.regs.h = self.buffer![1]
                 }
             default:
-                return false
+                break
             }
-            return true
+            
         }
         opcodes[0x2B] = {
             self.machine_cycle = .UlaOperation
@@ -1749,7 +804,7 @@ class Z80 {
                 self.regs.h = self.regs.l == 0xFF ? self.regs.h &- 1 : self.regs.h
                 self.machine_cycle = .OpcodeFetch
             }
-            return true
+            
         }
         opcodes[0x2C] = {
             if let pr = self.prefix {
@@ -1764,7 +819,7 @@ class Z80 {
             } else {
                 self.regs.l = self.ulaCall(self.regs.l, 1, ulaOp: .Add, ignoreCarry: true)
             }
-            return true
+            
         }
         opcodes[0x2D] = {
             if let pr = self.prefix {
@@ -1779,13 +834,12 @@ class Z80 {
             } else {
                 self.regs.l = self.ulaCall(self.regs.l, 1, ulaOp: .Sub, ignoreCarry: true)
             }
-            return true
+            
         }
         opcodes[0x2E] = {
             switch self.fixMCycle() {
             case 1:
                 self.num_bytes = 1
-                return false
             case 2:
                 if let pr = self.prefix {
                     switch pr {
@@ -1803,7 +857,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x31] = {
             switch self.fixMCycle() {
@@ -1814,7 +868,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x32] = {
             switch self.fixMCycle() {
@@ -1829,7 +883,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x33] = {
             self.machine_cycle = .UlaOperation
@@ -1837,7 +891,7 @@ class Z80 {
                 self.regs.sp = self.regs.sp &+ 1
                 self.machine_cycle = .OpcodeFetch
             }
-            return true
+            
         }
         opcodes[0x34] = {
             switch self.fixMCycle() {
@@ -1854,7 +908,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x36] = {
             switch self.fixMCycle() {
@@ -1889,7 +943,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x3A] = {
             switch self.fixMCycle() {
@@ -1905,7 +959,7 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x3B] = {
             self.machine_cycle = .UlaOperation
@@ -1913,31 +967,30 @@ class Z80 {
                 self.regs.sp = self.regs.sp &- 1
                 self.machine_cycle = .OpcodeFetch
             }
-            return true
+            
         }
         opcodes[0x3E] = {
             switch self.fixMCycle() {
             case 1:
                 self.num_bytes = 1
-                return false
             case 2:
                 self.regs.a = self.buffer![0]
             default:
                 break
             }
-            return true
+            
         }
         opcodes[0x40] = {
             self.regs.b = self.regs.b
-            return true
+            
         }
         opcodes[0x41] = {
             self.regs.b = self.regs.c
-            return true
+            
         }
         opcodes[0x42] = {
             self.regs.b = self.regs.d
-            return true
+            
         }
         opcodes[0x43] = {
             switch self.fixMCycle() {
@@ -1967,78 +1020,1101 @@ class Z80 {
             default:
                 break
             }
-            return true
+            
         }
-        opcodes[0x44] = opLd
-        opcodes[0x45] = opLd
-        opcodes[0x46] = opLd
-        opcodes[0x47] = opLd
-        opcodes[0x48] = opLd
-        opcodes[0x49] = opLd
-        opcodes[0x4A] = opLd
-        opcodes[0x4B] = opLd
-        opcodes[0x4C] = opLd
-        opcodes[0x4D] = opLd
-        opcodes[0x4E] = opLd
-        opcodes[0x4F] = opLd
-        opcodes[0x50] = opLd
-        opcodes[0x51] = opLd
-        opcodes[0x52] = opLd
-        opcodes[0x53] = opLd
-        opcodes[0x54] = opLd
-        opcodes[0x55] = opLd
-        opcodes[0x56] = opLd
-        opcodes[0x57] = opLd
-        opcodes[0x58] = opLd
-        opcodes[0x59] = opLd
-        opcodes[0x5A] = opLd
-        opcodes[0x5B] = opLd
-        opcodes[0x5C] = opLd
-        opcodes[0x5D] = opLd
-        opcodes[0x5E] = opLd
-        opcodes[0x5F] = opLd
-        opcodes[0x60] = opLd
-        opcodes[0x61] = opLd
-        opcodes[0x62] = opLd
-        opcodes[0x63] = opLd
-        opcodes[0x64] = opLd
-        opcodes[0x65] = opLd
-        opcodes[0x66] = opLd
-        opcodes[0x67] = opLd
-        opcodes[0x68] = opLd
-        opcodes[0x69] = opLd
-        opcodes[0x6A] = opLd
-        opcodes[0x6B] = opLd
-        opcodes[0x6C] = opLd
-        opcodes[0x6D] = opLd
-        opcodes[0x6E] = opLd
-        opcodes[0x6F] = opLd
-        opcodes[0x70] = opLd
-        opcodes[0x71] = opLd
-        opcodes[0x72] = opLd
-        opcodes[0x73] = opLd
-        opcodes[0x74] = opLd
-        opcodes[0x75] = opLd
+        opcodes[0x44] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.b = self.regs.ixh
+                case 0xFD:
+                    self.regs.b = self.regs.iyh
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.b = self.regs.h
+            }
+            
+        }
+        opcodes[0x45] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.b = self.regs.ixl
+                case 0xFD:
+                    self.regs.b = self.regs.iyl
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.b = self.regs.l
+            }
+            
+        }
+        opcodes[0x46] = {
+            switch self.fixMCycle() {
+            case 1:
+                self.num_bytes = 1
+                if self.prefix == nil {
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryRead
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    case 0xFD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.iyh, self.regs.iyl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    default:
+                        break
+                    }
+                    self.num_bytes = 1
+                } else {
+                    self.regs.b = self.buffer![0]
+                }
+            case 3:
+                self.regs.b = self.pins.data_bus
+                self.prefix = nil
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x47] = {
+            if let pr = self.prefix {
+                if pr == 0xED {
+                    self.regs.i = self.regs.a
+                }
+                self.prefix = nil
+            } else {
+                self.regs.b = self.regs.a
+            }
+            
+        }
+        opcodes[0x48] = {
+            self.regs.c = self.regs.b
+            
+        }
+        opcodes[0x49] = {
+            self.regs.c = self.regs.c
+            
+        }
+        opcodes[0x4A] = {
+            self.regs.c = self.regs.d
+            
+        }
+        opcodes[0x4B] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.num_bytes = 2
+                    }
+                } else {
+                    self.regs.c = self.regs.e
+                }
+            case 3:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.pins.address_bus = self.addressFromPair(self.buffer![1], self.buffer![0])
+                        self.num_bytes = 2
+                        self.buffer = []
+                        self.machine_cycle = .MemoryRead
+                    }
+                }
+            case 5:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.regs.c = self.buffer![0]
+                        self.regs.b = self.buffer![1]
+                    }
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x4C] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.c = self.regs.ixh
+                case 0xFD:
+                    self.regs.c = self.regs.iyh
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.c = self.regs.h
+            }
+            
+        }
+        opcodes[0x4D] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.c = self.regs.ixl
+                case 0xFD:
+                    self.regs.c = self.regs.iyl
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.c = self.regs.l
+            }
+            
+        }
+        opcodes[0x4E] = {
+            switch self.fixMCycle() {
+            case 1:
+                self.num_bytes = 1
+                if self.prefix == nil {
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryRead
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    case 0xFD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.iyh, self.regs.iyl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    default:
+                        break
+                    }
+                    self.num_bytes = 1
+                } else {
+                    self.regs.c = self.buffer![0]
+                }
+            case 3:
+                self.regs.c = self.pins.data_bus
+                self.prefix = nil
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x4F] = {
+            if let pr = self.prefix {
+                if pr == 0xED {
+                    self.regs.r = self.regs.a
+                }
+                self.prefix = nil
+            } else {
+                self.regs.c = self.regs.a
+            }
+            
+        }
+        opcodes[0x50] = {
+            self.regs.d = self.regs.b
+            
+        }
+        opcodes[0x51] = {
+            self.regs.d = self.regs.c
+            
+        }
+        opcodes[0x52] = {
+            self.regs.d = self.regs.d
+            
+        }
+        opcodes[0x53] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.num_bytes = 2
+                    }
+                } else {
+                    self.regs.d = self.regs.e
+                }
+            case 3:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xED:
+                        self.pins.address_bus = self.addressFromPair(self.buffer![1], self.buffer![0])
+                        self.machine_cycle = .MemoryWrite
+                        self.num_bytes = 2
+                        self.pins.data_bus = self.regs.e
+                        self.buffer = [self.regs.d]
+                        
+                    default:
+                        break
+                    }
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x54] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.d = self.regs.ixh
+                case 0xFD:
+                    self.regs.d = self.regs.iyh
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.d = self.regs.h
+            }
+            
+        }
+        opcodes[0x55] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.d = self.regs.ixl
+                case 0xFD:
+                    self.regs.d = self.regs.iyl
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.d = self.regs.l
+            }
+            
+        }
+        opcodes[0x56] = {
+            switch self.fixMCycle() {
+            case 1:
+                self.num_bytes = 1
+                if self.prefix == nil {
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryRead
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    case 0xFD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.iyh, self.regs.iyl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    default:
+                        break
+                    }
+                    self.num_bytes = 1
+                } else {
+                    self.regs.d = self.buffer![0]
+                }
+            case 3:
+                self.regs.d = self.pins.data_bus
+                self.prefix = nil
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x57] = {
+            if let pr = self.prefix {
+                if pr == 0xED {
+                    self.regs.a = self.regs.i
+                }
+                self.prefix = nil
+            } else {
+                self.regs.d = self.regs.a
+            }
+            
+        }
+        opcodes[0x58] = {
+            self.regs.e = self.regs.b
+            
+        }
+        opcodes[0x59] = {
+            self.regs.e = self.regs.c
+            
+        }
+        opcodes[0x5A] = {
+            self.regs.e = self.regs.d
+            
+        }
+        opcodes[0x5B] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.num_bytes = 2
+                    }
+                } else {
+                    self.regs.e = self.regs.e
+                }
+            case 3:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.pins.address_bus = self.addressFromPair(self.buffer![1], self.buffer![0])
+                        self.num_bytes = 2
+                        self.buffer = []
+                        self.machine_cycle = .MemoryRead
+                    }
+                }
+            case 5:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.regs.e = self.buffer![0]
+                        self.regs.d = self.buffer![1]
+                    }
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x5C] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.e = self.regs.ixh
+                case 0xFD:
+                    self.regs.e = self.regs.iyh
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.e = self.regs.h
+            }
+            
+        }
+        opcodes[0x5D] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.e = self.regs.ixl
+                case 0xFD:
+                    self.regs.e = self.regs.iyl
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.e = self.regs.l
+            }
+            
+        }
+        opcodes[0x5E] = {
+            switch self.fixMCycle() {
+            case 1:
+                self.num_bytes = 1
+                if self.prefix == nil {
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryRead
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    case 0xFD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.iyh, self.regs.iyl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    default:
+                        break
+                    }
+                    self.num_bytes = 1
+                } else {
+                    self.regs.e = self.buffer![0]
+                }
+            case 3:
+                self.regs.e = self.pins.data_bus
+                self.prefix = nil
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x5F] = {
+            if let pr = self.prefix {
+                if pr == 0xED {
+                    self.regs.a = self.regs.r
+                }
+                self.prefix = nil
+            } else {
+                self.regs.e = self.regs.a
+            }
+            
+        }
+        opcodes[0x60] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixh = self.regs.b
+                case 0xFD:
+                    self.regs.iyh = self.regs.b
+                default:
+                    break
+                }
+            } else {
+                self.regs.h = self.regs.b
+            }
+            
+        }
+        opcodes[0x61] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixh = self.regs.c
+                case 0xFD:
+                    self.regs.iyh = self.regs.c
+                default:
+                    break
+                }
+            } else {
+                self.regs.h = self.regs.c
+            }
+            
+        }
+        opcodes[0x62] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixh = self.regs.d
+                case 0xFD:
+                    self.regs.iyh = self.regs.d
+                default:
+                    break
+                }
+            } else {
+                self.regs.h = self.regs.d
+            }
+            
+        }
+        opcodes[0x63] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.num_bytes = 2
+                    }
+                } else {
+                    self.regs.h = self.regs.e
+                }
+            case 3:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xED:
+                        self.pins.address_bus = self.addressFromPair(self.buffer![1], self.buffer![0])
+                        self.machine_cycle = .MemoryWrite
+                        self.num_bytes = 2
+                        self.pins.data_bus = self.regs.l
+                        self.buffer = [self.regs.h]
+                        
+                    default:
+                        break
+                    }
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x64] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixh = self.regs.ixh
+                case 0xFD:
+                    self.regs.ixh = self.regs.iyh
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.h = self.regs.h
+            }
+            
+        }
+        opcodes[0x65] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixh = self.regs.ixl
+                case 0xFD:
+                    self.regs.ixh = self.regs.iyl
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.h = self.regs.l
+            }
+            
+        }
+        opcodes[0x66] = {
+            switch self.fixMCycle() {
+            case 1:
+                self.num_bytes = 1
+                if self.prefix == nil {
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryRead
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    case 0xFD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.iyh, self.regs.iyl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    default:
+                        break
+                    }
+                    self.num_bytes = 1
+                } else {
+                    self.regs.h = self.buffer![0]
+                }
+            case 3:
+                self.regs.h = self.pins.data_bus
+                self.prefix = nil
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x67] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixh = self.regs.a
+                case 0xFD:
+                    self.regs.iyh = self.regs.a
+                // case 0xED:
+                    // RRD
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.h = self.regs.a
+            }
+            
+        }
+        opcodes[0x68] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixl = self.regs.b
+                case 0xFD:
+                    self.regs.iyl = self.regs.b
+                default:
+                    break
+                }
+            } else {
+                self.regs.l = self.regs.b
+            }
+            
+        }
+        opcodes[0x69] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixl = self.regs.c
+                case 0xFD:
+                    self.regs.iyl = self.regs.c
+                default:
+                    break
+                }
+            } else {
+                self.regs.l = self.regs.c
+            }
+            
+        }
+        opcodes[0x6A] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixl = self.regs.d
+                case 0xFD:
+                    self.regs.iyl = self.regs.d
+                default:
+                    break
+                }
+            } else {
+                self.regs.l = self.regs.d
+            }
+            
+        }
+        opcodes[0x6B] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.num_bytes = 2
+                    }
+                } else {
+                    self.regs.l = self.regs.e
+                }
+            case 3:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.pins.address_bus = self.addressFromPair(self.buffer![1], self.buffer![0])
+                        self.num_bytes = 2
+                        self.buffer = []
+                        self.machine_cycle = .MemoryRead
+                    }
+                }
+            case 5:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.regs.l = self.buffer![0]
+                        self.regs.h = self.buffer![1]
+                    }
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x6C] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixl = self.regs.ixh
+                case 0xFD:
+                    self.regs.ixl = self.regs.iyh
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.l = self.regs.h
+            }
+            
+        }
+        opcodes[0x6D] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixl = self.regs.ixl
+                case 0xFD:
+                    self.regs.ixl = self.regs.iyl
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.l = self.regs.l
+            }
+            
+        }
+        opcodes[0x6E] = {
+            switch self.fixMCycle() {
+            case 1:
+                self.num_bytes = 1
+                if self.prefix == nil {
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryRead
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    case 0xFD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.iyh, self.regs.iyl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    default:
+                        break
+                    }
+                    self.num_bytes = 1
+                } else {
+                    self.regs.l = self.buffer![0]
+                }
+            case 3:
+                self.regs.l = self.pins.data_bus
+                self.prefix = nil
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x6F] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.ixl = self.regs.a
+                case 0xFD:
+                    self.regs.iyl = self.regs.a
+                    // case 0xED:
+                    // RLD
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.l = self.regs.a
+            }
+            
+        }
+        opcodes[0x70] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xDD || pr == 0xFD {
+                        self.num_bytes = 1
+                    }
+                } else {
+                    self.pins.data_bus = self.regs.b
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryWrite
+                    self.num_bytes = 1
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.writeToMemoryIX(self.regs.b)
+                    case 0xFD:
+                        self.writeToMemoryIY(self.regs.b)
+                    default:
+                        break
+                    }
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x71] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xDD || pr == 0xFD {
+                        self.num_bytes = 1
+                    }
+                } else {
+                    self.pins.data_bus = self.regs.c
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryWrite
+                    self.num_bytes = 1
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.writeToMemoryIX(self.regs.c)
+                    case 0xFD:
+                        self.writeToMemoryIY(self.regs.c)
+                    default:
+                        break
+                    }
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x72] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xDD || pr == 0xFD {
+                        self.num_bytes = 1
+                    }
+                } else {
+                    self.pins.data_bus = self.regs.d
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryWrite
+                    self.num_bytes = 1
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.writeToMemoryIX(self.regs.d)
+                    case 0xFD:
+                        self.writeToMemoryIY(self.regs.d)
+                    default:
+                        break
+                    }
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x73] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.num_bytes = 1
+                    case 0xFD:
+                        self.num_bytes = 1
+                    case 0xED:
+                        self.num_bytes = 2
+                    default:
+                        break
+                    }
+                } else {
+                    self.pins.data_bus = self.regs.e
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryWrite
+                    self.num_bytes = 1
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.writeToMemoryIX(self.regs.e)
+                        self.prefix = nil
+                    case 0xFD:
+                        self.writeToMemoryIY(self.regs.e)
+                        self.prefix = nil
+                    default:
+                        break
+                    }
+                }
+            case 3:
+                if self.prefix! == 0xED {
+                    self.pins.address_bus = self.addressFromPair(self.buffer![1], self.buffer![0])
+                    self.num_bytes = 2
+                    let sp = self.pairFromAddress(self.regs.sp)
+                    self.pins.data_bus = sp.l
+                    self.buffer = [sp.h]
+                    self.machine_cycle = .MemoryWrite
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x74] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xDD || pr == 0xFD {
+                        self.num_bytes = 1
+                    }
+                } else {
+                    self.pins.data_bus = self.regs.h
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryWrite
+                    self.num_bytes = 1
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.writeToMemoryIX(self.regs.h)
+                    case 0xFD:
+                        self.writeToMemoryIY(self.regs.h)
+                    default:
+                        break
+                    }
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x75] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xDD || pr == 0xFD {
+                        self.num_bytes = 1
+                    }
+                } else {
+                    self.pins.data_bus = self.regs.l
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryWrite
+                    self.num_bytes = 1
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.writeToMemoryIX(self.regs.l)
+                    case 0xFD:
+                        self.writeToMemoryIY(self.regs.l)
+                    default:
+                        break
+                    }
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
         opcodes[0x76] = {
             print("HALT !!")
             self.program_end = true
-            return true
+            
         }
-        opcodes[0x77] = opLd
-        opcodes[0x78] = opLd
-        opcodes[0x79] = opLd
-        opcodes[0x7A] = opLd
-        opcodes[0x7B] = opLd
-        opcodes[0x7C] = opLd
-        opcodes[0x7D] = opLd
-        opcodes[0x7E] = opLd
-        opcodes[0x7F] = opLd
-        opcodes[0xDD] = opPrefix
-        opcodes[0xED] = opPrefix
-        opcodes[0xFD] = opPrefix
+        opcodes[0x77] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xDD || pr == 0xFD {
+                        self.num_bytes = 1
+                    }
+                } else {
+                    self.pins.data_bus = self.regs.a
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryWrite
+                    self.num_bytes = 1
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.writeToMemoryIX(self.regs.a)
+                    case 0xFD:
+                        self.writeToMemoryIY(self.regs.a)
+                    default:
+                        break
+                    }
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x78] = {
+            self.regs.a = self.regs.b
+            
+        }
+        opcodes[0x79] = {
+            self.regs.a = self.regs.c
+            
+        }
+        opcodes[0x7A] = {
+            self.regs.a = self.regs.d
+            
+        }
+        opcodes[0x7B] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    if pr == 0xED {
+                        self.num_bytes = 2
+                    }
+                } else {
+                    self.regs.a = self.regs.e
+                }
+            case 3:
+                if self.prefix! == 0xED {
+                    self.pins.address_bus = self.addressFromPair(self.buffer![1], self.buffer![0])
+                    self.num_bytes = 2
+                    self.buffer = []
+                    self.machine_cycle = .MemoryRead
+                }
+            case 5:
+                if self.prefix! == 0xED {
+                    self.regs.sp = self.addressFromPair(self.buffer![1], self.buffer![0])
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+            
+            
+        }
+        opcodes[0x7C] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.a = self.regs.ixh
+                case 0xFD:
+                    self.regs.a = self.regs.iyh
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.a = self.regs.h
+            }
+            
+        }
+        opcodes[0x7D] = {
+            if let pr = self.prefix {
+                switch pr {
+                case 0xDD:
+                    self.regs.a = self.regs.ixl
+                case 0xFD:
+                    self.regs.a = self.regs.iyl
+                default:
+                    break
+                }
+                self.prefix = nil
+            } else {
+                self.regs.a = self.regs.l
+            }
+            
+        }
+        opcodes[0x7E] = {
+            switch self.fixMCycle() {
+            case 1:
+                self.num_bytes = 1
+                if self.prefix == nil {
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryRead
+                }
+            case 2:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    case 0xFD:
+                        self.pins.address_bus = self.addressFromPair(self.regs.iyh, self.regs.iyl)
+                        self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.buffer![0].comp2))
+                    default:
+                        break
+                    }
+                    self.num_bytes = 1
+                } else {
+                    self.regs.a = self.buffer![0]
+                }
+            case 3:
+                self.regs.a = self.pins.data_bus
+                self.prefix = nil
+            default:
+                break
+            }
+            
+        }
+        opcodes[0x7F] = {
+            self.regs.a = self.regs.a
+            
+        }
+        opcodes[0xDD] = { self.prefix = self.pins.data_bus }
+        opcodes[0xED] = { self.prefix = self.pins.data_bus }
+        opcodes[0xFD] = { self.prefix = self.pins.data_bus }
         opcodes[0xF9] = {
             self.regs.sp = self.addressFromPair(self.regs.h, self.regs.l)
-            return true
+            
         }
     }
 }
