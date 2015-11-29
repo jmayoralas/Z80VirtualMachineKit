@@ -73,11 +73,11 @@ private struct Registers {
 }
 
 private enum MachineCycle: Int {
-    case OpcodeFetch = 1, MemoryRead, MemoryWrite, UlaOperation
+    case OpcodeFetch = 1, MemoryRead, MemoryWrite, UlaOperation, TimeWait
 }
 
 private enum UlaOp {
-    case Add, Sub, And, Or, Xor
+    case Add, Adc, Sub, Sbc, And, Or, Xor, Rlc, Rrc, Rl, Rr, Sla, Sra, Sll, Srl
 }
 
 public enum Z80Error : ErrorType {
@@ -102,8 +102,18 @@ class Z80 {
     
     private var buffer: [UInt8]?
     private var num_bytes = 0
-    
+    private var offset_cb: UInt8?
     private var prefix: UInt8?
+    private var m_cycles_to_wait: [Int] = []
+    private var invalid_opcode = false
+    
+    
+    let S = 0
+    let Z = 1
+    let H = 3
+    let PV = 5
+    let N = 6
+    let C = 7
     
     init() {
         old_busreq = pins.busreq
@@ -123,8 +133,6 @@ class Z80 {
         
         t_cycle++
         
-        print("Cpu CLK! \(machine_cycle) - M\(m_cycle) - T\(t_cycle)")
-        
         switch machine_cycle {
         case .OpcodeFetch:
             opcodeFetch()
@@ -137,11 +145,20 @@ class Z80 {
             
         case .UlaOperation:
             endMachineCycle()
+            
+        case .TimeWait:
+            endMachineCycle()
         }
     }
 
     private func endMachineCycle() {
-        print("address_bus: \(pins.address_bus.hexStr()) - data_bus: \(pins.data_bus.hexStr()) - flags: \(regs.f.binArray)")
+        print("  A: \(regs.a.hexStr()) \(regs.a.binStr) -   F: \(regs.f.hexStr()) \(regs.f.binStr) - SP: \(regs.sp.hexStr())")
+        print("  B: \(regs.b.hexStr()) \(regs.b.binStr) -   C: \(regs.c.hexStr()) \(regs.c.binStr)")
+        print("  D: \(regs.d.hexStr()) \(regs.d.binStr) -   E: \(regs.e.hexStr()) \(regs.e.binStr)")
+        print("  H: \(regs.h.hexStr()) \(regs.h.binStr) -   L: \(regs.l.hexStr()) \(regs.l.binStr)")
+        print("IXH: \(regs.ixh.hexStr()) \(regs.ixh.binStr) - IXL: \(regs.ixl.hexStr()) \(regs.ixl.binStr)")
+        print("IYH: \(regs.iyh.hexStr()) \(regs.iyh.binStr) - IYL: \(regs.iyl.hexStr()) \(regs.iyl.binStr)")
+        print("address_bus: \(pins.address_bus.hexStr()) - data_bus: \(pins.data_bus.hexStr()) \(pins.data_bus.binStr) - PC: \(regs.pc.hexStr()) - M: \(m_cycle) - T: \(t_cycle) - \(machine_cycle)")
         
         switch machine_cycle {
         case .OpcodeFetch:
@@ -168,22 +185,45 @@ class Z80 {
             
         case .UlaOperation:
             break
+            
+        case .TimeWait:
+            if m_cycles_to_wait.count > 0 {
+                m_cycles_to_wait[0]--
+                if m_cycles_to_wait[0] == 0 {
+                    m_cycles_to_wait.removeFirst()
+                    if m_cycles_to_wait.count > 0 {
+                        m_cycle++
+                        t_cycle = 0
+                    }
+                }
+                if m_cycles_to_wait.count > 0 {
+                    return
+                }
+            }
         }
         
-        // continue execution of current opcode if no further access to memory needed or ula operation in progress
+        // continue execution of current opcode if no further access to memory needed or there is a ula operation in progress
         if ((fixMCycle() > 1) && (num_bytes == 0)) || machine_cycle == .UlaOperation {
             processOpcode()
         }
         
         if machine_cycle != .UlaOperation {
-            t_cycle = 0
-            m_cycle++
+            if invalid_opcode {
+                t_cycle = 0
+                print("(!!)")
+                self.prefix = nil
+                m_cycle = 0
+                invalid_opcode = false
+            } else {
+                if machine_cycle != .TimeWait || (machine_cycle == .TimeWait && m_cycles_to_wait.count > 0) {
+                    t_cycle = 0
+                    m_cycle++
+                }
+            }
             pins.busack = pins.busreq // Acknowledge bus requests
             int_request = pins.int // samples INT signal
             int_attended = false
         }
-        
-        print(regs)
     }
 
     private func processOpcode() {
@@ -191,7 +231,10 @@ class Z80 {
             // new opcode decoded
             running_opcode = pins.data_bus
             num_bytes = 0
-            buffer = []
+            // if we are executing a CB DD or CB FD sequence we have to keep the buffer untouched
+            if (prefix == nil) || (prefix != nil && prefix! != 0xDC && prefix! != 0xFC) {
+                buffer = []
+            }
         }
         
         opcodes[Int(running_opcode!)]()
@@ -205,7 +248,7 @@ class Z80 {
             regs.pc += UInt16(num_bytes)
             machine_cycle = .MemoryRead
         } else {
-            if num_bytes == 0 && machine_cycle != .UlaOperation {
+            if num_bytes == 0 && machine_cycle != .UlaOperation && machine_cycle != .TimeWait {
                 self.machine_cycle = .OpcodeFetch
             }
         }
@@ -379,6 +422,14 @@ class Z80 {
         machine_cycle = .MemoryWrite
         num_bytes = 1
     }
+    
+    private func readFromMemoryIX() {
+        pins.address_bus = addressFromPair(regs.ixh, regs.ixl)
+        pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
+        buffer = []
+        machine_cycle = .MemoryRead
+        num_bytes = 1
+    }
 
     private func writeToMemoryIY(byte: UInt8) {
         pins.address_bus = addressFromPair(regs.iyh, regs.iyl)
@@ -388,22 +439,55 @@ class Z80 {
         machine_cycle = .MemoryWrite
         num_bytes = 1
     }
+    
+    private func readFromMemoryIY() {
+        pins.address_bus = addressFromPair(regs.iyh, regs.iyl)
+        pins.address_bus = UInt16(Int16(pins.address_bus) + Int16(buffer![0].comp2))
+        buffer = []
+        machine_cycle = .MemoryRead
+        num_bytes = 1
+    }
 
     private func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
         return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
     }
-    
-    private func pairFromAddress(address: UInt16) -> (h: UInt8, l: UInt8) {
-        return (UInt8(address / 0x100), UInt8(address % 0x100))
-    }
-    
-    private func op3F() {
-        print("opcode from \(pins.address_bus): \(pins.data_bus)")
-    }
-    
+
     private func fixMCycle() -> Int {
         // fix the m_cycle if we are executing prefixed opcodes
-        return prefix != nil ? m_cycle - 1 : m_cycle
+        var m = m_cycle
+        if let pr = prefix {
+            m -= 1
+            if pr == 0xDC || pr == 0xFC {
+                m -= 3
+            }
+        }
+        
+        return m
+    }
+    
+    private func ulaCall16(operandA: UInt16, _ operandB: UInt16, ulaOp: UlaOp) -> UInt16 {
+        let f_old = regs.f
+        
+        let result_l = ulaCall(operandA.low, operandB.low, ulaOp: ulaOp, ignoreCarry: false)
+        
+        var ulaOp_high = ulaOp
+        
+        switch ulaOp {
+        case .Add: ulaOp_high = .Adc
+        case .Sub: ulaOp_high = .Sbc
+        default: break
+        }
+        
+        let result_h = ulaCall(operandA.high, operandB.high, ulaOp: ulaOp_high, ignoreCarry: false)
+        // bits S, Z and PV are not affected so restore from F backup
+        self.regs.f.bit(S, newVal: f_old.bit(S))
+        self.regs.f.bit(Z, newVal: f_old.bit(Z))
+        self.regs.f.bit(PV, newVal: f_old.bit(PV))
+        // N is reset
+        self.regs.f.resetBit(N)
+        
+        
+        return addressFromPair(result_h, result_l)
     }
     
     private func ulaCall(operandA: UInt8, _ operandB: UInt8, ulaOp: UlaOp, ignoreCarry: Bool) -> UInt8 {
@@ -411,37 +495,88 @@ class Z80 {
         Bit      0 1 2 3 4  5  6 7
         ￼￼Position S Z X H X P/V N C
         */
-        var flags = regs.f.binArray
+        
         var result: UInt8?
+        var old_carry: UInt8 = 0
         
         switch ulaOp {
+        case .Adc:
+            old_carry = UInt8(regs.f.bit(C))
+            fallthrough
         case .Add:
-            result = operandA &+ operandB
-            flags[3] = result!.low < operandA.low ? "1" : "0"   // H (Half Carry)
-            flags[5] = result! > 0x7F ? "1" : "0"               // P/V (Overflow)
-            flags[6] = "0"                                      // N (Add)
-            if !ignoreCarry {
-                flags[7] = result! < operandA ? "1" : "0"       // C (Carry)
+            regs.f.resetBit(N) // N (Add)
+            
+            result = operandA &+ operandB &+ old_carry
+
+            if result!.low < operandA.low {regs.f.setBit(H)} else {regs.f.resetBit(H)} // H (Half Carry)
+            
+            if result! > 0x7F { // P/V (Overflow) y S (Sign)
+                regs.f.setBit(PV)
+                regs.f.setBit(S)
+            } else {
+                regs.f.resetBit(PV)
+                regs.f.resetBit(S)
             }
             
+            if !ignoreCarry {
+                if result! < operandA {regs.f.setBit(C)} else {regs.f.resetBit(C)} // C (Carry)
+            }
+            
+            if result! == 0 {regs.f.setBit(Z)} else {regs.f.resetBit(Z)} // Z (Zero)
+
+        case .Sbc:
+            old_carry = UInt8(regs.f.bit(C))
+            fallthrough
         case .Sub:
-            result = operandA &- operandB
-            flags[3] = result!.low > operandA.low ? "1" : "0"   // H (Half Carry)
-            flags[5] = result! < 0x80 ? "1" : "0"               // P/V (Overflow)
-            flags[6] = "1"                                      // N (Substract)
+            regs.f.setBit(N) // N (Substract)
+            
+            result = operandA &- operandB &- old_carry
+            if result!.low > operandA.low {regs.f.setBit(H)} else {regs.f.resetBit(H)} // H (Half Carry)
+            if result! < 0x80 { // P/V (Overflow) y S (Sign)
+                regs.f.setBit(PV)
+                regs.f.setBit(S)
+            } else {
+                regs.f.resetBit(PV)
+                regs.f.resetBit(S)
+            }
             if !ignoreCarry {
-                flags[7] = result! > operandA ? "1" : "0"       // C (Carry)
+                if result! > operandA {regs.f.setBit(C)} else {regs.f.resetBit(C)} // C (Carry)
+            }
+            if result! == 0 {regs.f.setBit(Z)} else {regs.f.resetBit(Z)} // Z (Zero)
+        
+        case .Rl:
+            old_carry = UInt8(regs.f.bit(C))
+            fallthrough
+        case .Rlc:
+            regs.f.bit(C, newVal: operandA.bit(7)) // sign bit is copied to the carry flag
+            result = operandA << 1
+            if ulaOp == .Rl {
+                result!.bit(0, newVal: Int(old_carry)) // old carry is copied to the bit 0
+            } else {
+                result!.bit(0, newVal: regs.f.bit(C)) // new carry is copied to the bit 0
             }
             
+            regs.f.resetBit(H)
+            regs.f.resetBit(N)
+            
+        case .Rr:
+            old_carry = UInt8(regs.f.bit(C))
+            fallthrough
+        case .Rrc:
+            regs.f.bit(C, newVal: operandA.bit(0)) // least significant bit is copied to the carry flag
+            result = operandA >> 1
+            if ulaOp == .Rr {
+                result!.bit(7, newVal: Int(old_carry)) // old carry is copied to the bit 7
+            } else {
+                result!.bit(7, newVal: regs.f.bit(C)) // new carry is copied to the bit 7
+            }
+            
+            regs.f.resetBit(H)
+            regs.f.resetBit(N)
             
         default:
             break
         }
-        
-        flags[0] = (result! > 0x7F) ?  "1" : "0"                // S (Sign)
-        flags[1] = (result! == 0) ?  "1" : "0"                  // Z (Zero)
-        
-        regs.f = UInt8(flags.joinWithSeparator("").binaryToDecimal)
         
         return result!
     }
@@ -450,13 +585,54 @@ class Z80 {
         opcodes = Array<Void -> Void>(count: 0x100, repeatedValue: {})
         
         opcodes[0x00] = { // NOP
-            print("NOP")
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xCB:
+                        self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Rlc, ignoreCarry: false)
+                        self.prefix = nil
+                    case 0xDC:
+                        self.readFromMemoryIX()
+                    case 0xFC:
+                        self.readFromMemoryIY()
+                    default:
+                        self.invalid_opcode = true
+                    }
+                }
+            case 2:
+                if self.prefix != nil {
+                    self.regs.b = self.ulaCall(self.buffer![0], 1, ulaOp: .Rlc, ignoreCarry: false)
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
             
         }
         opcodes[0x01] = {
             switch self.fixMCycle() {
             case 1:
-                self.num_bytes = 2
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xCB:
+                        self.regs.c = self.ulaCall(self.regs.c, 1, ulaOp: .Rlc, ignoreCarry: false)
+                        self.prefix = nil
+                    case 0xDC:
+                        self.readFromMemoryIX()
+                    case 0xFC:
+                        self.readFromMemoryIY()
+                    default:
+                        self.invalid_opcode = true
+                    }
+                } else {
+                    self.num_bytes = 2
+                }
+            case 2:
+                if self.prefix != nil {
+                    self.regs.c = self.ulaCall(self.buffer![0], 1, ulaOp: .Rlc, ignoreCarry: false)
+                    self.prefix = nil
+                }
             case 3:
                 self.regs.b = self.buffer![1]
                 self.regs.c = self.buffer![0]
@@ -466,41 +642,310 @@ class Z80 {
             
         }
         opcodes[0x02] = {
-            if self.fixMCycle() == 1 {
-                self.pins.address_bus = self.addressFromPair(self.regs.b, self.regs.c)
-                self.pins.data_bus = self.regs.a
-                self.machine_cycle = .MemoryWrite
-                self.num_bytes = 1
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xCB:
+                        self.regs.d = self.ulaCall(self.regs.d, 1, ulaOp: .Rlc, ignoreCarry: false)
+                        self.prefix = nil
+                    case 0xDC:
+                        self.readFromMemoryIX()
+                    case 0xFC:
+                        self.readFromMemoryIY()
+                    default:
+                        self.invalid_opcode = true
+                    }
+                } else {
+                    self.pins.address_bus = self.addressFromPair(self.regs.b, self.regs.c)
+                    self.pins.data_bus = self.regs.a
+                    self.machine_cycle = .MemoryWrite
+                    self.num_bytes = 1
+                }
+            case 2:
+                if self.prefix != nil {
+                    self.regs.d = self.ulaCall(self.buffer![0], 1, ulaOp: .Rlc, ignoreCarry: false)
+                    self.prefix = nil
+                }
+            default:
+                break
             }
-            
         }
         opcodes[0x03] = {
-            self.machine_cycle = .UlaOperation
-            if self.t_cycle == 6 {
-                self.regs.c = self.regs.c &+ 1
-                self.regs.b = self.regs.c == 0 ? self.regs.b &+ 1 : self.regs.b
-                self.machine_cycle = .OpcodeFetch
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xCB:
+                        self.regs.e = self.ulaCall(self.regs.e, 1, ulaOp: .Rlc, ignoreCarry: false)
+                        self.prefix = nil
+                    case 0xDC:
+                        self.readFromMemoryIX()
+                    case 0xFC:
+                        self.readFromMemoryIY()
+                    default:
+                        self.invalid_opcode = true
+                    }
+                } else {
+                    self.machine_cycle = .UlaOperation
+                    if self.t_cycle == 6 {
+                        self.regs.c = self.regs.c &+ 1
+                        self.regs.b = self.regs.c == 0 ? self.regs.b &+ 1 : self.regs.b
+                        self.machine_cycle = .OpcodeFetch
+                    }
+                }
+            case 2:
+                if self.prefix != nil {
+                    self.regs.e = self.ulaCall(self.buffer![0], 1, ulaOp: .Rlc, ignoreCarry: false)
+                    self.prefix = nil
+                }
+            default:
+                break
             }
-            
         }
         opcodes[0x04] = {
-            self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Add, ignoreCarry: true)
-            
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xCB:
+                        self.regs.h = self.ulaCall(self.regs.h, 1, ulaOp: .Rlc, ignoreCarry: false)
+                        self.prefix = nil
+                    case 0xDC:
+                        self.readFromMemoryIX()
+                    case 0xFC:
+                        self.readFromMemoryIY()
+                    default:
+                        self.invalid_opcode = true
+                    }
+                } else {
+                    self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Add, ignoreCarry: true)
+                }
+            case 2:
+                if self.prefix != nil {
+                    self.regs.h = self.ulaCall(self.buffer![0], 1, ulaOp: .Rlc, ignoreCarry: false)
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
         }
         opcodes[0x05] = {
-            self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
-            
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xCB:
+                        self.regs.l = self.ulaCall(self.regs.l, 1, ulaOp: .Rlc, ignoreCarry: false)
+                        self.prefix = nil
+                    case 0xDC:
+                        self.readFromMemoryIX()
+                    case 0xFC:
+                        self.readFromMemoryIY()
+                    default:
+                        self.invalid_opcode = true
+                    }
+                } else {
+                    self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
+                }
+            case 2:
+                if self.prefix != nil {
+                    self.regs.l = self.ulaCall(self.buffer![0], 1, ulaOp: .Rlc, ignoreCarry: false)
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
         }
+        // ==================================================================================================================
+        // ============================== COMPLETED AND TESTED OPCODES ABOVE THIS LINE ======================================
+        // ==================================================================================================================
+        
         opcodes[0x06] = {
             switch self.fixMCycle() {
             case 1:
-                self.num_bytes = 1
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xCB:
+                        self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                        self.num_bytes = 1
+                        self.machine_cycle = .MemoryRead
+                    case 0xDC:
+                        self.offset_cb = self.buffer![0]
+                        self.readFromMemoryIX()
+                    case 0xFC:
+                        self.offset_cb = self.buffer![0]
+                        self.readFromMemoryIY()
+                    default:
+                        self.invalid_opcode = true
+                    }
+                } else {
+                    self.num_bytes = 1
+                }
             case 2:
-                self.regs.b = self.buffer![0]
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xCB:
+                        if self.t_cycle < 4 {
+                            self.machine_cycle = .TimeWait
+                        } else {
+                            let byte = self.ulaCall(self.buffer![0], 1, ulaOp: .Rlc, ignoreCarry: false)
+                            self.pins.data_bus = byte
+                            self.num_bytes = 1
+                            self.machine_cycle = .MemoryWrite
+                            self.prefix = nil
+                        }
+                    case 0xDC:
+                        let byte = self.ulaCall(self.buffer![0], 1, ulaOp: .Rlc, ignoreCarry: false)
+                        self.buffer![0] = self.offset_cb!
+                        self.writeToMemoryIX(byte)
+                        self.prefix = nil
+                    case 0xFC:
+                        let byte = self.ulaCall(self.buffer![0], 1, ulaOp: .Rlc, ignoreCarry: false)
+                        self.buffer![0] = self.offset_cb!
+                        self.writeToMemoryIY(byte)
+                        self.prefix = nil
+                    default:
+                        break
+                    }
+                } else {
+                    self.regs.b = self.buffer![0]
+                }
             default:
                 break
             }
             
+        }
+        opcodes[0x07] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xCB:
+                        self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Rlc, ignoreCarry: false)
+                        self.prefix = nil
+                    case 0xDC:
+                        self.readFromMemoryIX()
+                    case 0xFC:
+                        self.readFromMemoryIY()
+                    default:
+                        self.invalid_opcode = true
+                    }
+                } else {
+                    self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Rlc, ignoreCarry: false)
+                }
+            case 2:
+                if self.prefix != nil {
+                    self.regs.a = self.ulaCall(self.buffer![0], 1, ulaOp: .Rlc, ignoreCarry: false)
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+        }
+        opcodes[0x08] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xCB:
+                        self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Rrc, ignoreCarry: false)
+                        self.prefix = nil
+                    case 0xDC:
+                        self.readFromMemoryIX()
+                    case 0xFC:
+                        self.readFromMemoryIY()
+                    default:
+                        self.invalid_opcode = true
+                    }
+                } else {
+                    let a_ = self.regs.a_
+                    let f_ = self.regs.f_
+                    self.regs.a_ = self.regs.a
+                    self.regs.f_ = self.regs.f
+                    self.regs.a = a_
+                    self.regs.f = f_
+                }
+            case 2:
+                if self.prefix != nil {
+                    self.regs.b = self.ulaCall(self.buffer![0], 1, ulaOp: .Rrc, ignoreCarry: false)
+                    self.prefix = nil
+                }
+            default:
+                break
+            }
+        }
+        opcodes[0x09] = {
+            switch self.fixMCycle() {
+            case 1:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        self.machine_cycle = .TimeWait
+                        self.m_cycles_to_wait = [4,4,3]
+                    case 0xFD:
+                        self.machine_cycle = .TimeWait
+                        self.m_cycles_to_wait = [4,4,3]
+                    case 0xCB:
+                        self.machine_cycle = .TimeWait
+                        self.m_cycles_to_wait = [4]
+                    case 0xDC:
+                        self.readFromMemoryIX()
+                    case 0xFC:
+                        self.readFromMemoryIY()
+                    default:
+                        self.invalid_opcode = true
+                    }
+                } else {
+                    self.machine_cycle = .TimeWait
+                    self.m_cycles_to_wait = [4,3]
+                }
+            case 2:
+                if self.prefix != nil {
+                    self.regs.c = self.ulaCall(self.regs.c, 1, ulaOp: .Rrc, ignoreCarry: false)
+                    self.prefix = nil
+                    self.machine_cycle = .OpcodeFetch
+                    /*
+                    self.regs.c = self.ulaCall(self.buffer![0], 1, ulaOp: .Rrc, ignoreCarry: false)
+                    self.prefix = nil
+                    */
+                }
+            case 3:
+                // ADD HL,BC
+                let hl = self.addressFromPair(self.regs.h, self.regs.l)
+                let bc = self.addressFromPair(self.regs.b, self.regs.c)
+                let result = self.ulaCall16(hl, bc, ulaOp: .Add)
+                self.regs.h = result.high
+                self.regs.l = result.low
+                self.machine_cycle = .OpcodeFetch
+            case 4:
+                if let pr = self.prefix {
+                    switch pr {
+                    case 0xDD:
+                        // ADD IX,BC
+                        let ix = self.addressFromPair(self.regs.ixh, self.regs.ixl)
+                        let bc = self.addressFromPair(self.regs.b, self.regs.c)
+                        let result = self.ulaCall16(ix, bc, ulaOp: .Add)
+                        self.regs.ixh = result.high
+                        self.regs.ixl = result.low
+                        self.prefix = nil
+                        self.machine_cycle = .OpcodeFetch
+                    case 0xFD:
+                        // ADD IY,BC
+                        let iy = self.addressFromPair(self.regs.iyh, self.regs.iyl)
+                        let bc = self.addressFromPair(self.regs.b, self.regs.c)
+                        let result = self.ulaCall16(iy, bc, ulaOp: .Add)
+                        self.regs.iyh = result.high
+                        self.regs.iyl = result.low
+                        self.prefix = nil
+                        self.machine_cycle = .OpcodeFetch
+                    default:
+                        break
+                    }
+                }
+            default:
+                break
+            }
         }
         opcodes[0x0A] = {
             switch self.fixMCycle() {
@@ -542,6 +987,12 @@ class Z80 {
             default:
                 break
             }
+            
+        }
+        opcodes[0x0F] = {
+            self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Rrc, ignoreCarry: false)
+        }
+        opcodes[0x10] = {
             
         }
         opcodes[0x11] = {
@@ -593,6 +1044,15 @@ class Z80 {
             }
             
         }
+        opcodes[0x17] = {
+            self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Rl, ignoreCarry: false)
+        }
+        opcodes[0x18] = {
+            
+        }
+        opcodes[0x19] = {
+            
+        }
         opcodes[0x1A] = {
             switch self.fixMCycle() {
             case 1:
@@ -633,6 +1093,12 @@ class Z80 {
             default:
                 break
             }
+            
+        }
+        opcodes[0x1F] = {
+            self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Rr, ignoreCarry: false)
+        }
+        opcodes[0x20] = {
             
         }
         opcodes[0x21] = {
@@ -767,6 +1233,15 @@ class Z80 {
             }
             
         }
+        opcodes[0x27] = {
+            
+        }
+        opcodes[0x28] = {
+            
+        }
+        opcodes[0x29] = {
+            
+        }
         opcodes[0x2A] = {
             switch self.fixMCycle() {
             case 1:
@@ -859,6 +1334,12 @@ class Z80 {
             }
             
         }
+        opcodes[0x2F] = {
+            
+        }
+        opcodes[0x30] = {
+            
+        }
         opcodes[0x31] = {
             switch self.fixMCycle() {
             case 1:
@@ -910,6 +1391,9 @@ class Z80 {
             }
             
         }
+        opcodes[0x35] = {
+            
+        }
         opcodes[0x36] = {
             switch self.fixMCycle() {
             case 1:
@@ -945,6 +1429,15 @@ class Z80 {
             }
             
         }
+        opcodes[0x37] = {
+            
+        }
+        opcodes[0x38] = {
+            
+        }
+        opcodes[0x39] = {
+            
+        }
         opcodes[0x3A] = {
             switch self.fixMCycle() {
             case 1:
@@ -969,6 +1462,12 @@ class Z80 {
             }
             
         }
+        opcodes[0x3C] = {
+            
+        }
+        opcodes[0x3D] = {
+            
+        }
         opcodes[0x3E] = {
             switch self.fixMCycle() {
             case 1:
@@ -978,6 +1477,9 @@ class Z80 {
             default:
                 break
             }
+            
+        }
+        opcodes[0x3F] = {
             
         }
         opcodes[0x40] = {
@@ -1895,9 +2397,8 @@ class Z80 {
                 if self.prefix! == 0xED {
                     self.pins.address_bus = self.addressFromPair(self.buffer![1], self.buffer![0])
                     self.num_bytes = 2
-                    let sp = self.pairFromAddress(self.regs.sp)
-                    self.pins.data_bus = sp.l
-                    self.buffer = [sp.h]
+                    self.pins.data_bus = self.regs.sp.low
+                    self.buffer = [self.regs.sp.high]
                     self.machine_cycle = .MemoryWrite
                     self.prefix = nil
                 }
@@ -2108,6 +2609,31 @@ class Z80 {
         opcodes[0x7F] = {
             self.regs.a = self.regs.a
             
+        }
+        opcodes[0xCB] = {
+            if let pr = self.prefix {
+                switch self.fixMCycle() {
+                case 1:
+                    self.num_bytes = 1
+                case 2:
+                    self.machine_cycle = .TimeWait
+                    self.m_cycles_to_wait = [5]
+                case 3:
+                    switch pr {
+                    case 0xDD:
+                        self.prefix = 0xDC
+                    case 0xFD:
+                        self.prefix = 0xFC
+                    default:
+                        break
+                    }
+                    self.machine_cycle = .OpcodeFetch
+                default:
+                    break
+                }
+            } else {
+                self.prefix = self.pins.data_bus
+            }
         }
         opcodes[0xDD] = { self.prefix = self.pins.data_bus }
         opcodes[0xED] = { self.prefix = self.pins.data_bus }
