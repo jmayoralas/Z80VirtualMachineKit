@@ -12,6 +12,14 @@ extension UInt16 {
     func hexStr() -> String {
         return "0x" + (String(NSString(format:"%04X", self)))
     }
+    
+    var high: UInt8 {
+        return UInt8(self / 0x100)
+    }
+    
+    var low: UInt8 {
+        return UInt8(self % 0x100)
+    }
 }
 
 extension UInt8 {
@@ -24,7 +32,13 @@ extension UInt8 {
     }
     
     var binStr: String {
-        return String(self, radix: 2)
+        var result = String(self, radix: 2)
+        if result.characters.count < 8 {
+            for _ in 0 ... 7 - result.characters.count {
+                result.insert("0", atIndex: result.startIndex)
+            }
+        }
+        return result
     }
     
     var binArray: Array<String> {
@@ -32,12 +46,37 @@ extension UInt8 {
         for caracter in self.binStr.characters {
             res.append(String(caracter))
         }
-        
-        while res.count < 8 {
-            res.insert("0", atIndex: 0)
-        }
-        
         return res
+    }
+    
+    mutating func bit(index: Int, newVal: Int) -> UInt8 {
+        if newVal == 1 { self.setBit(index) } else { self.resetBit(index) }
+        
+        return self
+    }
+    
+    func bit(index: Int) -> Int {
+        return Int(self.binArray[7 - index])!
+    }
+    
+    mutating func setBit(index: Int) {
+        var mask = String()
+        var i = 0
+        for char in "00000000".characters {
+            mask.append((i == 7 - index) ? "1" : char)
+            i++
+        }
+        self = self | UInt8(mask.binaryToDecimal)
+    }
+    
+    mutating func resetBit(index: Int) {
+        var mask = String()
+        var i = 0
+        for char in "11111111".characters {
+            mask.append((i == 7 - index) ? "0" : char)
+            i++
+        }
+        self = self & UInt8(mask.binaryToDecimal)
     }
     
     var high: UInt8 {
