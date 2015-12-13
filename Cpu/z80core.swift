@@ -9,11 +9,14 @@
 import Foundation
 
 class Z80 {
-    let pins = Pins()
+    private var regs : Registers
+    let pins : Pins
+    let cu : ControlUnit
+    
     var program_end: Bool = false
     
     private var opcodes: Array<Void -> Void>!
-    private var regs = Registers()
+    
     private var machine_cycle = MachineCycle.OpcodeFetch // Always start in OpcodeFetch mode
     private var t_cycle = 0
     private var m_cycle = 0
@@ -30,22 +33,26 @@ class Z80 {
     private var m_cycles_to_wait: [Int] = []
     private var invalid_opcode = false
     
-    
-    let S = 0
-    let Z = 1
-    let H = 3
-    let PV = 5
-    let N = 6
-    let C = 7
-    
     init() {
+        regs = Registers()
+        pins = Pins()
+        cu = ControlUnit(pins: pins)
+        
         old_busreq = pins.busreq
+        
         initOpcodeTable()
+        
+        regs.pc = 0x1000 // entry point to begin opcode excutions
     }
     
-    func clk() throws {
+    func clk() {
         // program ended ?
         if program_end { return }
+        
+        // waits while wait signal is active
+        if pins.iorq && pins.wait {
+            return
+        }
         
         // waits until bus is available
         if pins.busreq || old_busreq != pins.busreq {
@@ -61,10 +68,16 @@ class Z80 {
             opcodeFetch()
             
         case .MemoryRead:
-            try memoryRead()
+            memoryRead()
             
         case .MemoryWrite:
-            try memoryWrite()
+            memoryWrite()
+            
+        case .IoRead:
+            ioRead()
+            
+        case .IoWrite:
+            ioWrite()
             
         case .UlaOperation:
             endMachineCycle()
@@ -75,106 +88,26 @@ class Z80 {
     }
 
     private func endMachineCycle() {
+        print("address_bus: \(pins.address_bus.hexStr()) - data_bus: \(pins.data_bus.hexStr()) \(pins.data_bus.binStr) - PC: \(regs.pc.hexStr()) - M: \(m_cycle) - T: \(t_cycle) - \(machine_cycle)")
+        print(" IR: \(regs.ir.hexStr())                      CNPxHxZS")
         print("  A: \(regs.a.hexStr()) \(regs.a.binStr) -   F: \(regs.f.hexStr()) \(regs.f.binStr) - SP: \(regs.sp.hexStr())")
         print("  B: \(regs.b.hexStr()) \(regs.b.binStr) -   C: \(regs.c.hexStr()) \(regs.c.binStr)")
         print("  D: \(regs.d.hexStr()) \(regs.d.binStr) -   E: \(regs.e.hexStr()) \(regs.e.binStr)")
         print("  H: \(regs.h.hexStr()) \(regs.h.binStr) -   L: \(regs.l.hexStr()) \(regs.l.binStr)")
         print("IXH: \(regs.ixh.hexStr()) \(regs.ixh.binStr) - IXL: \(regs.ixl.hexStr()) \(regs.ixl.binStr)")
         print("IYH: \(regs.iyh.hexStr()) \(regs.iyh.binStr) - IYL: \(regs.iyl.hexStr()) \(regs.iyl.binStr)")
-        print("address_bus: \(pins.address_bus.hexStr()) - data_bus: \(pins.data_bus.hexStr()) \(pins.data_bus.binStr) - PC: \(regs.pc.hexStr()) - M: \(m_cycle) - T: \(t_cycle) - \(machine_cycle)")
         
-        switch machine_cycle {
-        case .OpcodeFetch:
-            // data bus contains the opcode
-            // Decode the opcode
-            processOpcode()
-            
-        case .MemoryRead:
-            buffer!.append(pins.data_bus)
-            num_bytes--
-            if num_bytes > 0 {
-                pins.address_bus++
-                break
-            }
-
-        case .MemoryWrite:
-            num_bytes--
-            if buffer!.count > 0 {
-                pins.data_bus = buffer![0]
-                buffer!.removeFirst()
-                pins.address_bus++
-                break
-            }
-            
-        case .UlaOperation:
-            break
-            
-        case .TimeWait:
-            if m_cycles_to_wait.count > 0 {
-                m_cycles_to_wait[0]--
-                if m_cycles_to_wait[0] == 0 {
-                    m_cycles_to_wait.removeFirst()
-                    if m_cycles_to_wait.count > 0 {
-                        m_cycle++
-                        t_cycle = 0
-                    }
-                }
-                if m_cycles_to_wait.count > 0 {
-                    return
-                }
-            }
+        cu.processOpcode(&regs, t_cycle, m_cycle, &machine_cycle)
+        if regs.ir == 0x76 { program_end = true }
+        
+        if machine_cycle != .TimeWait {
+            t_cycle = 0
+            m_cycle++
         }
         
-        // continue execution of current opcode if no further access to memory needed or there is a ula operation in progress
-        if ((fixMCycle() > 1) && (num_bytes == 0)) || machine_cycle == .UlaOperation {
-            processOpcode()
-        }
-        
-        if machine_cycle != .UlaOperation {
-            if invalid_opcode {
-                t_cycle = 0
-                print("(!!)")
-                self.prefix = nil
-                m_cycle = 0
-                invalid_opcode = false
-            } else {
-                if machine_cycle != .TimeWait || (machine_cycle == .TimeWait && m_cycles_to_wait.count > 0) {
-                    t_cycle = 0
-                    m_cycle++
-                }
-            }
-            pins.busack = pins.busreq // Acknowledge bus requests
-            int_request = pins.int // samples INT signal
-            int_attended = false
-        }
-    }
-
-    private func processOpcode() {
-        if fixMCycle() == 1 {
-            // new opcode decoded
-            running_opcode = pins.data_bus
-            num_bytes = 0
-            // if we are executing a CB DD or CB FD sequence we have to keep the buffer untouched
-            if (prefix == nil) || (prefix != nil && prefix! != 0xDC && prefix! != 0xFC) {
-                buffer = []
-            }
-        }
-        
-        opcodes[Int(running_opcode!)]()
-        
-        // if we are in OpcodeFetch state and have to read bytes from memory
-        // must be for parameters read
-        if  machine_cycle == .OpcodeFetch && num_bytes > 0 {
-            // read parameter from PC and increment PC
-            pins.address_bus = regs.pc
-            // increment pc by num_bytes
-            regs.pc += UInt16(num_bytes)
-            machine_cycle = .MemoryRead
-        } else {
-            if num_bytes == 0 && machine_cycle != .UlaOperation && machine_cycle != .TimeWait {
-                self.machine_cycle = .OpcodeFetch
-            }
-        }
+        pins.busack = pins.busreq // Acknowledge bus requests
+        int_request = pins.int // samples INT signal
+        int_attended = false
     }
 
     private func opcodeFetch() {
@@ -214,6 +147,9 @@ class Z80 {
             // program counter update
             regs.pc++
             
+            // backup data bus into instruction register
+            regs.ir = pins.data_bus
+            
             endMachineCycle()
             
         default:
@@ -221,11 +157,7 @@ class Z80 {
         }
     }
     
-    private func memoryRead() throws {
-        if num_bytes == 0 {
-            throw Z80Error.ZeroBytesReadFromMemory
-        }
-        
+    private func memoryRead() {
         switch t_cycle {
         case 1:
             // memory address should be previously placed on the address bus (i.e.: by the last decoded instruction)
@@ -247,11 +179,7 @@ class Z80 {
         }
     }
     
-    private func memoryWrite() throws {
-        if num_bytes == 0 {
-            throw Z80Error.ZeroBytesWriteToMemory
-        }
-
+    private func memoryWrite() {
         switch t_cycle {
         case 1:
             // memory address should be previously placed on the address bus (i.e.: by the last decoded instruction)

@@ -30,13 +30,13 @@ class Memory {
         
         // read from memory
         if pins.rd {
-            print("(MR)")
+            // print("(MR)")
             pins.data_bus = peek(address)
         }
         
         // write to memory
         if pins.wr {
-            print("(MW)")
+            // print("(MW)")
             poke(address, bytes: [pins.data_bus])
         }
     }

@@ -8,6 +8,15 @@
 
 import Foundation
 
+extension SequenceType where Self.Generator.Element: Hashable {
+    func freq() -> [Self.Generator.Element: Int] {
+        return reduce([:]) { (var accu: [Self.Generator.Element: Int], element) in
+            accu[element] = accu[element]?.successor() ?? 1
+            return accu
+        }
+    }
+}
+
 extension UInt16 {
     func hexStr() -> String {
         return "0x" + (String(NSString(format:"%04X", self)))
@@ -23,6 +32,19 @@ extension UInt16 {
 }
 
 extension UInt8 {
+    var parity: Int {
+        let bit_array = self.binArray
+        
+        var result = 0
+        if let ones_count = bit_array.freq()["1"] {
+            if ones_count % 2 != 0 {
+                result = 1
+            }
+        }
+        
+        return result
+    }
+
     var comp2: Int {
         return self > 0x7F ? Int(Int(self) - 0xFF - 1) : Int(self)
     }

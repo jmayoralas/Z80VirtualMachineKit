@@ -27,6 +27,9 @@ class Pins {
 }
 
 struct Registers {
+    // Instruction Register
+    var ir: UInt8 = 0
+    
     // Main Register Set
     // accumulator
     var a: UInt8 = 0
@@ -70,10 +73,15 @@ struct Registers {
     
     // Program Counter
     var pc: UInt16 = 0
+    
+    // Internal software-controlled interrupt enable
+    var IFF1 : Bool = false
+    var IFF2 : Bool = false
+
 }
 
 enum MachineCycle: Int {
-    case OpcodeFetch = 1, MemoryRead, MemoryWrite, UlaOperation, TimeWait
+    case OpcodeFetch = 1, MemoryRead, MemoryWrite, IoRead, IoWrite, UlaOperation, TimeWait
 }
 
 enum UlaOp {
@@ -84,3 +92,10 @@ public enum Z80Error : ErrorType {
     case ZeroBytesReadFromMemory
     case ZeroBytesWriteToMemory
 }
+
+let S = 0
+let Z = 1
+let H = 3
+let PV = 5
+let N = 6
+let C = 7
