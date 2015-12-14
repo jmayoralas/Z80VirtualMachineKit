@@ -9,9 +9,6 @@
 import Foundation
 
 class TestDevice : IODevice {
-    override init(pins: Pins, port: UInt8) {
-        super.init(pins: pins, port: port)
-    }
     
     override func read() -> UInt8? {
         print("T: \(t_cycle)")
