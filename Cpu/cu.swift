@@ -14,13 +14,11 @@ class ControlUnit {
     let pins : Pins
     var regs : Registers!
     
-    private var opcodes: Array<Void -> Void>
-    private var opcodes_DD: Array<Void -> Void>!
-    private var opcodes_FD: Array<Void -> Void>!
-    private var opcodes_CB: Array<Void -> Void>!
-    private var opcodes_DDCB: Array<Void -> Void>!
-    private var opcodes_FDCB: Array<Void -> Void>!
-    private var opcodes_ED: Array<Void -> Void>!
+    typealias OpcodeTable = [() -> Void]
+    
+    var opcode_tables : [OpcodeTable]!
+    
+    var id_opcode_table : Int
     
     var m_cycle : Int
     var t_cycle : Int
@@ -29,12 +27,11 @@ class ControlUnit {
     
     var control_reg : UInt8! // backup register to store parameters between t_cycles of execution
     
-    var prefix_CB : Bool!
-    var prefix_DD : Bool!
-    var prefix_ED : Bool!
-    var prefix_FD : Bool!
-    
     // MARK: Methods
+    func isPrefixed() -> Bool {
+        return (id_opcode_table != prefix_NONE) ? true : false
+    }
+    
     func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
         return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
     }
@@ -43,8 +40,8 @@ class ControlUnit {
         self.t_cycle = t_cycle
         self.regs = regs
         self.machine_cycle = machine_cycle
-        
-        opcodes[Int(self.regs.ir)]()
+
+        opcode_tables[id_opcode_table][Int(self.regs.ir)]()
         
         machine_cycle = self.machine_cycle
         regs = self.regs
@@ -216,17 +213,15 @@ class ControlUnit {
         t_cycle = 0
         machine_cycle = .OpcodeFetch
         self.pins = pins
-        opcodes = Array<Void -> Void>(count: 0x100, repeatedValue: {})
+        id_opcode_table = prefix_NONE
         
-        initOpcodeTables()
+        opcode_tables = Array<OpcodeTable>(count: 7, repeatedValue: OpcodeTable(count: 0x100, repeatedValue: {}))
         
-        prefix_CB = false
-        prefix_DD = false
-        prefix_ED = false
-        prefix_FD = false
+        initOpcodeTableNONE(&opcode_tables[prefix_NONE])
+        initOpcodeTableDD(&opcode_tables[prefix_DD])
     }
     
-    func initOpcodeTables() {
+    func initOpcodeTableNONE(inout opcodes: OpcodeTable) {
         opcodes[0x00] = { // NOP
             return
         }
@@ -1671,7 +1666,7 @@ class ControlUnit {
             }
         }
         opcodes[0xCB] = { // PREFIX *** CB ***
-            self.prefix_CB = true
+            self.id_opcode_table = prefix_CB
         }
         opcodes[0xCC] = { // CALL Z &0000
             switch self.m_cycle {
@@ -2010,7 +2005,7 @@ class ControlUnit {
             }
         }
         opcodes[0xDD] = { // PREFIX *** DD ***
-            self.prefix_DD = true
+            self.id_opcode_table = prefix_DD
         }
         opcodes[0xDE] = { // SBC A,&00
             switch self.m_cycle {
@@ -2281,7 +2276,7 @@ class ControlUnit {
             }
         }
         opcodes[0xED] = { // PREFIX *** ED ***
-            self.prefix_ED = true
+            self.id_opcode_table = prefix_ED
         }
         opcodes[0xEE] = { // XOR &00
             switch self.m_cycle {
@@ -2526,7 +2521,7 @@ class ControlUnit {
             }
         }
         opcodes[0xFD] = { // PREFIX *** FD ***
-            self.prefix_FD = true
+            self.id_opcode_table = prefix_FD
         }
         opcodes[0xFE] = { // CP &00
             switch self.m_cycle {
@@ -2556,6 +2551,89 @@ class ControlUnit {
             default:
                 self.regs.pc = 0x0038
                 self.machine_cycle = .OpcodeFetch
+            }
+        }
+    }
+    
+    func initOpcodeTableDD(inout opcodes: OpcodeTable) {
+        opcodes[0x09] = { // ADD IX,BC
+            switch self.m_cycle {
+            case 2:
+                fallthrough
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.machine_cycle = .UlaOperation
+                }
+            default:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 3 {
+                    var ix = self.addressFromPair(self.regs.ixh, self.regs.ixl)
+                    ix = self.ulaCall16(ix, self.addressFromPair(self.regs.b, self.regs.c), ulaOp: .Add)
+                    self.regs.ixh = ix.high
+                    self.regs.ixl = ix.low
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            }
+        }
+        opcodes[0x19] = { // ADD IX,DE
+            switch self.m_cycle {
+            case 2:
+                fallthrough
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.machine_cycle = .UlaOperation
+                }
+            default:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 3 {
+                    var ix = self.addressFromPair(self.regs.ixh, self.regs.ixl)
+                    ix = self.ulaCall16(ix, self.addressFromPair(self.regs.d, self.regs.e), ulaOp: .Add)
+                    self.regs.ixh = ix.high
+                    self.regs.ixl = ix.low
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            }
+        }
+        opcodes[0x21] = { // LD IX,&0000
+            switch self.m_cycle {
+            case 2:
+                self.machine_cycle = .MemoryRead
+                self.pins.address_bus = self.regs.pc
+                self.regs.pc++
+            case 3:
+                self.regs.ixl = self.pins.data_bus
+                self.pins.address_bus = self.regs.pc
+                self.regs.pc++
+            default:
+                self.regs.ixh = self.pins.data_bus
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0x22] = { // LD (&0000),IX
+            switch self.m_cycle {
+            case 2:
+                self.machine_cycle = .MemoryRead
+                self.pins.address_bus = self.regs.pc
+                self.regs.pc++
+            case 3:
+                self.control_reg = self.pins.data_bus
+                self.pins.address_bus = self.regs.pc
+                self.regs.pc++
+            case 4:
+                self.pins.address_bus = self.addressFromPair(self.pins.data_bus, self.control_reg)
+                self.machine_cycle = .MemoryWrite
+                self.pins.data_bus = self.regs.ixl
+            case 5:
+                self.pins.address_bus++
+                self.pins.data_bus = self.regs.ixh
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
             }
         }
     }
