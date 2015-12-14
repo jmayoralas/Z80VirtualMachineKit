@@ -99,3 +99,11 @@ let H = 3
 let PV = 5
 let N = 6
 let C = 7
+
+let prefix_NONE = 0
+let prefix_DD = 1
+let prefix_FD = 2
+let prefix_CB = 3
+let prefix_DDCB = 4
+let prefix_FDCB = 5
+let prefix_ED = 6
