@@ -105,9 +105,6 @@ class Z80 {
     private func opcodeFetch() {
         switch t_cycle {
         case 1:
-            // clear previously decoded opcode
-            running_opcode = nil
-            
             // program counter is placed on the address bus
             pins.address_bus = regs.pc
             
@@ -116,7 +113,8 @@ class Z80 {
             
             // we are in M1 machine cycle
             pins.m1 = true
-            if prefix == nil {
+            // but if a prefixed opcode is running don't reset m_cycle counter
+            if !cu.isPrefixed() {
                 m_cycle = 1
             }
             
