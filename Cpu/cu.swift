@@ -215,7 +215,7 @@ class ControlUnit {
         self.pins = pins
         id_opcode_table = prefix_NONE
         
-        opcode_tables = Array<OpcodeTable>(count: 7, repeatedValue: OpcodeTable(count: 0x100, repeatedValue: {}))
+        opcode_tables = [OpcodeTable](count: 7, repeatedValue: OpcodeTable(count: 0x100, repeatedValue: {}))
         
         initOpcodeTableNONE(&opcode_tables[prefix_NONE])
         initOpcodeTableDD(&opcode_tables[prefix_DD])
