@@ -1384,23 +1384,7 @@ extension ControlUnit {
             }
         }
         opcodes[0xC7] = { // RST &00
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.regs.sp--
-                    self.pins.address_bus = self.regs.sp
-                    self.pins.data_bus = self.regs.pc.high
-                    self.machine_cycle = .MemoryWrite
-                }
-            case 2:
-                self.regs.sp--
-                self.pins.address_bus = self.regs.sp
-                self.pins.data_bus = self.regs.pc.low
-            default:
-                self.regs.pc = 0x0000
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.rst(0x0000)
         }
         opcodes[0xC8] = { // RET Z
             switch self.m_cycle {
@@ -1528,23 +1512,7 @@ extension ControlUnit {
             }
         }
         opcodes[0xCF] = { // RST &08
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.regs.sp--
-                    self.pins.address_bus = self.regs.sp
-                    self.pins.data_bus = self.regs.pc.high
-                    self.machine_cycle = .MemoryWrite
-                }
-            case 2:
-                self.regs.sp--
-                self.pins.address_bus = self.regs.sp
-                self.pins.data_bus = self.regs.pc.low
-            default:
-                self.regs.pc = 0x0008
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.rst(0x0008)
         }
         opcodes[0xD0] = { // RET NC
             switch self.m_cycle {
@@ -1672,23 +1640,7 @@ extension ControlUnit {
             }
         }
         opcodes[0xD7] = { // RST &10
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.regs.sp--
-                    self.pins.address_bus = self.regs.sp
-                    self.pins.data_bus = self.regs.pc.high
-                    self.machine_cycle = .MemoryWrite
-                }
-            case 2:
-                self.regs.sp--
-                self.pins.address_bus = self.regs.sp
-                self.pins.data_bus = self.regs.pc.low
-            default:
-                self.regs.pc = 0x0010
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.rst(0x0010)
         }
         opcodes[0xD8] = { // RET C
             switch self.m_cycle {
@@ -1807,23 +1759,7 @@ extension ControlUnit {
             }
         }
         opcodes[0xDF] = { // RST &18
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.regs.sp--
-                    self.pins.address_bus = self.regs.sp
-                    self.pins.data_bus = self.regs.pc.high
-                    self.machine_cycle = .MemoryWrite
-                }
-            case 2:
-                self.regs.sp--
-                self.pins.address_bus = self.regs.sp
-                self.pins.data_bus = self.regs.pc.low
-            default:
-                self.regs.pc = 0x0018
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.rst(0x0018)
         }
         opcodes[0xE0] = { // RET PO
             switch self.m_cycle {
@@ -1967,23 +1903,7 @@ extension ControlUnit {
             }
         }
         opcodes[0xE7] = { // RST &20
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.regs.sp--
-                    self.pins.address_bus = self.regs.sp
-                    self.pins.data_bus = self.regs.pc.high
-                    self.machine_cycle = .MemoryWrite
-                }
-            case 2:
-                self.regs.sp--
-                self.pins.address_bus = self.regs.sp
-                self.pins.data_bus = self.regs.pc.low
-            default:
-                self.regs.pc = 0x0020
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.rst(0x0020)
         }
         opcodes[0xE8] = { // RET PE
             switch self.m_cycle {
@@ -2078,23 +1998,7 @@ extension ControlUnit {
             }
         }
         opcodes[0xEF] = { // RST &28
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.regs.sp--
-                    self.pins.address_bus = self.regs.sp
-                    self.pins.data_bus = self.regs.pc.high
-                    self.machine_cycle = .MemoryWrite
-                }
-            case 2:
-                self.regs.sp--
-                self.pins.address_bus = self.regs.sp
-                self.pins.data_bus = self.regs.pc.low
-            default:
-                self.regs.pc = 0x0028
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.rst(0x0028)
         }
         opcodes[0xF0] = { // RET P
             switch self.m_cycle {
@@ -2212,23 +2116,7 @@ extension ControlUnit {
             }
         }
         opcodes[0xF7] = { // RST &30
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.regs.sp--
-                    self.pins.address_bus = self.regs.sp
-                    self.pins.data_bus = self.regs.pc.high
-                    self.machine_cycle = .MemoryWrite
-                }
-            case 2:
-                self.regs.sp--
-                self.pins.address_bus = self.regs.sp
-                self.pins.data_bus = self.regs.pc.low
-            default:
-                self.regs.pc = 0x0030
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.rst(0x0030)
         }
         opcodes[0xF8] = { // RET M
             switch self.m_cycle {
@@ -2323,23 +2211,7 @@ extension ControlUnit {
             }
         }
         opcodes[0xFF] = { // RST &38
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.regs.sp--
-                    self.pins.address_bus = self.regs.sp
-                    self.pins.data_bus = self.regs.pc.high
-                    self.machine_cycle = .MemoryWrite
-                }
-            case 2:
-                self.regs.sp--
-                self.pins.address_bus = self.regs.sp
-                self.pins.data_bus = self.regs.pc.low
-            default:
-                self.regs.pc = 0x0038
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.rst(0x0038)
         }
     }
 }
