@@ -97,13 +97,16 @@ extension ControlUnit {
                 self.regs.ixl = self.regs.ixl &+ 1
                 self.regs.ixh = self.regs.ixl == 0 ? self.regs.ixh &+ 1 : self.regs.ixh
                 self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
             }
         }
         opcodes[0x24] = { // INC IXH
             self.regs.ixh = self.ulaCall(self.regs.ixh, 1, ulaOp: .Add, ignoreCarry: true)
+            self.id_opcode_table = prefix_NONE
         }
         opcodes[0x25] = { // DEC IXH
             self.regs.ixh = self.ulaCall(self.regs.ixh, 1, ulaOp: .Sub, ignoreCarry: true)
+            self.id_opcode_table = prefix_NONE
         }
         opcodes[0x26] = { // LD IXH,&00
             switch self.m_cycle {
@@ -114,6 +117,7 @@ extension ControlUnit {
             default:
                 self.regs.ixh = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
             }
         }
         opcodes[0x29] = { // ADD IX,IX
@@ -133,6 +137,7 @@ extension ControlUnit {
                     self.regs.ixh = result.high
                     self.regs.ixl = result.low
                     self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
                 }
             }
         }
@@ -154,6 +159,7 @@ extension ControlUnit {
             default:
                 self.regs.ixh = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
             }
         }
         opcodes[0x2B] = { // DEC IX
@@ -163,13 +169,16 @@ extension ControlUnit {
                 self.regs.ixl = self.regs.ixl &- 1
                 self.regs.ixh = self.regs.ixl == 0xFF ? self.regs.ixh &- 1 : self.regs.ixh
                 self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
             }
         }
         opcodes[0x2C] = { // INC IXL
             self.regs.ixl = self.ulaCall(self.regs.ixl, 1, ulaOp: .Add, ignoreCarry: true)
+            self.id_opcode_table = prefix_NONE
         }
         opcodes[0x2D] = { // DEC IXL
             self.regs.ixl = self.ulaCall(self.regs.ixl, 1, ulaOp: .Sub, ignoreCarry: true)
+            self.id_opcode_table = prefix_NONE
         }
         opcodes[0x2E] = { // LD IXL,&00
             switch self.m_cycle {
@@ -180,6 +189,7 @@ extension ControlUnit {
             default:
                 self.regs.ixl = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
             }
         }
     }
