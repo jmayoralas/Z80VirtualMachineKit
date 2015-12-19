@@ -10,9 +10,11 @@ import Foundation
 
 class TestDevice : IODevice {
     var test_device_t_cycle : Int
+    var irq_pending : Bool
     
     override init(pins: Pins, port: UInt8) {
         test_device_t_cycle = 0
+        irq_pending = true
         
         super.init(pins: pins, port: port)
     }
@@ -36,14 +38,15 @@ class TestDevice : IODevice {
         return false
     }
     
-    override func irq() -> Bool {
+    override func irq() -> IrqKind? {
         test_device_t_cycle++
         
-        if test_device_t_cycle == 7 {
+        if test_device_t_cycle == 7 && irq_pending {
+            irq_pending = false
             test_device_t_cycle = 0
-            return true
+            return .NMI
         }
         
-        return false
+        return nil
     }
 }
