@@ -78,10 +78,11 @@ struct Registers {
     var IFF1 : Bool = false
     var IFF2 : Bool = false
 
+    var int_mode : Int = 0
 }
 
 enum MachineCycle: Int {
-    case OpcodeFetch = 1, MemoryRead, MemoryWrite, IoRead, IoWrite, UlaOperation, TimeWait
+    case OpcodeFetch = 1, MemoryRead, MemoryWrite, IoRead, IoWrite, UlaOperation, TimeWait, SoftIrq, NMIrq
 }
 
 enum UlaOp {
