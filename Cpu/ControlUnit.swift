@@ -10,10 +10,6 @@ import Foundation
 
 class ControlUnit {
     // MARK: Parameters
-    enum IrqKind {
-        case NMI, Soft
-    }
-    
     let pins : Pins
     var regs : Registers!
     

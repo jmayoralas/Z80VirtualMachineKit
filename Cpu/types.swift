@@ -94,6 +94,10 @@ public enum Z80Error : ErrorType {
     case ZeroBytesWriteToMemory
 }
 
+enum IrqKind {
+    case NMI, Soft
+}
+
 let S = 0
 let Z = 1
 let H = 3
