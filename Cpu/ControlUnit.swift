@@ -206,7 +206,34 @@ class ControlUnit {
     func checkParity(data: UInt8) -> Int {
         return (data.parity == 0) ? 1 : 0 // 1 -> Even parity, 0 -> Odd parity
     }
-
+    
+	func rst(address: UInt16) {
+        let last_t_cycle : Int
+        if irq_kind != nil && irq_kind! != .NMI {
+            last_t_cycle = 7
+        } else {
+            last_t_cycle = 5
+        }
+        switch m_cycle {
+        case 1:
+            machine_cycle = .TimeWait
+            if t_cycle == last_t_cycle {
+                regs.sp--
+                pins.address_bus = self.regs.sp
+                pins.data_bus = self.regs.pc.high
+                machine_cycle = .MemoryWrite
+            }
+        case 2:
+            regs.sp--
+            pins.address_bus = self.regs.sp
+            pins.data_bus = self.regs.pc.low
+        default:
+            regs.pc = address
+            machine_cycle = .OpcodeFetch
+            irq_kind = nil
+        }
+    }
+    
     // MARK: Initialization
     init(pins: Pins) {
         m_cycle = 0
