@@ -9,6 +9,13 @@
 import Foundation
 
 class TestDevice : IODevice {
+    var test_device_t_cycle : Int
+    
+    override init(pins: Pins, port: UInt8) {
+        test_device_t_cycle = 0
+        
+        super.init(pins: pins, port: port)
+    }
     
     override func read() -> UInt8? {
         print("T: \(t_cycle)")
@@ -26,6 +33,17 @@ class TestDevice : IODevice {
             print("test device write \(data) T: \(t_cycle)")
             return true
         }
+        return false
+    }
+    
+    override func irq() -> Bool {
+        test_device_t_cycle++
+        
+        if test_device_t_cycle == 7 {
+            test_device_t_cycle = 0
+            return true
+        }
+        
         return false
     }
 }
