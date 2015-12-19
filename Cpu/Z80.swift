@@ -22,15 +22,14 @@ class Z80 {
     private var m_cycle = 0
     private var old_busreq: Bool!
     
-    private var int_request: Bool = false // interruption requested
-    private var int_attended: Bool = false // interruption processed
-    
     private var prefix: UInt8?
     
     init() {
         regs = Registers()
         pins = Pins()
         cu = ControlUnit(pins: pins)
+        
+        regs.int_mode = 2
         
         old_busreq = pins.busreq
         
@@ -51,11 +50,18 @@ class Z80 {
             old_busreq = pins.busreq
             return
         }
+        
         pins.busack = false
         
         t_cycle++
         
         switch machine_cycle {
+        case .SoftIrq:
+            softIrq()
+        
+        case .NMIrq:
+            fallthrough
+            
         case .OpcodeFetch:
             opcodeFetch()
             
@@ -97,9 +103,25 @@ class Z80 {
             m_cycle++
         }
         
-        pins.busack = pins.busreq // Acknowledge bus requests
-        int_request = pins.int // samples INT signal
-        int_attended = false
+        // samples busreq, int and nmi signals on last T state
+        if !cu.isPrefixed() && machine_cycle == .OpcodeFetch {
+            pins.busack = pins.busreq // Acknowledge bus requests
+            // samples INT signal
+            if (pins.int && regs.IFF1) || pins.nmi {
+                if pins.nmi {
+                    machine_cycle = .NMIrq
+                    regs.IFF2 = regs.IFF1
+                    regs.IFF1 = false
+                } else {
+                    // one instruction delay after EI to ack the interrupt
+                    if regs.ir != 0xFB {
+                        machine_cycle = .SoftIrq
+                        regs.IFF2 = false
+                        regs.IFF1 = false
+                    }
+                }
+            }
+        }
     }
 
     private func opcodeFetch() {
@@ -146,7 +168,43 @@ class Z80 {
             t_cycle = 0 // reset t_cycle
         }
     }
-    
+
+    private func softIrq() {
+        switch t_cycle {
+        case 1:
+            // program counter is placed on the address bus
+            pins.address_bus = regs.pc
+            
+            // we are in M1 machine cycle
+            pins.m1 = true
+            m_cycle = 1
+            
+        case 3:
+            pins.iorq = true
+            
+        case 5:
+            // turn off mreq, m1 and rd signals
+            pins.iorq = false
+            pins.m1 = false
+            
+            // refresh cycle
+            pins.rfsh = true
+            
+        case 6:
+            pins.rfsh = false
+            
+            // backup data bus into instruction register
+            regs.ir = pins.data_bus
+            
+            endMachineCycle()
+            
+        default:
+            if t_cycle > 5 {
+                t_cycle = 0 // reset t_cycle
+            }
+        }
+    }
+
     private func memoryRead() {
         switch t_cycle {
         case 1:
