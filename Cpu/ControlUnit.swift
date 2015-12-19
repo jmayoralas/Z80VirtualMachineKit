@@ -10,6 +10,9 @@ import Foundation
 
 class ControlUnit {
     // MARK: Parameters
+    enum IrqKind {
+        case NMI, Soft
+    }
     
     let pins : Pins
     var regs : Registers!
@@ -27,6 +30,8 @@ class ControlUnit {
     
     var control_reg : UInt8! // backup register to store parameters between t_cycles of execution
     
+    var irq_kind : IrqKind?
+    
     // MARK: Methods
     func isPrefixed() -> Bool {
         return (id_opcode_table != prefix_NONE) ? true : false
@@ -35,13 +40,40 @@ class ControlUnit {
     func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
         return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
     }
+    
     func processOpcode(inout regs: Registers, _ t_cycle: Int, _ m_cycle: Int, inout _ machine_cycle: MachineCycle) {
         self.m_cycle = m_cycle
         self.t_cycle = t_cycle
         self.regs = regs
         self.machine_cycle = machine_cycle
 
-        opcode_tables[id_opcode_table][Int(self.regs.ir)]()
+        switch machine_cycle {
+        case .NMIrq:
+            irq_kind = .NMI
+        case .SoftIrq:
+            irq_kind = .Soft
+        default:
+            break
+        }
+        
+        if let irq = irq_kind {
+            if irq == .Soft {
+                switch regs.int_mode {
+                case 0:
+                    opcode_tables[id_opcode_table][Int(self.regs.ir)]()
+                case 1:
+                    rst(0x0038)
+                case 2:
+                    mode2SoftIrq()
+                default:
+                    break
+                }
+            } else {
+                rst(0x0066)
+            }
+        } else {
+            opcode_tables[id_opcode_table][Int(self.regs.ir)]()
+        }
         
         machine_cycle = self.machine_cycle
         regs = self.regs
@@ -206,8 +238,8 @@ class ControlUnit {
     func checkParity(data: UInt8) -> Int {
         return (data.parity == 0) ? 1 : 0 // 1 -> Even parity, 0 -> Odd parity
     }
-    
-	func rst(address: UInt16) {
+
+    func rst(address: UInt16) {
         let last_t_cycle : Int
         if irq_kind != nil && irq_kind! != .NMI {
             last_t_cycle = 7
@@ -229,6 +261,35 @@ class ControlUnit {
             pins.data_bus = self.regs.pc.low
         default:
             regs.pc = address
+            machine_cycle = .OpcodeFetch
+            irq_kind = nil
+        }
+    }
+    
+    func mode2SoftIrq() {
+        switch m_cycle {
+        case 1:
+            machine_cycle = .TimeWait
+            if t_cycle == 7 {
+                control_reg = pins.data_bus
+                control_reg.resetBit(0)
+                regs.sp--
+                pins.address_bus = regs.sp
+                pins.data_bus = regs.pc.high
+                machine_cycle = .MemoryWrite
+            }
+        case 2:
+            regs.sp--
+            pins.address_bus = self.regs.sp
+            pins.data_bus = self.regs.pc.low
+        case 3:
+            pins.address_bus = addressFromPair(regs.i, control_reg)
+            machine_cycle = .MemoryRead
+        case 4:
+            control_reg = pins.data_bus
+            pins.address_bus++
+        default:
+            regs.pc = addressFromPair(pins.data_bus, control_reg)
             machine_cycle = .OpcodeFetch
             irq_kind = nil
         }
