@@ -12,11 +12,11 @@ protocol IODeviceProtocol : class {
     var port : UInt8 { get set }
     var pins : Pins { get set }
     var t_cycle : Int { get set }
-    var int_requested : Bool { get set }
+    var int_requested : IrqKind? { get set }
 
     func read() -> UInt8?
     func write(data : UInt8) -> Bool
-    func irq() -> Bool
+    func irq() -> IrqKind?
 }
 
 
@@ -24,24 +24,42 @@ extension IODeviceProtocol {
     func clk() -> Void {
         t_cycle++
         
-        if int_requested {
-            if pins.m1 && pins.iorq {
-                pins.wait = true
-                if let data = self.read() {
-                    pins.data_bus = data
-                    pins.wait = false
-                    int_requested = false
+        if let irq_kind = int_requested {
+            switch irq_kind {
+            case .NMI:
+                if pins.m1 {
+                    pins.nmi = false
+                    int_requested = nil
                 }
-            } else {
+                
                 t_cycle = 0
+            case .Soft:
+                if pins.m1 && pins.iorq {
+                    pins.int = false
+                    pins.wait = true
+                    
+                    if let data = self.read() {
+                        pins.data_bus = data
+                        pins.wait = false
+                        int_requested = nil
+                    }
+                } else {
+                    t_cycle = 0
+                }
             }
         } else {
             // test if cpu is talking to us
             if !pins.iorq || pins.address_bus.low != port {
                 t_cycle = 0
-                if irq() {
-                    int_requested = true
-                    pins.int = true
+                
+                int_requested = irq()
+                
+                if let irq_kind = int_requested {
+                    if irq_kind == .Soft {
+                        pins.int = true
+                    } else {
+                        pins.nmi = true
+                    }
                 }
                 return
             }
@@ -74,13 +92,13 @@ class IODevice : IODeviceProtocol {
     var port : UInt8
     var pins : Pins
     var t_cycle : Int
-    var int_requested : Bool
+    var int_requested : IrqKind?
     
     init(pins: Pins, port: UInt8) {
         self.port = port
         self.pins = pins
         t_cycle = 0
-        int_requested = false
+        int_requested = nil
     }
     
     func read() -> UInt8? {
@@ -93,7 +111,7 @@ class IODevice : IODeviceProtocol {
         return true
     }
     
-    func irq() -> Bool {
-        return false
+    func irq() -> IrqKind? {
+        return nil
     }
 }
