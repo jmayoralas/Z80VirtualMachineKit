@@ -46,6 +46,7 @@ class ControlUnit {
         switch machine_cycle {
         case .NMIrq:
             irq_kind = .NMI
+            self.regs.pc--
         case .SoftIrq:
             irq_kind = .Soft
         default:
