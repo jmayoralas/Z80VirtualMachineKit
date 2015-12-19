@@ -29,7 +29,7 @@ class Z80 {
         pins = Pins()
         cu = ControlUnit(pins: pins)
         
-        regs.int_mode = 2
+        regs.int_mode = 0
         
         old_busreq = pins.busreq
         
