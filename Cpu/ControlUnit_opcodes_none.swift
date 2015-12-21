@@ -66,8 +66,12 @@ extension ControlUnit {
         }
         opcodes[0x07] = { // RLCA
             let PV_backup = self.regs.f.bit(PV)
+            let S_backup = self.regs.f.bit(S)
+            let Z_backup = self.regs.f.bit(Z)
             self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Rlc, ignoreCarry: false)
             self.regs.f.bit(PV, newVal: PV_backup)
+            self.regs.f.bit(S, newVal: S_backup)
+            self.regs.f.bit(Z, newVal: Z_backup)
         }
         opcodes[0x08] = { // EX AF,AF'
             let a_ = self.regs.a_
@@ -136,8 +140,13 @@ extension ControlUnit {
         }
         opcodes[0x0F] = { // RRCA
             let PV_backup = self.regs.f.bit(PV)
+            let S_backup = self.regs.f.bit(S)
+            let Z_backup = self.regs.f.bit(Z)
             self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Rrc, ignoreCarry: false)
             self.regs.f.bit(PV, newVal: PV_backup)
+            self.regs.f.bit(S, newVal: S_backup)
+            self.regs.f.bit(Z, newVal: Z_backup)
+
         }
         opcodes[0x10] = { // DJNZ N
             switch self.m_cycle {
@@ -217,8 +226,13 @@ extension ControlUnit {
         }
         opcodes[0x17] = { // RLA
             let PV_backup = self.regs.f.bit(PV)
+            let S_backup = self.regs.f.bit(S)
+            let Z_backup = self.regs.f.bit(Z)
             self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Rl, ignoreCarry: false)
             self.regs.f.bit(PV, newVal: PV_backup)
+            self.regs.f.bit(S, newVal: S_backup)
+            self.regs.f.bit(Z, newVal: Z_backup)
+
         }
         opcodes[0x18] = { // JR &00
             switch self.m_cycle {
@@ -296,8 +310,13 @@ extension ControlUnit {
         }
         opcodes[0x1F] = { // RRA
             let PV_backup = self.regs.f.bit(PV)
+            let Z_backup = self.regs.f.bit(Z)
+            let S_backup = self.regs.f.bit(S)
             self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Rr, ignoreCarry: false)
             self.regs.f.bit(PV, newVal: PV_backup)
+            self.regs.f.bit(Z, newVal: Z_backup)
+            self.regs.f.bit(S, newVal: S_backup)
+
         }
         opcodes[0x20] = { // JR NZ &00
             switch self.m_cycle {
