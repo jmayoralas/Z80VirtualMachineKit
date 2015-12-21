@@ -86,7 +86,7 @@ enum MachineCycle: Int {
 }
 
 enum UlaOp {
-    case Add, Adc, Sub, Sbc, And, Or, Xor, Rlc, Rrc, Rl, Rr, Sla, Sra, Sll, Srl
+    case Add, Adc, Sub, Sbc, And, Or, Xor, Rlc, Rrc, Rl, Rr, Sla, Sra, Sll, Srl, Sls, Bit
 }
 
 public enum Z80Error : ErrorType {
