@@ -931,6 +931,9 @@ extension ControlUnit {
                 self.id_opcode_table = prefix_NONE
             }
         }
+        opcodes[0xCB] = {
+            self.id_opcode_table = prefix_FDCB
+        }
         opcodes[0xE1] = { // POP IY
             switch self.m_cycle {
             case 2:
