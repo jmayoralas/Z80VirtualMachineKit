@@ -710,6 +710,709 @@ extension ControlUnit {
             self.ulaCall(self.regs.a, 7, ulaOp: .Bit, ignoreCarry: false)
             self.id_opcode_table = prefix_NONE
         }
-
+        opcodes[0x80] = { // RES 0,B
+            self.regs.b.resetBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x81] = { // RES 0,C
+            self.regs.c.resetBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x82] = { // RES 0,D
+            self.regs.d.resetBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x83] = { // RES 0,E
+            self.regs.e.resetBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x84] = { // RES 0,H
+            self.regs.h.resetBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x85] = { // RES 0,L
+            self.regs.l.resetBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x86] = { // RES 0,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.resetBit(0)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0x87] = { // RES 0,A
+            self.regs.a.resetBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x88] = { // RES 1,B
+            self.regs.b.resetBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x89] = { // RES 1,C
+            self.regs.c.resetBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x8A] = { // RES 1,D
+            self.regs.d.resetBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x8B] = { // RES 1,E
+            self.regs.e.resetBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x8C] = { // RES 1,H
+            self.regs.h.resetBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x8D] = { // RES 1,L
+            self.regs.l.resetBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x8E] = { // RES 1,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.resetBit(1)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0x8F] = { // RES 1,A
+            self.regs.a.resetBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x90] = { // RES 2,B
+            self.regs.b.resetBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x91] = { // RES 2,C
+            self.regs.c.resetBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x92] = { // RES 2,D
+            self.regs.d.resetBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x93] = { // RES 2,E
+            self.regs.e.resetBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x94] = { // RES 2,H
+            self.regs.h.resetBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x95] = { // RES 2,L
+            self.regs.l.resetBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x96] = { // RES 2,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.resetBit(2)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0x97] = { // RES 2,A
+            self.regs.a.resetBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x98] = { // RES 3,B
+            self.regs.b.resetBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x99] = { // RES 3,C
+            self.regs.c.resetBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x9A] = { // RES 3,D
+            self.regs.d.resetBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x9B] = { // RES 3,E
+            self.regs.e.resetBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x9C] = { // RES 3,H
+            self.regs.h.resetBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x9D] = { // RES 3,L
+            self.regs.l.resetBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0x9E] = { // RES 3,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.resetBit(3)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0x9F] = { // RES 3,A
+            self.regs.a.resetBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xA0] = { // RES 4,B
+            self.regs.b.resetBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xA1] = { // RES 4,C
+            self.regs.c.resetBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xA2] = { // RES 4,D
+            self.regs.d.resetBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xA3] = { // RES 4,E
+            self.regs.e.resetBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xA4] = { // RES 4,H
+            self.regs.h.resetBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xA5] = { // RES 4,L
+            self.regs.l.resetBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xA6] = { // RES 4,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.resetBit(4)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xA7] = { // RES 4,A
+            self.regs.a.resetBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xA8] = { // RES 5,B
+            self.regs.b.resetBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xA9] = { // RES 5,C
+            self.regs.c.resetBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xAA] = { // RES 5,D
+            self.regs.d.resetBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xAB] = { // RES 5,E
+            self.regs.e.resetBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xAC] = { // RES 5,H
+            self.regs.h.resetBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xAD] = { // RES 5,L
+            self.regs.l.resetBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xAE] = { // RES 5,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.resetBit(5)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xAF] = { // RES 5,A
+            self.regs.a.resetBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xB0] = { // RES 6,B
+            self.regs.b.resetBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xB1] = { // RES 6,C
+            self.regs.c.resetBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xB2] = { // RES 6,D
+            self.regs.d.resetBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xB3] = { // RES 6,E
+            self.regs.e.resetBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xB4] = { // RES 6,H
+            self.regs.h.resetBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xB5] = { // RES 6,L
+            self.regs.l.resetBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xB6] = { // RES 6,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.resetBit(6)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xB7] = { // RES 6,A
+            self.regs.a.resetBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xB8] = { // RES 7,B
+            self.regs.b.resetBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xB9] = { // RES 7,C
+            self.regs.c.resetBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xBA] = { // RES 7,D
+            self.regs.d.resetBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xBB] = { // RES 7,E
+            self.regs.e.resetBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xBC] = { // RES 7,H
+            self.regs.h.resetBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xBD] = { // RES 7,L
+            self.regs.l.resetBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xBE] = { // RES 7,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.resetBit(7)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xBF] = { // RES 7,A
+            self.regs.a.resetBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+                opcodes[0xC0] = { // SET 0,B
+            self.regs.b.setBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xC1] = { // SET 0,C
+            self.regs.c.setBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xC2] = { // SET 0,D
+            self.regs.d.setBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xC3] = { // SET 0,E
+            self.regs.e.setBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xC4] = { // SET 0,H
+            self.regs.h.setBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xC5] = { // SET 0,L
+            self.regs.l.setBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xC6] = { // SET 0,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.setBit(0)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xC7] = { // SET 0,A
+            self.regs.a.setBit(0)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xC8] = { // SET 1,B
+            self.regs.b.setBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xC9] = { // SET 1,C
+            self.regs.c.setBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xCA] = { // SET 1,D
+            self.regs.d.setBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xCB] = { // SET 1,E
+            self.regs.e.setBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xCC] = { // SET 1,H
+            self.regs.h.setBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xCD] = { // SET 1,L
+            self.regs.l.setBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xCE] = { // SET 1,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.setBit(1)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xCF] = { // SET 1,A
+            self.regs.a.setBit(1)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xD0] = { // SET 2,B
+            self.regs.b.setBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xD1] = { // SET 2,C
+            self.regs.c.setBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xD2] = { // SET 2,D
+            self.regs.d.setBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xD3] = { // SET 2,E
+            self.regs.e.setBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xD4] = { // SET 2,H
+            self.regs.h.setBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xD5] = { // SET 2,L
+            self.regs.l.setBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xD6] = { // SET 2,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.setBit(2)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xD7] = { // SET 2,A
+            self.regs.a.setBit(2)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xD8] = { // SET 3,B
+            self.regs.b.setBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xD9] = { // SET 3,C
+            self.regs.c.setBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xDA] = { // SET 3,D
+            self.regs.d.setBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xDB] = { // SET 3,E
+            self.regs.e.setBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xDC] = { // SET 3,H
+            self.regs.h.setBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xDD] = { // SET 3,L
+            self.regs.l.setBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xDE] = { // SET 3,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.setBit(3)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xDF] = { // SET 3,A
+            self.regs.a.setBit(3)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xE0] = { // SET 4,B
+            self.regs.b.setBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xE1] = { // SET 4,C
+            self.regs.c.setBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xE2] = { // SET 4,D
+            self.regs.d.setBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xE3] = { // SET 4,E
+            self.regs.e.setBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xE4] = { // SET 4,H
+            self.regs.h.setBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xE5] = { // SET 4,L
+            self.regs.l.setBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xE6] = { // SET 4,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.setBit(4)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xE7] = { // SET 4,A
+            self.regs.a.setBit(4)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xE8] = { // SET 5,B
+            self.regs.b.setBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xE9] = { // SET 5,C
+            self.regs.c.setBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xEA] = { // SET 5,D
+            self.regs.d.setBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xEB] = { // SET 5,E
+            self.regs.e.setBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xEC] = { // SET 5,H
+            self.regs.h.setBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xED] = { // SET 5,L
+            self.regs.l.setBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xEE] = { // SET 5,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.setBit(5)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xEF] = { // SET 5,A
+            self.regs.a.setBit(5)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xF0] = { // SET 6,B
+            self.regs.b.setBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xF1] = { // SET 6,C
+            self.regs.c.setBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xF2] = { // SET 6,D
+            self.regs.d.setBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xF3] = { // SET 6,E
+            self.regs.e.setBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xF4] = { // SET 6,H
+            self.regs.h.setBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xF5] = { // SET 6,L
+            self.regs.l.setBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xF6] = { // SET 6,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.setBit(6)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xF7] = { // SET 6,A
+            self.regs.a.setBit(6)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xF8] = { // SET 7,B
+            self.regs.b.setBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xF9] = { // SET 7,C
+            self.regs.c.setBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xFA] = { // SET 7,D
+            self.regs.d.setBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xFB] = { // SET 7,E
+            self.regs.e.setBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xFC] = { // SET 7,H
+            self.regs.h.setBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xFD] = { // SET 7,L
+            self.regs.l.setBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
+        opcodes[0xFE] = { // SET 7,(HL)
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 4 {
+                    self.pins.data_bus.setBit(7)
+                    self.machine_cycle = .MemoryWrite
+                }
+            default:
+                self.machine_cycle = .OpcodeFetch
+                self.id_opcode_table = prefix_NONE
+            }
+        }
+        opcodes[0xFF] = { // SET 7,A
+            self.regs.a.setBit(7)
+            self.id_opcode_table = prefix_NONE
+        }
     }
 }
