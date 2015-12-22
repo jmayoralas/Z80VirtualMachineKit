@@ -932,7 +932,21 @@ extension ControlUnit {
             }
         }
         opcodes[0xCB] = {
-            self.id_opcode_table = prefix_DDCB
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.regs.pc
+                self.regs.pc++
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.control_reg = self.pins.data_bus
+                self.pins.address_bus = self.regs.pc
+                self.regs.pc++
+            case 4:
+                self.regs.ir_ = self.pins.data_bus
+                fallthrough
+            default:
+                self.opcode_tables[prefix_DDCB][Int(self.regs.ir_)]()
+            }
         }
         opcodes[0xE1] = { // POP IX
             switch self.m_cycle {
