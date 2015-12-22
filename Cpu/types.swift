@@ -27,8 +27,9 @@ class Pins {
 }
 
 struct Registers {
-    // Instruction Register
+    // Instruction Registers
     var ir: UInt8 = 0
+    var ir_: UInt8 = 0
     
     // Main Register Set
     // accumulator
