@@ -340,6 +340,7 @@ class ControlUnit {
         initOpcodeTableDD(&opcode_tables[prefix_DD])
         initOpcodeTableFD(&opcode_tables[prefix_FD])
         initOpcodeTableCB(&opcode_tables[prefix_CB])
+        initOpcodeTableED(&opcode_tables[prefix_ED])
         initOpcodeTableDDCB(&opcode_tables[prefix_DDCB])
         initOpcodeTableFDCB(&opcode_tables[prefix_FDCB])
     }
