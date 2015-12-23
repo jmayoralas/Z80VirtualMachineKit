@@ -1718,7 +1718,7 @@ extension ControlUnit {
                 self.machine_cycle = .OpcodeFetch
             }
         }
-        opcodes[0xDB] = { // IN (&00), A
+        opcodes[0xDB] = { // IN A,(&00)
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
