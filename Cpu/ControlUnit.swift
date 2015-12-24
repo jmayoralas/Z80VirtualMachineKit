@@ -90,13 +90,12 @@ class ControlUnit {
         }
         
         let result_h = ulaCall(operandA.high, operandB.high, ulaOp: ulaOp_high, ignoreCarry: false)
-        // bits S, Z and PV are not affected so restore from F backup
-        self.regs.f.bit(S, newVal: f_old.bit(S))
-        self.regs.f.bit(Z, newVal: f_old.bit(Z))
-        self.regs.f.bit(PV, newVal: f_old.bit(PV))
-        // N is reset
-        self.regs.f.resetBit(N)
-        
+        if ulaOp == .Add {
+            // bits S, Z and PV are not affected so restore from F backup
+            self.regs.f.bit(S, newVal: f_old.bit(S))
+            self.regs.f.bit(Z, newVal: f_old.bit(Z))
+            self.regs.f.bit(PV, newVal: f_old.bit(PV))
+        }
         
         return addressFromPair(result_h, result_l)
     }
