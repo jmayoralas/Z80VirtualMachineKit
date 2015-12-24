@@ -89,7 +89,7 @@ class Z80 {
         print("address_bus: \(pins.address_bus.hexStr()) - data_bus: \(pins.data_bus.hexStr()) \(pins.data_bus.binStr) - PC: \(regs.pc.hexStr()) - M: \(m_cycle) - T: \(t_cycle) - \(machine_cycle)")
         print(" IR: \(regs.ir.hexStr())                      CNPxHxZS")
         print("  A: \(regs.a.hexStr()) \(regs.a.binStr) -   F: \(regs.f.hexStr()) \(regs.f.binStr) - SP: \(regs.sp.hexStr())")
-        print("  B: \(regs.b.hexStr()) \(regs.b.binStr) -   C: \(regs.c.hexStr()) \(regs.c.binStr)")
+        print("  B: \(regs.b.hexStr()) \(regs.b.binStr) -   C: \(regs.c.hexStr()) \(regs.c.binStr) -  I: \(regs.i.hexStr())")
         print("  D: \(regs.d.hexStr()) \(regs.d.binStr) -   E: \(regs.e.hexStr()) \(regs.e.binStr)")
         print("  H: \(regs.h.hexStr()) \(regs.h.binStr) -   L: \(regs.l.hexStr()) \(regs.l.binStr)")
         print("IXH: \(regs.ixh.hexStr()) \(regs.ixh.binStr) - IXL: \(regs.ixl.hexStr()) \(regs.ixl.binStr)")
