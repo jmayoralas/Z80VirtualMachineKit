@@ -106,7 +106,7 @@ class ControlUnit {
         ￼￼Position S Z X H X P/V N C
         */
         
-        var result: UInt8?
+        var result: UInt8 = 0
         var old_carry: UInt8 = 0
         
         switch ulaOp {
@@ -116,9 +116,9 @@ class ControlUnit {
         case .Add:
             result = operandA &+ operandB &+ old_carry
             
-            if result!.low < operandA.low {regs.f.setBit(H)} else {regs.f.resetBit(H)} // H (Half Carry)
+            if result.low < operandA.low {regs.f.setBit(H)} else {regs.f.resetBit(H)} // H (Half Carry)
             regs.f.resetBit(N) // N (Add)
-            regs.f.bit(PV, newVal: checkOverflow(operandA, operandB, result: result!, ulaOp: ulaOp))
+            regs.f.bit(PV, newVal: checkOverflow(operandA, operandB, result: result, ulaOp: ulaOp))
             
             if !ignoreCarry {
                 if (result < operandA) || (result == operandA && operandB > 0) {
@@ -134,9 +134,9 @@ class ControlUnit {
         case .Sub:
             result = operandA &- operandB &- old_carry
             
-            if result!.low > operandA.low {regs.f.setBit(H)} else {regs.f.resetBit(H)} // H (Half Carry)
+            if result.low > operandA.low {regs.f.setBit(H)} else {regs.f.resetBit(H)} // H (Half Carry)
             regs.f.setBit(N) // N (Substract)
-            regs.f.bit(PV, newVal: checkOverflow(operandA, operandB, result: result!, ulaOp: ulaOp))
+            regs.f.bit(PV, newVal: checkOverflow(operandA, operandB, result: result, ulaOp: ulaOp))
             
             if !ignoreCarry {
                 if (result > operandA) || (result == operandA && operandB > 0) {
@@ -153,14 +153,14 @@ class ControlUnit {
             regs.f.bit(C, newVal: operandA.bit(7)) // sign bit is copied to the carry flag
             result = operandA << 1
             if ulaOp == .Rl {
-                result!.bit(0, newVal: Int(old_carry)) // old carry is copied to the bit 0
+                result.bit(0, newVal: Int(old_carry)) // old carry is copied to the bit 0
             } else {
-                result!.bit(0, newVal: regs.f.bit(C)) // new carry is copied to the bit 0
+                result.bit(0, newVal: regs.f.bit(C)) // new carry is copied to the bit 0
             }
             
             regs.f.resetBit(H)
             regs.f.resetBit(N)
-            regs.f.bit(PV, newVal: checkParity(result!))
+            regs.f.bit(PV, newVal: checkParity(result))
             
         case .Rr:
             old_carry = UInt8(regs.f.bit(C))
@@ -169,14 +169,14 @@ class ControlUnit {
             regs.f.bit(C, newVal: operandA.bit(0)) // least significant bit is copied to the carry flag
             result = operandA >> 1
             if ulaOp == .Rr {
-                result!.bit(7, newVal: Int(old_carry)) // old carry is copied to the bit 7
+                result.bit(7, newVal: Int(old_carry)) // old carry is copied to the bit 7
             } else {
-                result!.bit(7, newVal: regs.f.bit(C)) // new carry is copied to the bit 7
+                result.bit(7, newVal: regs.f.bit(C)) // new carry is copied to the bit 7
             }
             
             regs.f.resetBit(H)
             regs.f.resetBit(N)
-            regs.f.bit(PV, newVal: checkParity(result!))
+            regs.f.bit(PV, newVal: checkParity(result))
         
         case .Sls:
             fallthrough
@@ -184,22 +184,22 @@ class ControlUnit {
             regs.f.bit(C, newVal: operandA.bit(7)) // sign bit is copied to the carry flag
             result = operandA << 1
             if ulaOp == .Sls {
-                result!.bit(0, newVal: 1)
+                result.bit(0, newVal: 1)
             }
             
             regs.f.resetBit(H)
             regs.f.resetBit(N)
-            regs.f.bit(PV, newVal: checkParity(result!))
+            regs.f.bit(PV, newVal: checkParity(result))
             
         case .Sra:
             regs.f.bit(C, newVal: operandA.bit(0)) // bit 0 is copied to the carry flag
             let sign_bit = operandA.bit(7)
             result = operandA >> 1
-            result!.bit(7, newVal: sign_bit) // sign bit is restored
+            result.bit(7, newVal: sign_bit) // sign bit is restored
             
             regs.f.resetBit(H)
             regs.f.resetBit(N)
-            regs.f.bit(PV, newVal: checkParity(result!))
+            regs.f.bit(PV, newVal: checkParity(result))
         
         case .Srl:
             regs.f.bit(C, newVal: operandA.bit(0)) // bit 0 is copied to the carry flag
@@ -207,7 +207,7 @@ class ControlUnit {
             
             regs.f.resetBit(H)
             regs.f.resetBit(N)
-            regs.f.bit(PV, newVal: checkParity(result!))
+            regs.f.bit(PV, newVal: checkParity(result))
             
         case .And:
             fallthrough
@@ -228,7 +228,7 @@ class ControlUnit {
                 break
             }
             
-            regs.f.bit(PV, newVal: checkParity(result!))
+            regs.f.bit(PV, newVal: checkParity(result))
             regs.f.resetBit(N)
             regs.f.resetBit(C)
             
@@ -241,11 +241,11 @@ class ControlUnit {
         }
         
         if ulaOp != .Bit {
-            regs.f.bit(S, newVal: result!.bit(7))
-            if result! == 0 {regs.f.setBit(Z)} else {regs.f.resetBit(Z)} // Z (Zero)
+            regs.f.bit(S, newVal: result.bit(7))
+            if result == 0 {regs.f.setBit(Z)} else {regs.f.resetBit(Z)} // Z (Zero)
         }
         
-        return result!
+        return result
     }
     
     func checkOverflow(opA: UInt8, _ opB: UInt8, result: UInt8, ulaOp: UlaOp) -> Int {
