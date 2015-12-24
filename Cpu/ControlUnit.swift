@@ -120,8 +120,12 @@ class ControlUnit {
             regs.f.resetBit(N) // N (Add)
             regs.f.bit(PV, newVal: checkOverflow(operandA, operandB, result: result!, ulaOp: ulaOp))
             
-            if !ignoreCarry && operandB > 0 {
-                if result! <= operandA {regs.f.setBit(C)} else {regs.f.resetBit(C)} // C (Carry)
+            if !ignoreCarry {
+                if (result < operandA) || (result == operandA && operandB > 0) {
+                    regs.f.setBit(C)
+                } else {
+                    regs.f.resetBit(C)
+                } 
             }
             
         case .Sbc:
@@ -135,7 +139,11 @@ class ControlUnit {
             regs.f.bit(PV, newVal: checkOverflow(operandA, operandB, result: result!, ulaOp: ulaOp))
             
             if !ignoreCarry {
-                if result! > operandA {regs.f.setBit(C)} else {regs.f.resetBit(C)} // C (Carry)
+                if (result > operandA) || (result == operandA && operandB > 0) {
+                    regs.f.setBit(C)
+                } else {
+                    regs.f.resetBit(C)
+                }
             }
             
         case .Rl:
