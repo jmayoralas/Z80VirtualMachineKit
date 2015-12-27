@@ -199,8 +199,7 @@ extension ControlUnit {
             }
         }
         opcodes[0x4C] = { // NEG
-            self.regs.a = UInt8(self.regs.a.comp2)
-            self.id_opcode_table = prefix_NONE
+            self.opcode_tables[self.id_opcode_table][0x44]()
         }
         opcodes[0x4D] = { // RETI #TO-DO: signal an I/O device that the interrupt routine is completed
             switch self.m_cycle {
@@ -219,8 +218,7 @@ extension ControlUnit {
             }
         }
         opcodes[0x4E] = { // IM 0
-            self.regs.int_mode = 0
-            self.id_opcode_table = prefix_NONE
+            self.opcode_tables[self.id_opcode_table][0x46]()
         }
         opcodes[0x4F] = { // LD R,A
             self.machine_cycle = .TimeWait
