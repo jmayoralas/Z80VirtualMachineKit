@@ -1044,5 +1044,46 @@ extension ControlUnit {
                 self.id_opcode_table = prefix_NONE   
             }
         }
+        opcodes[0xB0] = { // LDIR
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.pins.address_bus = self.addressFromPair(self.regs.d, self.regs.e)
+                self.machine_cycle = .MemoryWrite
+            case 4:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    let f_backup = self.regs.f
+                    let de = self.ulaCall16(self.pins.address_bus, 1, ulaOp: .Add)
+                    self.regs.d = de.high
+                    self.regs.e = de.low
+                    let hl = self.ulaCall16(self.addressFromPair(self.regs.h, self.regs.l), 1, ulaOp: .Add)
+                    self.regs.h = hl.high
+                    self.regs.l = hl.low
+                    let bc = self.ulaCall16(self.addressFromPair(self.regs.b, self.regs.c), 1, ulaOp: .Sub)
+                    self.regs.b = bc.high
+                    self.regs.c = bc.low
+                    self.regs.f = f_backup
+                    self.regs.f.resetBit(H)
+                    self.regs.f.resetBit(N)
+                    if bc != 0 {
+                        self.machine_cycle = .UlaOperation
+                    } else {
+                        self.regs.f.resetBit(PV)
+                        self.machine_cycle = .OpcodeFetch
+                        self.id_opcode_table = prefix_NONE
+                    }
+                }
+            default:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.regs.pc = self.regs.pc - 2
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            }
+        }
     }
 }
