@@ -1085,5 +1085,262 @@ extension ControlUnit {
                 }
             }
         }
+        opcodes[0xB1] = { // CPIR
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 3 {
+                    self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Sub, ignoreCarry: true)
+                    self.machine_cycle = .UlaOperation
+                }
+            case 4:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    let f_backup = self.regs.f
+                    let hl = self.ulaCall16(self.addressFromPair(self.regs.h, self.regs.l), 1, ulaOp: .Add)
+                    self.regs.h = hl.high
+                    self.regs.l = hl.low
+                    let bc = self.ulaCall16(self.addressFromPair(self.regs.b, self.regs.c), 1, ulaOp: .Sub)
+                    self.regs.b = bc.high
+                    self.regs.c = bc.low
+                    self.regs.f = f_backup
+                    if bc != 0 && self.regs.f.bit(Z) == 0 {
+                        self.machine_cycle = .UlaOperation
+                        self.regs.f.setBit(PV)
+                    } else {
+                        self.regs.f.resetBit(PV)
+                        self.machine_cycle = .OpcodeFetch
+                        self.id_opcode_table = prefix_NONE
+                    }
+                }
+            default:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.regs.pc = self.regs.pc - 2
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            }
+        }
+        opcodes[0xB2] = { // INIR
+            switch self.m_cycle {
+            case 2:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.pins.address_bus = self.addressFromPair(self.regs.b, self.regs.c)
+                    self.machine_cycle = .IoRead
+                }
+            case 3:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryWrite
+            case 4:
+                let f_backup = self.regs.f
+                let hl = self.ulaCall16(self.addressFromPair(self.regs.h, self.regs.l), 1, ulaOp: .Add)
+                self.regs.h = hl.high
+                self.regs.l = hl.low
+                self.regs.f = f_backup
+                self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
+                if self.regs.b != 0 {
+                    self.machine_cycle = .UlaOperation
+                    self.regs.f.setBit(PV)
+                } else {
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            default:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.regs.pc = self.regs.pc - 2
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            }
+        }
+        opcodes[0xB3] = { // OTIR
+            switch self.m_cycle {
+            case 2:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryRead
+                }
+            case 3:
+                self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
+                self.pins.address_bus = self.addressFromPair(self.regs.b, self.regs.c)
+                self.machine_cycle = .IoWrite
+            case 4:
+                let f_backup = self.regs.f
+                let hl = self.ulaCall16(self.addressFromPair(self.regs.h, self.regs.l), 1, ulaOp: .Add)
+                self.regs.h = hl.high
+                self.regs.l = hl.low
+                self.regs.f = f_backup
+                if self.regs.b != 0 {
+                    self.machine_cycle = .UlaOperation
+                    self.regs.f.setBit(PV)
+                } else {
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            default:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.regs.pc = self.regs.pc - 2
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            }
+        }
+        opcodes[0xB8] = { // LDDR
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.pins.address_bus = self.addressFromPair(self.regs.d, self.regs.e)
+                self.machine_cycle = .MemoryWrite
+            case 4:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    let f_backup = self.regs.f
+                    let de = self.ulaCall16(self.pins.address_bus, 1, ulaOp: .Sub)
+                    self.regs.d = de.high
+                    self.regs.e = de.low
+                    let hl = self.ulaCall16(self.addressFromPair(self.regs.h, self.regs.l), 1, ulaOp: .Sub)
+                    self.regs.h = hl.high
+                    self.regs.l = hl.low
+                    let bc = self.ulaCall16(self.addressFromPair(self.regs.b, self.regs.c), 1, ulaOp: .Sub)
+                    self.regs.b = bc.high
+                    self.regs.c = bc.low
+                    self.regs.f = f_backup
+                    self.regs.f.resetBit(H)
+                    self.regs.f.resetBit(N)
+                    if bc != 0 {
+                        self.machine_cycle = .UlaOperation
+                    } else {
+                        self.regs.f.resetBit(PV)
+                        self.machine_cycle = .OpcodeFetch
+                        self.id_opcode_table = prefix_NONE
+                    }
+                }
+            default:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.regs.pc = self.regs.pc - 2
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            }
+        }
+        opcodes[0xB9] = { // CPDR
+            switch self.m_cycle {
+            case 2:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryRead
+            case 3:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 3 {
+                    self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Sub, ignoreCarry: true)
+                    self.machine_cycle = .UlaOperation
+                }
+            case 4:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    let f_backup = self.regs.f
+                    let hl = self.ulaCall16(self.addressFromPair(self.regs.h, self.regs.l), 1, ulaOp: .Sub)
+                    self.regs.h = hl.high
+                    self.regs.l = hl.low
+                    let bc = self.ulaCall16(self.addressFromPair(self.regs.b, self.regs.c), 1, ulaOp: .Sub)
+                    self.regs.b = bc.high
+                    self.regs.c = bc.low
+                    self.regs.f = f_backup
+                    if bc != 0 && self.regs.f.bit(Z) == 0 {
+                        self.machine_cycle = .UlaOperation
+                        self.regs.f.setBit(PV)
+                    } else {
+                        self.regs.f.resetBit(PV)
+                        self.machine_cycle = .OpcodeFetch
+                        self.id_opcode_table = prefix_NONE
+                    }
+                }
+            default:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.regs.pc = self.regs.pc - 2
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            }
+        }
+        opcodes[0xBA] = { // INDR
+            switch self.m_cycle {
+            case 2:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.pins.address_bus = self.addressFromPair(self.regs.b, self.regs.c)
+                    self.machine_cycle = .IoRead
+                }
+            case 3:
+                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                self.machine_cycle = .MemoryWrite
+            case 4:
+                let f_backup = self.regs.f
+                let hl = self.ulaCall16(self.addressFromPair(self.regs.h, self.regs.l), 1, ulaOp: .Sub)
+                self.regs.h = hl.high
+                self.regs.l = hl.low
+                self.regs.f = f_backup
+                self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
+                if self.regs.b != 0 {
+                    self.machine_cycle = .UlaOperation
+                    self.regs.f.setBit(PV)
+                } else {
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            default:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.regs.pc = self.regs.pc - 2
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            }
+        }
+        opcodes[0xBB] = { // OTDR
+            switch self.m_cycle {
+            case 2:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
+                    self.machine_cycle = .MemoryRead
+                }
+            case 3:
+                self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
+                self.pins.address_bus = self.addressFromPair(self.regs.b, self.regs.c)
+                self.machine_cycle = .IoWrite
+            case 4:
+                let f_backup = self.regs.f
+                let hl = self.ulaCall16(self.addressFromPair(self.regs.h, self.regs.l), 1, ulaOp: .Sub)
+                self.regs.h = hl.high
+                self.regs.l = hl.low
+                self.regs.f = f_backup
+                if self.regs.b != 0 {
+                    self.machine_cycle = .UlaOperation
+                    self.regs.f.setBit(PV)
+                } else {
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            default:
+                self.machine_cycle = .TimeWait
+                if self.t_cycle == 5 {
+                    self.regs.pc = self.regs.pc - 2
+                    self.machine_cycle = .OpcodeFetch
+                    self.id_opcode_table = prefix_NONE
+                }
+            }
+        }
     }
 }
