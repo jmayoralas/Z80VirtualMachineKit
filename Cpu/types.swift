@@ -26,60 +26,60 @@ class Pins {
     var wr: Bool = false
 }
 
-struct Registers {
+public struct Registers {
     // Instruction Registers
-    var ir: UInt8 = 0
-    var ir_: UInt8 = 0
+    public var ir: UInt8 = 0
+    public var ir_: UInt8 = 0
     
     // Main Register Set
     // accumulator
-    var a: UInt8 = 0
-    var b: UInt8 = 0
-    var d: UInt8 = 0
-    var h: UInt8 = 0
+    public var a: UInt8 = 0
+    public var b: UInt8 = 0
+    public var d: UInt8 = 0
+    public var h: UInt8 = 0
     
     // flags
-    var f: UInt8 = 0
-    var c: UInt8 = 0
-    var e: UInt8 = 0
-    var l: UInt8 = 0
+    public var f: UInt8 = 0
+    public var c: UInt8 = 0
+    public var e: UInt8 = 0
+    public var l: UInt8 = 0
     
     // Alternate Register Set
     // accumulator
-    var a_: UInt8 = 0
-    var b_: UInt8 = 0
-    var d_: UInt8 = 0
-    var h_: UInt8 = 0
+    public var a_: UInt8 = 0
+    public var b_: UInt8 = 0
+    public var d_: UInt8 = 0
+    public var h_: UInt8 = 0
     
     // flags
-    var f_: UInt8 = 0
-    var c_: UInt8 = 0
-    var e_: UInt8 = 0
-    var l_: UInt8 = 0
+    public var f_: UInt8 = 0
+    public var c_: UInt8 = 0
+    public var e_: UInt8 = 0
+    public var l_: UInt8 = 0
     
     // Interrupt Vector
-    var i: UInt8 = 0
+    public var i: UInt8 = 0
     
     // Memory Refresh
-    var r: UInt8 = 0
+    public var r: UInt8 = 0
     
     // Index Registers
-    var ixh: UInt8 = 0
-    var ixl: UInt8 = 0
-    var iyh: UInt8 = 0
-    var iyl: UInt8 = 0
+    public var ixh: UInt8 = 0
+    public var ixl: UInt8 = 0
+    public var iyh: UInt8 = 0
+    public var iyl: UInt8 = 0
     
     // Stack Pointer
-    var sp: UInt16 = 0
+    public var sp: UInt16 = 0
     
     // Program Counter
-    var pc: UInt16 = 0
+    public var pc: UInt16 = 0
     
     // Internal software-controlled interrupt enable
-    var IFF1 : Bool = false
-    var IFF2 : Bool = false
+    public var IFF1 : Bool = false
+    public var IFF2 : Bool = false
 
-    var int_mode : Int = 0
+    public var int_mode : Int = 0
 }
 
 enum MachineCycle: Int {
