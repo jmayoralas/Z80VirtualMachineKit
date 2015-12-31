@@ -21,6 +21,8 @@
 		1DD7231C1C35871800178421 /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723101C35871800178421 /* Memory.swift */; };
 		1DD7231D1C35871800178421 /* types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723111C35871800178421 /* types.swift */; };
 		1DD7231E1C35871800178421 /* Z80.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723121C35871800178421 /* Z80.swift */; };
+		1DD723211C3588F200178421 /* IODevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7231F1C3588F200178421 /* IODevice.swift */; };
+		1DD723221C3588F200178421 /* TestDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723201C3588F200178421 /* TestDevice.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +42,8 @@
 		1DD723101C35871800178421 /* Memory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
 		1DD723111C35871800178421 /* types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = types.swift; sourceTree = "<group>"; };
 		1DD723121C35871800178421 /* Z80.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Z80.swift; sourceTree = "<group>"; };
+		1DD7231F1C3588F200178421 /* IODevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IODevice.swift; path = ../../IODevice.swift; sourceTree = "<group>"; };
+		1DD723201C3588F200178421 /* TestDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestDevice.swift; path = ../../TestDevice.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +79,8 @@
 				1DD723061C35871800178421 /* Cpu */,
 				1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */,
 				1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */,
+				1DD7231F1C3588F200178421 /* IODevice.swift */,
+				1DD723201C3588F200178421 /* TestDevice.swift */,
 				1DD722DB1C35857B00178421 /* Info.plist */,
 			);
 			path = Z80VirtualMachineKit;
@@ -187,10 +193,12 @@
 				1DD723181C35871800178421 /* ControlUnit_opcodes_fd.swift in Sources */,
 				1DD723171C35871800178421 /* ControlUnit_opcodes_ed.swift in Sources */,
 				1DD7231E1C35871800178421 /* Z80.swift in Sources */,
+				1DD723221C3588F200178421 /* TestDevice.swift in Sources */,
 				1DD723161C35871800178421 /* ControlUnit_opcodes_ddcb.swift in Sources */,
 				1DD7231C1C35871800178421 /* Memory.swift in Sources */,
 				1DD7231B1C35871800178421 /* extensions.swift in Sources */,
 				1DD7231D1C35871800178421 /* types.swift in Sources */,
+				1DD723211C3588F200178421 /* IODevice.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
