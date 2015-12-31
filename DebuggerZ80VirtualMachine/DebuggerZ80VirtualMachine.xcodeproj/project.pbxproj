@@ -13,6 +13,8 @@
 		1DD7233E1C358A9600178421 /* Z80VirtualMachineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DD7233C1C358A5500178421 /* Z80VirtualMachineKit.framework */; };
 		1DD723411C358AFB00178421 /* Z80VirtualMachineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DD7233C1C358A5500178421 /* Z80VirtualMachineKit.framework */; };
 		1DD723421C358AFB00178421 /* Z80VirtualMachineKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1DD7233C1C358A5500178421 /* Z80VirtualMachineKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1DD723461C35902900178421 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723441C35902900178421 /* MainViewController.swift */; };
+		1DD723471C35902900178421 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DD723451C35902900178421 /* MainViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,6 +38,8 @@
 		1DD723341C3589BB00178421 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		1DD723361C3589BB00178421 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1DD7233C1C358A5500178421 /* Z80VirtualMachineKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Z80VirtualMachineKit.framework; path = "../../../../../../../../Users/jluis/Library/Developer/Xcode/DerivedData/Z80WorkSpace-asyhurttcvxdzmfuvqgqghnnqfmw/Build/Products/Debug/Z80VirtualMachineKit.framework"; sourceTree = "<group>"; };
+		1DD723441C35902900178421 /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		1DD723451C35902900178421 /* MainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +79,8 @@
 				1DD723311C3589BB00178421 /* Assets.xcassets */,
 				1DD723331C3589BB00178421 /* MainMenu.xib */,
 				1DD723361C3589BB00178421 /* Info.plist */,
+				1DD723441C35902900178421 /* MainViewController.swift */,
+				1DD723451C35902900178421 /* MainViewController.xib */,
 			);
 			path = DebuggerZ80VirtualMachine;
 			sourceTree = "<group>";
@@ -139,6 +145,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1DD723321C3589BB00178421 /* Assets.xcassets in Resources */,
+				1DD723471C35902900178421 /* MainViewController.xib in Resources */,
 				1DD723351C3589BB00178421 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -151,6 +158,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1DD723301C3589BB00178421 /* AppDelegate.swift in Sources */,
+				1DD723461C35902900178421 /* MainViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
