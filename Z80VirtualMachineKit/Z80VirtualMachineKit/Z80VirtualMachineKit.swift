@@ -42,4 +42,8 @@ public class Z80VirtualMachineKit
     public func loadRomAtAddress(address: Int, data: [UInt8]) throws {
         try memory.loadRomAtAddress(address, data: data)
     }
+    
+    public func getCpuRegs() -> Registers {
+        return cpu.getRegs()
+    }
 }
