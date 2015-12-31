@@ -17,7 +17,7 @@ extension SequenceType where Self.Generator.Element: Hashable {
     }
 }
 
-extension UInt16 {
+public extension UInt16 {
     func hexStr() -> String {
         return "0x" + (String(NSString(format:"%04X", self)))
     }
@@ -31,7 +31,7 @@ extension UInt16 {
     }
 }
 
-extension UInt8 {
+public extension UInt8 {
     var parity: Int {
         let bit_array = self.binArray
         
@@ -110,7 +110,7 @@ extension UInt8 {
     }
 }
 
-extension String {
+public extension String {
     var binaryToDecimal: Int {
         return Int(strtoul(self, nil, 2))
     }
