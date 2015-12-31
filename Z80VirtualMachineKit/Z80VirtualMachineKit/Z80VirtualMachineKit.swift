@@ -14,7 +14,7 @@ public class Z80VirtualMachineKit
     private let cpu : Z80
     private var io_devices : [IODevice]
     
-    init() {
+    public init() {
         cpu = Z80()
         memory = Memory(pins: cpu.pins)
         io_devices = []
