@@ -88,7 +88,7 @@ extension IODeviceProtocol {
     }
 }
 
-class IODevice : IODeviceProtocol {
+public class IODevice : IODeviceProtocol {
     var port : UInt8
     var pins : Pins
     var t_cycle : Int
