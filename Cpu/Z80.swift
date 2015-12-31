@@ -84,6 +84,10 @@ class Z80 {
             endMachineCycle()
         }
     }
+    
+    func getRegs() -> Registers {
+        return regs
+    }
 
     private func endMachineCycle() {
         print("address_bus: \(pins.address_bus.hexStr()) - data_bus: \(pins.data_bus.hexStr()) \(pins.data_bus.binStr) - PC: \(regs.pc.hexStr()) - M: \(m_cycle) - T: \(t_cycle) - \(machine_cycle)")
