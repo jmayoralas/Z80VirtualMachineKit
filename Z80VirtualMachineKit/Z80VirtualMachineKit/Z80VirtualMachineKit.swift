@@ -83,6 +83,10 @@ import Foundation
         cpu.org(pc)
     }
     
+    public func clearMemory() {
+        memory.clear()
+    }
+    
     public func dumpMemoryFromAddress(fromAddress: Int, toAddress: Int) -> [UInt8] {
         return memory.dumpFromAddress(fromAddress, toAddress: toAddress)
     }
