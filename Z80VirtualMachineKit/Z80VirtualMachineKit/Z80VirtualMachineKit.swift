@@ -46,4 +46,36 @@ public class Z80VirtualMachineKit
     public func getCpuRegs() -> Registers {
         return cpu.getRegs()
     }
+    
+    public func getTCycle() -> Int {
+        return cpu.getTCycle()
+    }
+    
+    public func getMCycle() -> Int {
+        return cpu.getMCycle()
+    }
+    
+    public func getDataBus() -> UInt8 {
+        return cpu.pins.data_bus
+    }
+    
+    public func getAddressBus() -> UInt16 {
+        return cpu.pins.address_bus
+    }
+    
+    public func setPc(pc: UInt16) {
+        cpu.org(pc)
+    }
+    
+    public func dumpMemoryFromAddress(fromAddress: Int, toAddress: Int) -> [UInt8] {
+        return memory.dumpFromAddress(fromAddress, toAddress: toAddress)
+    }
+    
+    func MemoryWriteAtAddress(address: Int, byte: UInt8) {
+        delegate?.Z80VMMemoryWriteAtAddress?(address, byte: byte)
+    }
+    
+    func MemoryReadAtAddress(address: Int, byte: UInt8) {
+        delegate?.Z80VMMemoryReadAtAddress?(address, byte: byte)
+    }
 }
