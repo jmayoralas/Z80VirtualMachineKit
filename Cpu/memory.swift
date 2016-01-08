@@ -14,9 +14,16 @@ enum MemoryErrors: ErrorType {
     case UnknownError
 }
 
+@objc protocol MemoryChange {
+    optional func MemoryWriteAtAddress(address: Int, byte: UInt8)
+    optional func MemoryReadAtAddress(address: Int, byte: UInt8)
+}
+
 class Memory {
     typealias RomRanges = [(start: Int, end: Int)]
     let pins: Pins!
+    
+    var delegate: MemoryChange?
     
     private var data: [UInt8] = Array(count: 0x10000, repeatedValue: 0)
     private var rom_ranges: RomRanges
@@ -50,6 +57,7 @@ class Memory {
             if !isAddressReadOnly(address) {
                 for byte in bytes {
                     data[my_address++] = byte
+                    delegate?.MemoryWriteAtAddress?(my_address - 1, byte: byte)
                 }
                 
             }
@@ -58,6 +66,7 @@ class Memory {
     
     func peek(address: Int) -> UInt8 {
         if address >= 0 && address < data.count {
+            delegate?.MemoryReadAtAddress?(address, byte: data[address])
             return data[address]
         }
         
