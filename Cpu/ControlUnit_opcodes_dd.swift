@@ -200,7 +200,7 @@ extension ControlUnit {
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.pins.data_bus.comp2))
+                self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.pins.data_bus.comp2))
                 self.machine_cycle = .MemoryRead
             case 4:
                 self.machine_cycle = .TimeWait
@@ -226,7 +226,7 @@ extension ControlUnit {
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.pins.data_bus.comp2))
+                self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.pins.data_bus.comp2))
                 self.machine_cycle = .MemoryRead
             case 4:
                 self.machine_cycle = .TimeWait
@@ -258,7 +258,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryWrite
                 }
             default:
@@ -308,7 +308,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -338,7 +338,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -368,7 +368,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -398,7 +398,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -444,7 +444,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -494,7 +494,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -520,7 +520,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.pins.data_bus = self.regs.b
                     self.machine_cycle = .MemoryWrite
                 }
@@ -542,7 +542,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.pins.data_bus = self.regs.c
                     self.machine_cycle = .MemoryWrite
                 }
@@ -564,7 +564,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.pins.data_bus = self.regs.d
                     self.machine_cycle = .MemoryWrite
                 }
@@ -586,7 +586,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.pins.data_bus = self.regs.e
                     self.machine_cycle = .MemoryWrite
                 }
@@ -608,7 +608,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.pins.data_bus = self.regs.h
                     self.machine_cycle = .MemoryWrite
                 }
@@ -630,7 +630,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.pins.data_bus = self.regs.l
                     self.machine_cycle = .MemoryWrite
                 }
@@ -652,7 +652,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.pins.data_bus = self.regs.a
                     self.machine_cycle = .MemoryWrite
                 }
@@ -682,7 +682,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -712,7 +712,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -742,7 +742,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -772,7 +772,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -802,7 +802,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -832,7 +832,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -862,7 +862,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -892,7 +892,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
@@ -922,7 +922,7 @@ extension ControlUnit {
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.pins.address_bus = self.addressFromPair(self.regs.ixh, self.regs.ixl)
-                    self.pins.address_bus = UInt16(Int16(self.pins.address_bus) + Int16(self.control_reg.comp2))
+                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
                     self.machine_cycle = .MemoryRead
                 }
             default:
