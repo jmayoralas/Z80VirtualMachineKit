@@ -8,16 +8,26 @@
 
 import Foundation
 
-public class Z80VirtualMachineKit
+@objc public protocol Z80VirtualMachineStatus {
+    optional func Z80VMMemoryWriteAtAddress(address: Int, byte: UInt8)
+    optional func Z80VMMemoryReadAtAddress(address: Int, byte: UInt8)
+}
+
+@objc public class Z80VirtualMachineKit: NSObject, MemoryChange
 {
+    public var delegate: Z80VirtualMachineStatus?
+    
     private let memory : Memory
     private let cpu : Z80
     private var io_devices : [IODevice]
     
-    public init() {
+    override public init() {
         cpu = Z80()
         memory = Memory(pins: cpu.pins)
         io_devices = []
+        super.init()
+        
+        memory.delegate = self
     }
     
     public func step() {
