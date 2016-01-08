@@ -21,6 +21,12 @@ public class Z80VirtualMachineKit
     }
     
     public func step() {
+        repeat {
+            clk()
+        } while cpu.getMCycle() > 1 || cpu.getTCycle() > 1
+    }
+    
+    public func clk() {
         cpu.clk()
         if cpu.pins.mreq {
             memory.clk() // memory's clock line is connected to mreq pin of cpu
