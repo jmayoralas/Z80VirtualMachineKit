@@ -19,7 +19,7 @@ extension SequenceType where Self.Generator.Element: Hashable {
 
 public extension UInt16 {
     func hexStr() -> String {
-        return "0x" + (String(NSString(format:"%04X", self)))
+        return (String(NSString(format:"%04X", self)))
     }
     
     var high: UInt8 {
@@ -50,7 +50,7 @@ public extension UInt8 {
     }
     
     func hexStr() -> String {
-        return "0x" + (String(NSString(format:"%02X", self)))
+        return (String(NSString(format:"%02X", self)))
     }
     
     var binStr: String {
