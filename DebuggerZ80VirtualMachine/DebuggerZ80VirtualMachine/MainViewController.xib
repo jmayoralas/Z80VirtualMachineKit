@@ -482,7 +482,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="2a3-Im-ERR" viewBased="YES" id="jqb-rA-lj6">
-                                <rect key="frame" x="10" y="0.0" width="1206" height="217"/>
+                                <rect key="frame" x="10" y="0.0" width="1206" height="216"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1073,7 +1073,7 @@
                         </subviews>
                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </clipView>
-                    <scroller key="horizontalScroller" verticalHuggingPriority="750" doubleValue="0.0018832391713747645" horizontal="YES" id="lIu-SH-H6l">
+                    <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="lIu-SH-H6l">
                         <rect key="frame" x="1" y="241" width="675" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
@@ -1082,7 +1082,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <tableHeaderView key="headerView" id="2a3-Im-ERR">
-                        <rect key="frame" x="10" y="-1" width="1206" height="24"/>
+                        <rect key="frame" x="10" y="-2" width="1206" height="25"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </tableHeaderView>
                 </scrollView>
@@ -1114,6 +1114,16 @@
                     </buttonCell>
                     <connections>
                         <action selector="setPcClick:" target="-2" id="u5v-aZ-p8B"/>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xrY-Xy-vJ2">
+                    <rect key="frame" x="621" y="343" width="129" height="32"/>
+                    <buttonCell key="cell" type="push" title="Clear memory" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="IQM-fh-xnq">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="clearMemoryClick:" target="-2" id="RgJ-Sq-G8k"/>
                     </connections>
                 </button>
             </subviews>

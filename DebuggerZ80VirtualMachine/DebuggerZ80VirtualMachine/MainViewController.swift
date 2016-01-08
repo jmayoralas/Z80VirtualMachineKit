@@ -96,12 +96,16 @@ import Z80VirtualMachineKit
         }
         
         dumpAddress = 0x1000
-        memoryDump = vm.dumpMemoryFromAddress(dumpAddress, toAddress: dumpAddress + 0xFF)
-        try! vm.loadRomAtAddress(0x1000, data: [0x21, 0x77, 0x10, 0x36, 0xDD])
+        _refreshMemoryDump()
         
         self.refreshView()
     }
 
+    @IBAction func clearMemoryClick(sender: AnyObject) {
+        vm.clearMemory()
+        _refreshMemoryDump()
+    }
+    
     @IBAction func setPcClick(sender: AnyObject) {
         vm.setPc(UInt16(strtoul(PcTextField.stringValue, nil, 16)))
     }
@@ -109,8 +113,7 @@ import Z80VirtualMachineKit
     @IBAction func gotoClick(sender: AnyObject) {
         // get memory dump at address specified by AddressBus text field
         dumpAddress = Int(strtoul(AddressBusTextField.stringValue, nil, 16))
-        memoryDump = vm.dumpMemoryFromAddress(dumpAddress, toAddress: dumpAddress + 0xFF)
-        memoryPeeker.reloadData()        
+        _refreshMemoryDump()
     }
     
     @IBAction func loadProgramClick(sender: AnyObject) {
@@ -123,6 +126,7 @@ import Z80VirtualMachineKit
             var buffer = [UInt8](count: data!.length, repeatedValue: 0)
             data!.getBytes(&buffer, length: data!.length)
             vm.loadRamAtAddress(Int(AddressBusTextField.stringValue)!, data: buffer)
+            memoryPeeker.reloadData()
         }
     }
     
@@ -179,9 +183,14 @@ import Z80VirtualMachineKit
         IylBinTextField!.stringValue = regs.iyl.binStr
     }
     
+    private func _refreshMemoryDump() {
+        memoryDump = vm.dumpMemoryFromAddress(dumpAddress, toAddress: dumpAddress + 0xFF)
+        memoryPeeker.reloadData()
+    }
+    
     // MARK: Z80VirtualMachineStatus delegate
     func Z80VMMemoryWriteAtAddress(address: Int, byte: UInt8) {
-        if dumpAddress <= address && address < dumpAddress + 0x10 {
+        if dumpAddress <= address && address < dumpAddress + 0x100 {
             memoryDump[address - dumpAddress] = byte
             memoryPeeker.reloadData()
         }
