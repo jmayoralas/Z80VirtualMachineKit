@@ -985,7 +985,7 @@ extension ControlUnit {
             }
         }
         opcodes[0x76] = { // HALT
-            return
+            self.machine_cycle = .TimeWait
         }
         opcodes[0x77] = { // LD (HL),A
             switch self.m_cycle {
