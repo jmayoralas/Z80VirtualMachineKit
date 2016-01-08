@@ -1,0 +1,10 @@
+framework module Z80VirtualMachineKit {
+  umbrella header "Z80VirtualMachineKit.h"
+
+  export *
+  module * { export * }
+}
+
+module Z80VirtualMachineKit.Swift {
+    header "Z80VirtualMachineKit-Swift.h"
+}
