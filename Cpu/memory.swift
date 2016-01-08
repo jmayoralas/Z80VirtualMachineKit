@@ -79,6 +79,12 @@ class Memory {
         return rom_ranges
     }
     
+    func dumpFromAddress(fromAddress: Int, toAddress: Int) -> [UInt8] {
+        let myFromAddress = fromAddress < 0 ? 0 : fromAddress
+        let myToAddress = toAddress >= data.count ? data.count - 1  : toAddress
+        return Array(data[myFromAddress...myToAddress])
+    }
+    
     private func isAddressReadOnly(address: Int) -> Bool {
         for range in rom_ranges {
             if range.start <= address && address <= range.end {
