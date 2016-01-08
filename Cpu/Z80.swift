@@ -36,10 +36,11 @@ class Z80 {
         regs.pc = 0x1000 // entry point to begin opcode excutions
     }
     
+    func org(pc: UInt16) {
+        regs.pc = pc
+    }
+    
     func clk() {
-        // program ended ?
-        if program_end { return }
-        
         // waits while wait signal is active
         if pins.iorq && pins.wait {
             return
@@ -88,6 +89,14 @@ class Z80 {
     func getRegs() -> Registers {
         return regs
     }
+    
+    func getTCycle() -> Int {
+        return t_cycle
+    }
+    
+    func getMCycle() -> Int {
+        return m_cycle
+    }
 
     private func endMachineCycle() {
         print("address_bus: \(pins.address_bus.hexStr()) - data_bus: \(pins.data_bus.hexStr()) \(pins.data_bus.binStr) - PC: \(regs.pc.hexStr()) - M: \(m_cycle) - T: \(t_cycle) - \(machine_cycle)")
@@ -100,7 +109,6 @@ class Z80 {
         print("IYH: \(regs.iyh.hexStr()) \(regs.iyh.binStr) - IYL: \(regs.iyl.hexStr()) \(regs.iyl.binStr)")
         
         cu.processOpcode(&regs, t_cycle, m_cycle, &machine_cycle)
-        if regs.ir == 0x76 { program_end = true }
         
         if machine_cycle != .TimeWait {
             t_cycle = 0
