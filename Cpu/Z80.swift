@@ -99,6 +99,7 @@ class Z80 {
     }
 
     private func endMachineCycle() {
+        /*
         print("address_bus: \(pins.address_bus.hexStr()) - data_bus: \(pins.data_bus.hexStr()) \(pins.data_bus.binStr) - PC: \(regs.pc.hexStr()) - M: \(m_cycle) - T: \(t_cycle) - \(machine_cycle)")
         print(" IR: \(regs.ir.hexStr())                      CNPxHxZS")
         print("  A: \(regs.a.hexStr()) \(regs.a.binStr) -   F: \(regs.f.hexStr()) \(regs.f.binStr) - SP: \(regs.sp.hexStr())")
@@ -107,7 +108,7 @@ class Z80 {
         print("  H: \(regs.h.hexStr()) \(regs.h.binStr) -   L: \(regs.l.hexStr()) \(regs.l.binStr)")
         print("IXH: \(regs.ixh.hexStr()) \(regs.ixh.binStr) - IXL: \(regs.ixl.hexStr()) \(regs.ixl.binStr)")
         print("IYH: \(regs.iyh.hexStr()) \(regs.iyh.binStr) - IYL: \(regs.iyl.hexStr()) \(regs.iyl.binStr)")
-        
+        */
         cu.processOpcode(&regs, t_cycle, m_cycle, &machine_cycle)
         
         if machine_cycle != .TimeWait {
