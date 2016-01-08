@@ -94,6 +94,10 @@ class Memory {
         return Array(data[myFromAddress...myToAddress])
     }
     
+    func clear() {
+        data = Array(count: 0x10000, repeatedValue: 0)
+    }
+    
     private func isAddressReadOnly(address: Int) -> Bool {
         for range in rom_ranges {
             if range.start <= address && address <= range.end {
