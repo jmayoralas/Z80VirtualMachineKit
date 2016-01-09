@@ -30,6 +30,10 @@ import Foundation
         memory.delegate = self
     }
     
+    public func reset() {
+        cpu.reset()
+    }
+    
     public func run() {
         // var instructions = 0
         repeat {
