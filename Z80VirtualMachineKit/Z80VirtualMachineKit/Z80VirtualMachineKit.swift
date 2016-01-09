@@ -30,10 +30,18 @@ import Foundation
         memory.delegate = self
     }
     
+    public func run() {
+        // var instructions = 0
+        repeat {
+            step()
+            // instructions++
+        } while !cpu.pins.halt // && instructions <= 6200
+    }
+    
     public func step() {
         repeat {
             clk()
-        } while cpu.getMCycle() > 1 || cpu.getTCycle() > 1
+        } while (cpu.getMCycle() > 1 || cpu.getTCycle() > 1) && !cpu.pins.halt
     }
     
     public func clk() {

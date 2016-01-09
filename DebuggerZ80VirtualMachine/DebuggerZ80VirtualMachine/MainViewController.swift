@@ -20,6 +20,8 @@ import Z80VirtualMachineKit
     @IBOutlet weak var MTextField: ColorChangeTextField!
     @IBOutlet weak var TTextField: ColorChangeTextField!
     
+    @IBOutlet weak var instructionCounter: NSTextField!
+    
     @IBOutlet weak var DataBusTextField: ColorChangeTextField!
     @IBOutlet weak var DataBusBinTextField: ColorChangeTextField!
     @IBOutlet weak var AddressBusTextField: ColorChangeTextField!
@@ -53,6 +55,7 @@ import Z80VirtualMachineKit
     
     var dumpAddress: Int!
     var memoryDump: [UInt8]!
+    var insCounter: Int!
 
     var vm = Z80VirtualMachineKit()
     
@@ -95,12 +98,19 @@ import Z80VirtualMachineKit
             }
         }
         
-        dumpAddress = 0x1000
+        dumpAddress = 0x0000
+        insCounter = -1
         _refreshMemoryDump()
         
         self.refreshView()
     }
 
+    @IBAction func runClick(sender: AnyObject) {
+        vm.run()
+        refreshView()
+        _refreshMemoryDump()
+    }
+    
     @IBAction func clearMemoryClick(sender: AnyObject) {
         vm.clearMemory()
         _refreshMemoryDump()
@@ -132,6 +142,7 @@ import Z80VirtualMachineKit
     
     func f5Pressed() {
         vm.step()
+        insCounter!++
         
         self.refreshView()
     }
@@ -153,6 +164,7 @@ import Z80VirtualMachineKit
         MTextField!.stringValue = "\(vm.getMCycle())"
         TTextField!.stringValue = "\(vm.getTCycle())"
         
+        instructionCounter.stringValue = "\(insCounter)"
         DataBusTextField!.stringValue = "\(vm.getDataBus().hexStr())"
         DataBusBinTextField!.stringValue = "\(vm.getDataBus().binStr)"
         AddressBusTextField!.stringValue = "\(vm.getAddressBus().hexStr())"
@@ -181,6 +193,8 @@ import Z80VirtualMachineKit
         IyhBinTextField!.stringValue = regs.iyh.binStr
         IylTextField!.stringValue = "\(regs.iyl.hexStr())"
         IylBinTextField!.stringValue = regs.iyl.binStr
+        
+        print("C': \(regs.c_.hexStr()) - D': \(regs.d_.hexStr())")
     }
     
     private func _refreshMemoryDump() {

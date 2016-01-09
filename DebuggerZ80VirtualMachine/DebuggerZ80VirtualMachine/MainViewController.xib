@@ -41,6 +41,7 @@
                 <outlet property="PcTextField" destination="acV-eA-a6Z" id="L9d-f7-jfF"/>
                 <outlet property="SpTextField" destination="6fd-ys-8vZ" id="NCK-dM-1mg"/>
                 <outlet property="TTextField" destination="TyK-Nb-vmq" id="GVk-j1-kmg"/>
+                <outlet property="instructionCounter" destination="XQG-A5-MUz" id="0EB-Dw-Qpc"/>
                 <outlet property="memoryPeeker" destination="jqb-rA-lj6" id="wmz-ig-kDD"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>
@@ -482,7 +483,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="2a3-Im-ERR" viewBased="YES" id="jqb-rA-lj6">
-                                <rect key="frame" x="10" y="0.0" width="1206" height="216"/>
+                                <rect key="frame" x="10" y="0.0" width="1206" height="215"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1082,7 +1083,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <tableHeaderView key="headerView" id="2a3-Im-ERR">
-                        <rect key="frame" x="10" y="-2" width="1206" height="25"/>
+                        <rect key="frame" x="10" y="-3" width="1206" height="26"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </tableHeaderView>
                 </scrollView>
@@ -1126,6 +1127,32 @@
                         <action selector="clearMemoryClick:" target="-2" id="RgJ-Sq-G8k"/>
                     </connections>
                 </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S55-NC-t0D">
+                    <rect key="frame" x="135" y="415" width="64" height="32"/>
+                    <buttonCell key="cell" type="push" title="Run" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="GmF-AZ-JKB">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="runClick:" target="-2" id="0p4-aW-xqg"/>
+                    </connections>
+                </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mCS-q9-eqz">
+                    <rect key="frame" x="18" y="315" width="81" height="17"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Instructions" id="tsv-kB-dxe">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XQG-A5-MUz" customClass="ColorChangeTextField" customModule="DebuggerZ80VirtualMachine" customModuleProvider="target">
+                    <rect key="frame" x="102" y="315" width="66" height="17"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" identifier="PC" title="Label" id="UhN-r2-kq1">
+                        <font key="font" metaFont="systemBold"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
             <point key="canvasLocation" x="614.5" y="478"/>
         </customView>
