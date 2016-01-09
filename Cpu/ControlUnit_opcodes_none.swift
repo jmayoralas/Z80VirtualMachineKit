@@ -1131,7 +1131,7 @@ extension ControlUnit {
             self.regs.a = self.ulaCall(self.regs.a, self.regs.d, ulaOp: .Sbc, ignoreCarry: false)
         }
         opcodes[0x9B] = { // SBC A,E
-            self.regs.a = self.ulaCall(self.regs.a, self.regs.d, ulaOp: .Sbc, ignoreCarry: false)
+            self.regs.a = self.ulaCall(self.regs.a, self.regs.e, ulaOp: .Sbc, ignoreCarry: false)
         }
         opcodes[0x9C] = { // SBC A,H
             self.regs.a = self.ulaCall(self.regs.a, self.regs.h, ulaOp: .Sbc, ignoreCarry: false)
