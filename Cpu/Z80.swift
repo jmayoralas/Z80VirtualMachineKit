@@ -29,11 +29,34 @@ class Z80 {
         pins = Pins()
         cu = ControlUnit(pins: pins)
         
-        regs.int_mode = 0
-        
         old_busreq = pins.busreq
         
-        regs.pc = 0x1000 // entry point to begin opcode excutions
+        reset()
+    }
+    
+    func reset() {
+        regs.pc = 0x0000
+        regs.int_mode = 0
+        regs.IFF1 = false
+        regs.IFF2 = false
+        regs.i = 0x00
+        regs.r = 0x00
+        
+        pins.data_bus = 0x00
+        pins.address_bus = 0x00
+        pins.busack = false
+        pins.busreq = false
+        pins.halt = false
+        pins.int = false
+        pins.iorq = false
+        pins.m1 = false
+        pins.mreq = false
+        pins.nmi = false
+        pins.rd = false
+        pins.reset = false
+        pins.rfsh = false
+        pins.wait = false
+        pins.wr = false
     }
     
     func org(pc: UInt16) {
@@ -171,6 +194,15 @@ class Z80 {
             
             // program counter update
             regs.pc++
+            
+            // save bit 7 of R to restore after increment
+            let bit7 = regs.r.bit(7)
+            // increment only seven bits
+            regs.r.resetBit(7)
+            regs.r = regs.r + 1 <= 0x7F ? regs.r + 1 : 0
+            
+            // restore bit 7
+            regs.r.bit(7, newVal: bit7)
             
             // backup data bus into instruction register
             regs.ir = pins.data_bus
