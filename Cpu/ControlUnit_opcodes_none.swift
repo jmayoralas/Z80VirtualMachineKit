@@ -986,6 +986,7 @@ extension ControlUnit {
         }
         opcodes[0x76] = { // HALT
             self.machine_cycle = .TimeWait
+            self.pins.halt = true
         }
         opcodes[0x77] = { // LD (HL),A
             switch self.m_cycle {
