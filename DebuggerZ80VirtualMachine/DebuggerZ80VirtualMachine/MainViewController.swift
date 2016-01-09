@@ -16,6 +16,7 @@ import Z80VirtualMachineKit
     @IBOutlet weak var IrTextField: ColorChangeTextField!
     @IBOutlet weak var SpTextField: ColorChangeTextField!
     @IBOutlet weak var ITextField: ColorChangeTextField!
+    @IBOutlet weak var RTextField: ColorChangeTextField!
     
     @IBOutlet weak var MTextField: ColorChangeTextField!
     @IBOutlet weak var TTextField: ColorChangeTextField!
@@ -111,6 +112,12 @@ import Z80VirtualMachineKit
         _refreshMemoryDump()
     }
     
+    @IBAction func resetClick(sender: AnyObject) {
+        vm.reset()
+        refreshView()
+        _refreshMemoryDump()
+    }
+    
     @IBAction func clearMemoryClick(sender: AnyObject) {
         vm.clearMemory()
         _refreshMemoryDump()
@@ -160,6 +167,7 @@ import Z80VirtualMachineKit
         IrTextField!.stringValue = "\(regs.ir.hexStr())"
         SpTextField!.stringValue = "\(regs.sp.hexStr())"
         ITextField!.stringValue = "\(regs.i.hexStr())"
+        RTextField!.stringValue = "\(regs.r.hexStr())"
         
         MTextField!.stringValue = "\(vm.getMCycle())"
         TTextField!.stringValue = "\(vm.getTCycle())"
@@ -193,8 +201,6 @@ import Z80VirtualMachineKit
         IyhBinTextField!.stringValue = regs.iyh.binStr
         IylTextField!.stringValue = "\(regs.iyl.hexStr())"
         IylBinTextField!.stringValue = regs.iyl.binStr
-        
-        print("C': \(regs.c_.hexStr()) - D': \(regs.d_.hexStr())")
     }
     
     private func _refreshMemoryDump() {

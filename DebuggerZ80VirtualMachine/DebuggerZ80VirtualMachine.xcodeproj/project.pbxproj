@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D4B448A1C3BF71A0037FEEF /* Z80VirtualMachineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D4B44891C3BF71A0037FEEF /* Z80VirtualMachineKit.framework */; };
 		1D6C90C51C3705D1008ADF3A /* ColorChangeTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C90C41C3705D1008ADF3A /* ColorChangeTextField.swift */; };
-		1D71C5E11C3BF92E00E3A8C0 /* Z80VirtualMachineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D4B44891C3BF71A0037FEEF /* Z80VirtualMachineKit.framework */; };
-		1D71C5E21C3BF92E00E3A8C0 /* Z80VirtualMachineKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1D4B44891C3BF71A0037FEEF /* Z80VirtualMachineKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1DCCC3181C41A16A00A05935 /* Z80VirtualMachineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DCCC3171C41A16A00A05935 /* Z80VirtualMachineKit.framework */; };
+		1DCCC3191C41A17C00A05935 /* Z80VirtualMachineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DCCC3171C41A16A00A05935 /* Z80VirtualMachineKit.framework */; };
+		1DCCC31A1C41A17C00A05935 /* Z80VirtualMachineKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1DCCC3171C41A16A00A05935 /* Z80VirtualMachineKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1DD723301C3589BB00178421 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7232F1C3589BB00178421 /* AppDelegate.swift */; };
 		1DD723321C3589BB00178421 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DD723311C3589BB00178421 /* Assets.xcassets */; };
 		1DD723351C3589BB00178421 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DD723331C3589BB00178421 /* MainMenu.xib */; };
@@ -25,7 +25,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				1D71C5E21C3BF92E00E3A8C0 /* Z80VirtualMachineKit.framework in Embed Frameworks */,
+				1DCCC31A1C41A17C00A05935 /* Z80VirtualMachineKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -33,8 +33,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1D4B44891C3BF71A0037FEEF /* Z80VirtualMachineKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Z80VirtualMachineKit.framework; sourceTree = "<group>"; };
 		1D6C90C41C3705D1008ADF3A /* ColorChangeTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorChangeTextField.swift; sourceTree = "<group>"; };
+		1DCCC3171C41A16A00A05935 /* Z80VirtualMachineKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Z80VirtualMachineKit.framework; sourceTree = "<group>"; };
 		1DD7232C1C3589BB00178421 /* DebuggerZ80VirtualMachine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DebuggerZ80VirtualMachine.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD7232F1C3589BB00178421 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1DD723311C3589BB00178421 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -49,8 +49,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1D71C5E11C3BF92E00E3A8C0 /* Z80VirtualMachineKit.framework in Frameworks */,
-				1D4B448A1C3BF71A0037FEEF /* Z80VirtualMachineKit.framework in Frameworks */,
+				1DCCC3191C41A17C00A05935 /* Z80VirtualMachineKit.framework in Frameworks */,
+				1DCCC3181C41A16A00A05935 /* Z80VirtualMachineKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,7 +60,7 @@
 		1DD723231C3589BB00178421 = {
 			isa = PBXGroup;
 			children = (
-				1D4B44891C3BF71A0037FEEF /* Z80VirtualMachineKit.framework */,
+				1DCCC3171C41A16A00A05935 /* Z80VirtualMachineKit.framework */,
 				1DD7232E1C3589BB00178421 /* DebuggerZ80VirtualMachine */,
 				1DD7232D1C3589BB00178421 /* Products */,
 			);
