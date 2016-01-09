@@ -100,7 +100,6 @@ import Z80VirtualMachineKit
         }
         
         dumpAddress = 0x0000
-        insCounter = -1
         _refreshMemoryDump()
         
         self.refreshView()
@@ -149,7 +148,6 @@ import Z80VirtualMachineKit
     
     func f5Pressed() {
         vm.step()
-        insCounter!++
         
         self.refreshView()
     }
@@ -172,7 +170,7 @@ import Z80VirtualMachineKit
         MTextField!.stringValue = "\(vm.getMCycle())"
         TTextField!.stringValue = "\(vm.getTCycle())"
         
-        instructionCounter.stringValue = "\(insCounter)"
+        instructionCounter.stringValue = "\(vm.getInstructionsCount())"
         DataBusTextField!.stringValue = "\(vm.getDataBus().hexStr())"
         DataBusBinTextField!.stringValue = "\(vm.getDataBus().binStr)"
         AddressBusTextField!.stringValue = "\(vm.getAddressBus().hexStr())"

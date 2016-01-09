@@ -20,11 +20,16 @@ import Foundation
     private let memory : Memory
     private let cpu : Z80
     private var io_devices : [IODevice]
+    private var instructions: Int
+    
+    private var old_m1: Bool
     
     override public init() {
         cpu = Z80()
+        old_m1 = cpu.pins.m1
         memory = Memory(pins: cpu.pins)
         io_devices = []
+        instructions = -1
         super.init()
         
         memory.delegate = self
@@ -35,10 +40,8 @@ import Foundation
     }
     
     public func run() {
-        // var instructions = 0
         repeat {
             step()
-            // instructions++
         } while !cpu.pins.halt // && instructions <= 6200
     }
     
@@ -54,9 +57,19 @@ import Foundation
             memory.clk() // memory's clock line is connected to mreq pin of cpu
         }
         
+        if cpu.pins.m1 && old_m1 != cpu.pins.m1 {
+            instructions++
+        }
+        
+        old_m1 = cpu.pins.m1
+        
         for io_device in io_devices {
             io_device.clk()
         }
+    }
+    
+    public func getInstructionsCount() -> Int {
+        return instructions < 0 ? 0 : instructions
     }
     
     public func addIoDevice(io_device: IODevice) {
