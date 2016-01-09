@@ -89,7 +89,7 @@ extension ControlUnit {
             }
         }
         opcodes[0x44] = { // NEG
-            self.regs.a = UInt8(self.regs.a.comp2)
+            self.regs.a = self.ulaCall(0, self.regs.a, ulaOp: .Sub, ignoreCarry: false)
             self.id_opcode_table = prefix_NONE
         }
         opcodes[0x45] = { // RETN
