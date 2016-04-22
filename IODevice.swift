@@ -22,7 +22,7 @@ protocol IODeviceProtocol : class {
 
 extension IODeviceProtocol {
     func clk() -> Void {
-        t_cycle++
+        t_cycle += 1
         
         if let irq_kind = int_requested {
             switch irq_kind {
