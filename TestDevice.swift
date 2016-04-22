@@ -39,7 +39,7 @@ class TestDevice : IODevice {
     }
     
     override func irq() -> IrqKind? {
-        test_device_t_cycle++
+        test_device_t_cycle += 1
         
         if test_device_t_cycle == 7 && irq_pending {
             irq_pending = false
