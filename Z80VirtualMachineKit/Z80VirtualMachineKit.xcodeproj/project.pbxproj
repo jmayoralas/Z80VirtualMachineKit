@@ -18,11 +18,11 @@
 		1DD723191C35871800178421 /* ControlUnit_opcodes_fdcb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7230D1C35871800178421 /* ControlUnit_opcodes_fdcb.swift */; };
 		1DD7231A1C35871800178421 /* ControlUnit_opcodes_none.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7230E1C35871800178421 /* ControlUnit_opcodes_none.swift */; };
 		1DD7231B1C35871800178421 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7230F1C35871800178421 /* extensions.swift */; };
-		1DD7231C1C35871800178421 /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723101C35871800178421 /* Memory.swift */; };
 		1DD7231D1C35871800178421 /* types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723111C35871800178421 /* types.swift */; };
 		1DD7231E1C35871800178421 /* Z80.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723121C35871800178421 /* Z80.swift */; };
 		1DD723211C3588F200178421 /* IODevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7231F1C3588F200178421 /* IODevice.swift */; };
 		1DD723221C3588F200178421 /* TestDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723201C3588F200178421 /* TestDevice.swift */; };
+		1DFE1E231CCA8C4900AB6F74 /* memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DFE1E221CCA8C4900AB6F74 /* memory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,11 +39,11 @@
 		1DD7230D1C35871800178421 /* ControlUnit_opcodes_fdcb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlUnit_opcodes_fdcb.swift; sourceTree = "<group>"; };
 		1DD7230E1C35871800178421 /* ControlUnit_opcodes_none.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlUnit_opcodes_none.swift; sourceTree = "<group>"; };
 		1DD7230F1C35871800178421 /* extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
-		1DD723101C35871800178421 /* Memory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
 		1DD723111C35871800178421 /* types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = types.swift; sourceTree = "<group>"; };
 		1DD723121C35871800178421 /* Z80.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Z80.swift; sourceTree = "<group>"; };
 		1DD7231F1C3588F200178421 /* IODevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IODevice.swift; path = ../../IODevice.swift; sourceTree = "<group>"; };
 		1DD723201C3588F200178421 /* TestDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestDevice.swift; path = ../../TestDevice.swift; sourceTree = "<group>"; };
+		1DFE1E221CCA8C4900AB6F74 /* memory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = memory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,7 +98,7 @@
 				1DD7230D1C35871800178421 /* ControlUnit_opcodes_fdcb.swift */,
 				1DD7230E1C35871800178421 /* ControlUnit_opcodes_none.swift */,
 				1DD7230F1C35871800178421 /* extensions.swift */,
-				1DD723101C35871800178421 /* Memory.swift */,
+				1DFE1E221CCA8C4900AB6F74 /* memory.swift */,
 				1DD723111C35871800178421 /* types.swift */,
 				1DD723121C35871800178421 /* Z80.swift */,
 			);
@@ -188,6 +188,7 @@
 				1DD722E21C3585A800178421 /* Z80VirtualMachineKit.swift in Sources */,
 				1DD723151C35871800178421 /* ControlUnit_opcodes_dd.swift in Sources */,
 				1DD7231A1C35871800178421 /* ControlUnit_opcodes_none.swift in Sources */,
+				1DFE1E231CCA8C4900AB6F74 /* memory.swift in Sources */,
 				1DD723131C35871800178421 /* ControlUnit.swift in Sources */,
 				1DD723141C35871800178421 /* ControlUnit_opcodes_cb.swift in Sources */,
 				1DD723181C35871800178421 /* ControlUnit_opcodes_fd.swift in Sources */,
@@ -195,7 +196,6 @@
 				1DD7231E1C35871800178421 /* Z80.swift in Sources */,
 				1DD723221C3588F200178421 /* TestDevice.swift in Sources */,
 				1DD723161C35871800178421 /* ControlUnit_opcodes_ddcb.swift in Sources */,
-				1DD7231C1C35871800178421 /* Memory.swift in Sources */,
 				1DD7231B1C35871800178421 /* extensions.swift in Sources */,
 				1DD7231D1C35871800178421 /* types.swift in Sources */,
 				1DD723211C3588F200178421 /* IODevice.swift in Sources */,
@@ -349,6 +349,7 @@
 				1DD722E01C35857B00178421 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

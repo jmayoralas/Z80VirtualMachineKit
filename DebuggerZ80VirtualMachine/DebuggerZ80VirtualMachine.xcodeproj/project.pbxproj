@@ -8,24 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		1D6C90C51C3705D1008ADF3A /* ColorChangeTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C90C41C3705D1008ADF3A /* ColorChangeTextField.swift */; };
-		1DCCC3181C41A16A00A05935 /* Z80VirtualMachineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DCCC3171C41A16A00A05935 /* Z80VirtualMachineKit.framework */; };
-		1DCCC3191C41A17C00A05935 /* Z80VirtualMachineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DCCC3171C41A16A00A05935 /* Z80VirtualMachineKit.framework */; };
-		1DCCC31A1C41A17C00A05935 /* Z80VirtualMachineKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1DCCC3171C41A16A00A05935 /* Z80VirtualMachineKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1DD723301C3589BB00178421 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7232F1C3589BB00178421 /* AppDelegate.swift */; };
 		1DD723321C3589BB00178421 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DD723311C3589BB00178421 /* Assets.xcassets */; };
 		1DD723351C3589BB00178421 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DD723331C3589BB00178421 /* MainMenu.xib */; };
 		1DD723461C35902900178421 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723441C35902900178421 /* MainViewController.swift */; };
 		1DD723471C35902900178421 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DD723451C35902900178421 /* MainViewController.xib */; };
+		1DD93F411CCA9B79000A7E27 /* Z80VirtualMachineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DD93F401CCA9B79000A7E27 /* Z80VirtualMachineKit.framework */; };
+		1DD93F421CCA9B79000A7E27 /* Z80VirtualMachineKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1DD93F401CCA9B79000A7E27 /* Z80VirtualMachineKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		1DD723431C358AFB00178421 /* Embed Frameworks */ = {
+		1DFE1E2E1CCA990A00AB6F74 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				1DCCC31A1C41A17C00A05935 /* Z80VirtualMachineKit.framework in Embed Frameworks */,
+				1DD93F421CCA9B79000A7E27 /* Z80VirtualMachineKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -34,7 +33,6 @@
 
 /* Begin PBXFileReference section */
 		1D6C90C41C3705D1008ADF3A /* ColorChangeTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorChangeTextField.swift; sourceTree = "<group>"; };
-		1DCCC3171C41A16A00A05935 /* Z80VirtualMachineKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Z80VirtualMachineKit.framework; sourceTree = "<group>"; };
 		1DD7232C1C3589BB00178421 /* DebuggerZ80VirtualMachine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DebuggerZ80VirtualMachine.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD7232F1C3589BB00178421 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1DD723311C3589BB00178421 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -42,6 +40,7 @@
 		1DD723361C3589BB00178421 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1DD723441C35902900178421 /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		1DD723451C35902900178421 /* MainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainViewController.xib; sourceTree = "<group>"; };
+		1DD93F401CCA9B79000A7E27 /* Z80VirtualMachineKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Z80VirtualMachineKit.framework; path = "../../../../../../../Users/jluis/Library/Developer/Xcode/DerivedData/z80emu-cvhmbrssnepuuahfeimnjhpxmaxt/Build/Products/Debug/Z80VirtualMachineKit.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,8 +48,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1DCCC3191C41A17C00A05935 /* Z80VirtualMachineKit.framework in Frameworks */,
-				1DCCC3181C41A16A00A05935 /* Z80VirtualMachineKit.framework in Frameworks */,
+				1DD93F411CCA9B79000A7E27 /* Z80VirtualMachineKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,7 +58,7 @@
 		1DD723231C3589BB00178421 = {
 			isa = PBXGroup;
 			children = (
-				1DCCC3171C41A16A00A05935 /* Z80VirtualMachineKit.framework */,
+				1DD93F401CCA9B79000A7E27 /* Z80VirtualMachineKit.framework */,
 				1DD7232E1C3589BB00178421 /* DebuggerZ80VirtualMachine */,
 				1DD7232D1C3589BB00178421 /* Products */,
 			);
@@ -98,7 +96,7 @@
 				1DD723281C3589BB00178421 /* Sources */,
 				1DD723291C3589BB00178421 /* Frameworks */,
 				1DD7232A1C3589BB00178421 /* Resources */,
-				1DD723431C358AFB00178421 /* Embed Frameworks */,
+				1DFE1E2E1CCA990A00AB6F74 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -116,7 +114,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0720;
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = lomocorp;
 				TargetAttributes = {
 					1DD7232B1C3589BB00178421 = {
