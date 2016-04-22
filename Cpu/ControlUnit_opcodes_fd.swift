@@ -57,11 +57,11 @@ extension ControlUnit {
             case 2:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 3:
                 self.regs.iyl = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.iyh = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -73,17 +73,17 @@ extension ControlUnit {
             case 2:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 3:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 4:
                 self.pins.address_bus = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .MemoryWrite
                 self.pins.data_bus = self.regs.iyl
             case 5:
-                self.pins.address_bus++
+                self.pins.address_bus += 1
                 self.pins.data_bus = self.regs.iyh
             default:
                 self.machine_cycle = .OpcodeFetch
@@ -113,7 +113,7 @@ extension ControlUnit {
             case 2:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.iyh = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -146,16 +146,16 @@ extension ControlUnit {
             case 2:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 3:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 4:
                 self.pins.address_bus = self.addressFromPair(self.pins.data_bus, self.control_reg)
             case 5:
                 self.regs.iyl = self.pins.data_bus
-                self.pins.address_bus++
+                self.pins.address_bus += 1
             default:
                 self.regs.iyh = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -185,7 +185,7 @@ extension ControlUnit {
             case 2:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.iyl = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -196,7 +196,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.pins.address_bus = self.addressFromPair(self.regs.iyh, self.regs.iyl)
@@ -222,7 +222,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.pins.address_bus = self.addressFromPair(self.regs.iyh, self.regs.iyl)
@@ -248,12 +248,12 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 4:
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
@@ -299,7 +299,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -329,7 +329,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -359,7 +359,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -389,7 +389,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -435,7 +435,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -485,7 +485,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -511,7 +511,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -533,7 +533,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -555,7 +555,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -577,7 +577,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -599,7 +599,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -621,7 +621,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -643,7 +643,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -673,7 +673,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -703,7 +703,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -733,7 +733,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -763,7 +763,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -793,7 +793,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -823,7 +823,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -853,7 +853,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -883,7 +883,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -913,7 +913,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
@@ -935,12 +935,12 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 4:
                 self.regs.ir_ = self.pins.data_bus
                 fallthrough
@@ -952,12 +952,12 @@ extension ControlUnit {
             switch self.m_cycle {
             case 2:
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
                 self.machine_cycle = .MemoryRead
             case 3:
                 self.regs.iyl = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.iyh = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -998,13 +998,13 @@ extension ControlUnit {
             case 2:
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.iyh
                     self.machine_cycle = .MemoryWrite
                 }
             case 3:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.iyl
             default:

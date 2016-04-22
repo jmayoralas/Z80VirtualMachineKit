@@ -77,7 +77,7 @@ class Z80 {
         
         pins.busack = false
         
-        t_cycle++
+        t_cycle += 1
         
         switch machine_cycle {
         case .SoftIrq:
@@ -136,7 +136,7 @@ class Z80 {
         
         if machine_cycle != .TimeWait {
             t_cycle = 0
-            m_cycle++
+            m_cycle += 1
         }
         
         // samples busreq, int and nmi signals on last T state
@@ -193,7 +193,7 @@ class Z80 {
             pins.rfsh = false
             
             // program counter update
-            regs.pc++
+            regs.pc += 1
             
             // save bit 7 of R to restore after increment
             let bit7 = regs.r.bit(7)

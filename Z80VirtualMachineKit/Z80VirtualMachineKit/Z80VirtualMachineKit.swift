@@ -58,7 +58,7 @@ import Foundation
         }
         
         if cpu.pins.m1 && old_m1 != cpu.pins.m1 {
-            instructions++
+            instructions += 1
         }
         
         old_m1 = cpu.pins.m1

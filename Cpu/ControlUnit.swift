@@ -46,7 +46,7 @@ class ControlUnit {
         switch machine_cycle {
         case .NMIrq:
             irq_kind = .NMI
-            self.regs.pc--
+            self.regs.pc -= 1
         case .SoftIrq:
             irq_kind = .Soft
         default:
@@ -288,13 +288,13 @@ class ControlUnit {
         case 1:
             machine_cycle = .TimeWait
             if t_cycle == last_t_cycle {
-                regs.sp--
+                regs.sp -= 1
                 pins.address_bus = self.regs.sp
                 pins.data_bus = self.regs.pc.high
                 machine_cycle = .MemoryWrite
             }
         case 2:
-            regs.sp--
+            regs.sp -= 1
             pins.address_bus = self.regs.sp
             pins.data_bus = self.regs.pc.low
         default:
@@ -311,13 +311,13 @@ class ControlUnit {
             if t_cycle == 7 {
                 control_reg = pins.data_bus
                 control_reg.resetBit(0)
-                regs.sp--
+                regs.sp -= 1
                 pins.address_bus = regs.sp
                 pins.data_bus = regs.pc.high
                 machine_cycle = .MemoryWrite
             }
         case 2:
-            regs.sp--
+            regs.sp -= 1
             pins.address_bus = self.regs.sp
             pins.data_bus = self.regs.pc.low
         case 3:
@@ -325,7 +325,7 @@ class ControlUnit {
             machine_cycle = .MemoryRead
         case 4:
             control_reg = pins.data_bus
-            pins.address_bus++
+            pins.address_bus += 1
         default:
             regs.pc = addressFromPair(pins.data_bus, control_reg)
             machine_cycle = .OpcodeFetch

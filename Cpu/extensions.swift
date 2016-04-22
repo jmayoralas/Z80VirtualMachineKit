@@ -10,7 +10,8 @@ import Foundation
 
 extension SequenceType where Self.Generator.Element: Hashable {
     func freq() -> [Self.Generator.Element: Int] {
-        return reduce([:]) { (var accu: [Self.Generator.Element: Int], element) in
+        return reduce([:]) { (accu: [Self.Generator.Element: Int], element) in
+            var accu = accu
             accu[element] = accu[element]?.successor() ?? 1
             return accu
         }
@@ -86,7 +87,7 @@ public extension UInt8 {
         var i = 0
         for char in "00000000".characters {
             mask.append((i == 7 - index) ? "1" : char)
-            i++
+            i += 1
         }
         self = self | UInt8(mask.binaryToDecimal)
     }
@@ -96,7 +97,7 @@ public extension UInt8 {
         var i = 0
         for char in "11111111".characters {
             mask.append((i == 7 - index) ? "0" : char)
-            i++
+            i += 1
         }
         self = self & UInt8(mask.binaryToDecimal)
     }

@@ -18,11 +18,11 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.regs.c = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.b = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -58,7 +58,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.b = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -132,7 +132,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.c = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -155,11 +155,11 @@ extension ControlUnit {
                 if self.t_cycle == 5 {
                     self.machine_cycle = .MemoryRead
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                 }
             case 2:
                 self.control_reg = self.pins.data_bus // preserve data bus
-                self.regs.b--
+                self.regs.b -= 1
                 if self.regs.b == 0 {
                     self.machine_cycle = .OpcodeFetch
                 } else {
@@ -178,11 +178,11 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.regs.e = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.d = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -218,7 +218,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.d = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -239,7 +239,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.control_reg = self.pins.data_bus // preserve data bus
                 self.machine_cycle = .UlaOperation
@@ -302,7 +302,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.e = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -323,7 +323,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.control_reg = self.pins.data_bus // preserve data bus
                 if self.regs.f.bit(Z) == 1 {
@@ -344,11 +344,11 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.regs.l = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.h = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -359,17 +359,17 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 3:
                 self.pins.address_bus = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .MemoryWrite
                 self.pins.data_bus = self.regs.l
             case 4:
-                self.pins.address_bus++
+                self.pins.address_bus += 1
                 self.pins.data_bus = self.regs.h
             default:
                 self.machine_cycle = .OpcodeFetch
@@ -395,7 +395,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.h = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -449,7 +449,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.control_reg = self.pins.data_bus // preserve data bus
                 if self.regs.f.bit(Z) == 0 {
@@ -490,16 +490,16 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 3:
                 self.pins.address_bus = self.addressFromPair(self.pins.data_bus, self.control_reg)
             case 4:
                 self.regs.l = self.pins.data_bus
-                self.pins.address_bus++
+                self.pins.address_bus += 1
             default:
                 self.regs.h = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -525,7 +525,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.l = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -541,7 +541,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.control_reg = self.pins.data_bus // preserve data bus
                 if self.regs.f.bit(C) == 1 {
@@ -562,11 +562,11 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.sp = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -577,11 +577,11 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 3:
                 self.pins.address_bus = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .MemoryWrite
@@ -633,7 +633,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
                 self.machine_cycle = .MemoryWrite
@@ -651,7 +651,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.control_reg = self.pins.data_bus // preserve data bus
                 if self.regs.f.bit(C) == 0 {
@@ -692,11 +692,11 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             case 3:
                 self.pins.address_bus = self.addressFromPair(self.pins.data_bus, self.control_reg)
             default:
@@ -723,7 +723,7 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .MemoryRead
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.a = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -1282,13 +1282,13 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(Z) == 0 {
                     self.pins.address_bus = self.regs.sp
-                    self.regs.sp++
+                    self.regs.sp += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1298,12 +1298,12 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
                 self.machine_cycle = .MemoryRead
             case 2:
                 self.regs.c = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.b = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -1314,7 +1314,7 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(Z) == 0 {
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 } else {
                     self.regs.pc = self.regs.pc + 2
@@ -1322,7 +1322,7 @@ extension ControlUnit {
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1332,12 +1332,12 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1348,13 +1348,13 @@ extension ControlUnit {
             case 1:
                 self.regs.pc = self.regs.pc + 2
                 if self.regs.f.bit(Z) == 0 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.pc.high
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.pc.low
             case 3:
@@ -1362,13 +1362,13 @@ extension ControlUnit {
                 if self.t_cycle == 4 {
                     self.regs.pc = self.regs.pc - 2
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 4:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1379,13 +1379,13 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.b
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.c
             default:
@@ -1396,7 +1396,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             default:
                 self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Add, ignoreCarry: false)
@@ -1411,13 +1411,13 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(Z) == 1 {
                     self.pins.address_bus = self.regs.sp
-                    self.regs.sp++
+                    self.regs.sp += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1427,12 +1427,12 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
                 self.machine_cycle = .MemoryRead
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1443,7 +1443,7 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(Z) == 1 {
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 } else {
                     self.regs.pc = self.regs.pc + 2
@@ -1451,7 +1451,7 @@ extension ControlUnit {
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1465,13 +1465,13 @@ extension ControlUnit {
             case 1:
                 self.regs.pc = self.regs.pc + 2
                 if self.regs.f.bit(Z) == 1 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.pc.high
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.pc.low
             case 3:
@@ -1479,13 +1479,13 @@ extension ControlUnit {
                 if self.t_cycle == 4 {
                     self.regs.pc = self.regs.pc - 2
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 4:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1495,12 +1495,12 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.regs.pc = self.regs.pc + 2
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.pc.high
                 self.machine_cycle = .MemoryWrite
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.pc.low
             case 3:
@@ -1508,13 +1508,13 @@ extension ControlUnit {
                 if self.t_cycle == 4 {
                     self.regs.pc = self.regs.pc - 2
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 4:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1524,7 +1524,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             default:
                 self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Adc, ignoreCarry: false)
@@ -1539,13 +1539,13 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(C) == 0 {
                     self.pins.address_bus = self.regs.sp
-                    self.regs.sp++
+                    self.regs.sp += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1555,12 +1555,12 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
                 self.machine_cycle = .MemoryRead
             case 2:
                 self.regs.e = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.d = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -1571,7 +1571,7 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(C) == 0 {
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 } else {
                     self.regs.pc = self.regs.pc + 2
@@ -1579,7 +1579,7 @@ extension ControlUnit {
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1589,7 +1589,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 2:
                 self.pins.address_bus = self.addressFromPair(self.regs.a, self.pins.data_bus)
@@ -1604,13 +1604,13 @@ extension ControlUnit {
             case 1:
                 self.regs.pc = self.regs.pc + 2
                 if self.regs.f.bit(C) == 0 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.pc.high
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.pc.low
             case 3:
@@ -1618,13 +1618,13 @@ extension ControlUnit {
                 if self.t_cycle == 4 {
                     self.regs.pc = self.regs.pc - 2
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 4:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1635,13 +1635,13 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.d
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.e
             default:
@@ -1652,7 +1652,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             default:
                 self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Sub, ignoreCarry: false)
@@ -1667,13 +1667,13 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(C) == 1 {
                     self.pins.address_bus = self.regs.sp
-                    self.regs.sp++
+                    self.regs.sp += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1705,7 +1705,7 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(C) == 1 {
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 } else {
                     self.regs.pc = self.regs.pc + 2
@@ -1713,7 +1713,7 @@ extension ControlUnit {
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1723,7 +1723,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             case 2:
                 self.pins.address_bus = self.addressFromPair(self.regs.a, self.pins.data_bus)
@@ -1738,13 +1738,13 @@ extension ControlUnit {
             case 1:
                 self.regs.pc = self.regs.pc + 2
                 if self.regs.f.bit(C) == 1 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.pc.high
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.pc.low
             case 3:
@@ -1752,13 +1752,13 @@ extension ControlUnit {
                 if self.t_cycle == 4 {
                     self.regs.pc = self.regs.pc - 2
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 4:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1771,7 +1771,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             default:
                 self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Sbc, ignoreCarry: false)
@@ -1786,13 +1786,13 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(PV) == 0 {
                     self.pins.address_bus = self.regs.sp
-                    self.regs.sp++
+                    self.regs.sp += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1802,12 +1802,12 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
                 self.machine_cycle = .MemoryRead
             case 2:
                 self.regs.l = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.h = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -1818,7 +1818,7 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(PV) == 0 {
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 } else {
                     self.regs.pc = self.regs.pc + 2
@@ -1826,7 +1826,7 @@ extension ControlUnit {
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1866,13 +1866,13 @@ extension ControlUnit {
             case 1:
                 self.regs.pc = self.regs.pc + 2
                 if self.regs.f.bit(PV) == 0 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.pc.high
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.pc.low
             case 3:
@@ -1880,13 +1880,13 @@ extension ControlUnit {
                 if self.t_cycle == 4 {
                     self.regs.pc = self.regs.pc - 2
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 4:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1898,13 +1898,13 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.h
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.l
             default:
@@ -1915,7 +1915,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             default:
                 self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .And, ignoreCarry: false)
@@ -1930,13 +1930,13 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(PV) == 1 {
                     self.pins.address_bus = self.regs.sp
-                    self.regs.sp++
+                    self.regs.sp += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1950,7 +1950,7 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(PV) == 1 {
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 } else {
                     self.regs.pc = self.regs.pc + 2
@@ -1958,7 +1958,7 @@ extension ControlUnit {
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -1977,13 +1977,13 @@ extension ControlUnit {
             case 1:
                 self.regs.pc = self.regs.pc + 2
                 if self.regs.f.bit(PV) == 1 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.pc.high
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.pc.low
             case 3:
@@ -1991,13 +1991,13 @@ extension ControlUnit {
                 if self.t_cycle == 4 {
                     self.regs.pc = self.regs.pc - 2
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 4:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -2010,7 +2010,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             default:
                 self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Xor, ignoreCarry: false)
@@ -2025,13 +2025,13 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(S) == 0 {
                     self.pins.address_bus = self.regs.sp
-                    self.regs.sp++
+                    self.regs.sp += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -2041,12 +2041,12 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
                 self.machine_cycle = .MemoryRead
             case 2:
                 self.regs.f = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.a = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
@@ -2057,7 +2057,7 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(S) == 0 {
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 } else {
                     self.regs.pc = self.regs.pc + 2
@@ -2065,7 +2065,7 @@ extension ControlUnit {
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -2080,13 +2080,13 @@ extension ControlUnit {
             case 1:
                 self.regs.pc = self.regs.pc + 2
                 if self.regs.f.bit(S) == 0 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.pc.high
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.pc.low
             case 3:
@@ -2094,13 +2094,13 @@ extension ControlUnit {
                 if self.t_cycle == 4 {
                     self.regs.pc = self.regs.pc - 2
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 4:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -2111,13 +2111,13 @@ extension ControlUnit {
             case 1:
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.a
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.f
             default:
@@ -2128,7 +2128,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             default:
                 self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Or, ignoreCarry: false)
@@ -2143,13 +2143,13 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(S) == 1 {
                     self.pins.address_bus = self.regs.sp
-                    self.regs.sp++
+                    self.regs.sp += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.sp
-                self.regs.sp++
+                self.regs.sp += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -2167,7 +2167,7 @@ extension ControlUnit {
             case 1:
                 if self.regs.f.bit(S) == 1 {
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 } else {
                     self.regs.pc = self.regs.pc + 2
@@ -2175,7 +2175,7 @@ extension ControlUnit {
             case 2:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -2190,13 +2190,13 @@ extension ControlUnit {
             case 1:
                 self.regs.pc = self.regs.pc + 2
                 if self.regs.f.bit(S) == 1 {
-                    self.regs.sp--
+                    self.regs.sp -= 1
                     self.pins.address_bus = self.regs.sp
                     self.pins.data_bus = self.regs.pc.high
                     self.machine_cycle = .MemoryWrite
                 }
             case 2:
-                self.regs.sp--
+                self.regs.sp -= 1
                 self.pins.address_bus = self.regs.sp
                 self.pins.data_bus = self.regs.pc.low
             case 3:
@@ -2204,13 +2204,13 @@ extension ControlUnit {
                 if self.t_cycle == 4 {
                     self.regs.pc = self.regs.pc - 2
                     self.pins.address_bus = self.regs.pc
-                    self.regs.pc++
+                    self.regs.pc += 1
                     self.machine_cycle = .MemoryRead
                 }
             case 4:
                 self.control_reg = self.pins.data_bus
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
@@ -2223,7 +2223,7 @@ extension ControlUnit {
             switch self.m_cycle {
             case 1:
                 self.pins.address_bus = self.regs.pc
-                self.regs.pc++
+                self.regs.pc += 1
                 self.machine_cycle = .MemoryRead
             default:
                 self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Sub, ignoreCarry: false)
