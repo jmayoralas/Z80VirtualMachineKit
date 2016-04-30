@@ -34,6 +34,11 @@ class Memory {
     }
     
     func clk() {
+        // if no memory request, just return
+        if !pins.mreq {
+            return
+        }
+        
         let address = Int(pins.address_bus)
         
         // read from memory
