@@ -54,9 +54,7 @@ import Foundation
     
     public func clk() {
         cpu.clk()
-        if cpu.pins.mreq {
-            memory.clk() // memory's clock line is connected to mreq pin of cpu
-        }
+        memory.clk() // memory's clock line is connected to mreq pin of cpu
         
         if cpu.pins.m1 && old_m1 != cpu.pins.m1 {
             instructions += 1
