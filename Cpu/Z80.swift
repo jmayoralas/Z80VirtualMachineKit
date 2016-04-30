@@ -88,7 +88,7 @@ class Z80 {
         t_cycle += 1
         T += 1
         
-        if T == 240000000 {
+        if T == 1000000 {
             pins.halt = true
             return
         }

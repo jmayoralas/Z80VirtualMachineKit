@@ -68,6 +68,7 @@ import Z80VirtualMachineKit
         super.viewDidLoad()
         
         vm.delegate = self
+        vm.addIoDevice(0x01)
         
         NSEvent.addLocalMonitorForEventsMatchingMask(.KeyDownMask) { (theEvent) -> NSEvent? in
             switch theEvent.keyCode {

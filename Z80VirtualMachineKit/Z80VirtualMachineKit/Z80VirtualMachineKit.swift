@@ -71,8 +71,8 @@ import Foundation
         return instructions < 0 ? 0 : instructions
     }
     
-    public func addIoDevice(io_device: IODevice) {
-        io_devices.append(io_device)
+    public func addIoDevice(port: UInt8) {
+        io_devices.append(IODevice(pins: cpu.pins, port: port))
     }
     
     public func loadRamAtAddress(address: Int, data: [UInt8]) {
