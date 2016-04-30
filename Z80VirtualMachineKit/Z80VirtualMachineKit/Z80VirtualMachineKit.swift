@@ -37,6 +37,7 @@ import Foundation
     
     public func reset() {
         cpu.reset()
+        instructions = -1
     }
     
     public func run() {
@@ -94,6 +95,10 @@ import Foundation
     
     public func getMCycle() -> Int {
         return cpu.getMCycle()
+    }
+    
+    public func getTCount() -> Int {
+        return cpu.getTCount()
     }
     
     public func getDataBus() -> UInt8 {
