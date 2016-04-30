@@ -14,6 +14,7 @@
                 <outlet property="BTextField" destination="LXB-WT-rzf" id="aqy-S5-tci"/>
                 <outlet property="CBinTextField" destination="W4B-UO-eBv" id="2aV-7L-JkG"/>
                 <outlet property="CTextField" destination="GSq-HN-wcX" id="iMJ-sE-35n"/>
+                <outlet property="CiclosTextField" destination="GaN-EO-ZML" id="A4Y-qT-UcF"/>
                 <outlet property="DBinTextField" destination="Rgt-vc-bJl" id="dwx-YJ-fP4"/>
                 <outlet property="DTextField" destination="Hji-5H-79x" id="gss-Ka-Lyi"/>
                 <outlet property="DataBusBinTextField" destination="p5c-rd-GKb" id="v40-fi-1Ga"/>
@@ -1180,6 +1181,22 @@
                         <action selector="resetClick:" target="-2" id="0ep-lf-WdX"/>
                     </connections>
                 </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bdu-LZ-67B" userLabel="Label">
+                    <rect key="frame" x="590" y="303" width="47" height="17"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Ciclos" id="UXi-57-qIR">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GaN-EO-ZML" customClass="ColorChangeTextField" customModule="DebuggerZ80VirtualMachine" customModuleProvider="target">
+                    <rect key="frame" x="641" y="303" width="66" height="17"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" identifier="PC" title="Label" id="oVk-IY-dtr">
+                        <font key="font" metaFont="systemBold"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
             <point key="canvasLocation" x="614.5" y="478"/>
         </customView>

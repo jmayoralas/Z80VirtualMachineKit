@@ -26,6 +26,8 @@ import Z80VirtualMachineKit
     @IBOutlet weak var DataBusTextField: ColorChangeTextField!
     @IBOutlet weak var DataBusBinTextField: ColorChangeTextField!
     @IBOutlet weak var AddressBusTextField: ColorChangeTextField!
+    
+    @IBOutlet weak var CiclosTextField: ColorChangeTextField!
         
     @IBOutlet weak var ATextField: ColorChangeTextField!
     @IBOutlet weak var BTextField: ColorChangeTextField!
@@ -174,6 +176,8 @@ import Z80VirtualMachineKit
         DataBusTextField!.stringValue = "\(vm.getDataBus().hexStr())"
         DataBusBinTextField!.stringValue = "\(vm.getDataBus().binStr)"
         AddressBusTextField!.stringValue = "\(vm.getAddressBus().hexStr())"
+        
+        CiclosTextField!.stringValue = "\(vm.getTCount())"
         
         ATextField!.stringValue = "\(regs.a.hexStr())"
         ABinTextField!.stringValue = regs.a.binStr
