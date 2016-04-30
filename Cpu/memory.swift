@@ -56,8 +56,8 @@ class Memory {
             var my_address = address
             if !isAddressReadOnly(address) {
                 for byte in bytes {
-                    my_address += 1
                     data[my_address] = byte
+                    my_address += 1
                     delegate?.MemoryWriteAtAddress?(my_address - 1, byte: byte)
                 }
                 
