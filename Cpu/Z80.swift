@@ -19,6 +19,7 @@ class Z80 {
     
     private var machine_cycle = MachineCycle.OpcodeFetch // Always start in OpcodeFetch mode
     private var t_cycle = 0
+    private var T = 0
     private var m_cycle = 0
     private var old_busreq: Bool!
     
@@ -41,7 +42,8 @@ class Z80 {
         regs.IFF2 = false
         regs.i = 0x00
         regs.r = 0x00
-        
+        regs.sp = 0x7FFF
+
         pins.data_bus = 0x00
         pins.address_bus = 0x00
         pins.busack = false
@@ -57,6 +59,12 @@ class Z80 {
         pins.rfsh = false
         pins.wait = false
         pins.wr = false
+        
+        t_cycle = 0
+        m_cycle = 0
+        T = 0
+        machine_cycle = .OpcodeFetch
+        old_busreq = pins.busreq
     }
     
     func org(pc: UInt16) {
@@ -78,6 +86,12 @@ class Z80 {
         pins.busack = false
         
         t_cycle += 1
+        T += 1
+        
+        if T == 240000000 {
+            pins.halt = true
+            return
+        }
         
         switch machine_cycle {
         case .SoftIrq:
@@ -119,6 +133,10 @@ class Z80 {
     
     func getMCycle() -> Int {
         return m_cycle
+    }
+    
+    func getTCount() -> Int {
+        return T
     }
 
     private func endMachineCycle() {
