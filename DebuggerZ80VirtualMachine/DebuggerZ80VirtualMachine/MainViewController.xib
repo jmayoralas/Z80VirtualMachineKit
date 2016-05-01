@@ -1197,6 +1197,16 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vk9-Tu-jV6">
+                    <rect key="frame" x="694" y="249" width="77" height="32"/>
+                    <buttonCell key="cell" type="push" title="Test" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="V0v-eY-jFe">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="testClick:" target="-2" id="tBc-WV-dtV"/>
+                    </connections>
+                </button>
             </subviews>
             <point key="canvasLocation" x="614.5" y="478"/>
         </customView>

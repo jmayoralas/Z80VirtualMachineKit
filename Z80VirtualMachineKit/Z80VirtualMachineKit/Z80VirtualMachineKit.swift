@@ -119,6 +119,26 @@ import Foundation
         return memory.dumpFromAddress(fromAddress, toAddress: toAddress)
     }
     
+    public func testNewCpu() {
+        let bus = Bus16()
+        
+        let ram_1 = Ram(base_address: 0x0000, block_size: 0x0400)
+        let ram_2 = Ram(base_address: 0x0400, block_size: 0x0400)
+        bus.addBusComponent(ram_1)
+        bus.addBusComponent(ram_2)
+        
+        bus.write(0x0001, value: 0xAA)
+        bus.write(0x03FF, value: 0xAA)
+        bus.write(0x0400, value: 0xBB)
+        bus.write(0x0401, value: 0xBB)
+        
+        print("data : \(bus.read(0x0001).hexStr())")
+        print("data : \(bus.read(0x03FF).hexStr())")
+        print("data : \(bus.read(0x0400).hexStr())")
+        print("data : \(bus.read(0x0401).hexStr())")
+        print("data : \(bus.read(0xF401).hexStr())")
+    }
+    
     func MemoryWriteAtAddress(address: Int, byte: UInt8) {
         delegate?.Z80VMMemoryWriteAtAddress?(address, byte: byte)
     }

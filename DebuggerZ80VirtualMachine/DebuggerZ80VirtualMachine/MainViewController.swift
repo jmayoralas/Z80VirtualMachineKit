@@ -149,6 +149,10 @@ import Z80VirtualMachineKit
         }
     }
     
+    @IBAction func testClick(sender: AnyObject) {
+        vm.testNewCpu()
+    }
+    
     func f5Pressed() {
         vm.step()
         
