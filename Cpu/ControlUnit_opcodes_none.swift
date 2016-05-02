@@ -74,12 +74,9 @@ extension ControlUnit {
             self.regs.f.bit(Z, newVal: Z_backup)
         }
         opcodes[0x08] = { // EX AF,AF'
-            let a_ = self.regs.a_
-            let f_ = self.regs.f_
-            self.regs.a_ = self.regs.a
-            self.regs.f_ = self.regs.f
-            self.regs.a = a_
-            self.regs.f = f_
+            let af_ = self.regs.af_
+            self.regs.af_ = self.regs.af
+            self.regs.af = af_
         }
         opcodes[0x09] = { // ADD HL,BC
             switch self.m_cycle {
@@ -1680,24 +1677,15 @@ extension ControlUnit {
             }
         }
         opcodes[0xD9] = { // EXX
-            let b = self.regs.b
-            let c = self.regs.c
-            let d = self.regs.d
-            let e = self.regs.e
-            let h = self.regs.h
-            let l = self.regs.l
-            self.regs.b = self.regs.b_
-            self.regs.c = self.regs.c_
-            self.regs.d = self.regs.d_
-            self.regs.e = self.regs.e_
-            self.regs.h = self.regs.h_
-            self.regs.l = self.regs.l_
-            self.regs.b_ = b
-            self.regs.c_ = c
-            self.regs.d_ = d
-            self.regs.e_ = e
-            self.regs.h_ = h
-            self.regs.l_ = l
+            let bc = self.regs.bc
+            let de = self.regs.de
+            let hl = self.regs.hl
+            self.regs.bc = self.regs.bc_
+            self.regs.de = self.regs.de_
+            self.regs.hl = self.regs.hl_
+            self.regs.bc_ = bc
+            self.regs.de_ = de
+            self.regs.hl_ = hl
             
         }
         opcodes[0xDA] = { // JP C &0000
