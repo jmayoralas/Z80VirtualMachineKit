@@ -33,7 +33,15 @@ public struct Registers {
     
     // Main Register Set
     // accumulator
-    public var a: UInt8 = 0
+    public var a: UInt8 {
+        get {
+            return UInt8(self.af >> 8)
+        }
+        set(newValue) {
+            let masked_value = (UInt16(newValue << 8) )
+            self.af = self.af &
+        }
+    }
     public var b: UInt8 = 0
     public var d: UInt8 = 0
     public var h: UInt8 = 0
@@ -58,15 +66,7 @@ public struct Registers {
 
     // 16 bit registers
     // primary
-    var af: UInt16 {
-        get {
-            return UInt16(Int(Int(self.a) * 0x100) + Int(self.f))
-        }
-        set(newValue) {
-            self.a = newValue.high
-            self.f = newValue.low
-        }
-    }
+    var af: UInt16 = 0
 
     var bc: UInt16 {
         get {
