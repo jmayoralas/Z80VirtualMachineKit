@@ -52,9 +52,8 @@ import Foundation
     }
     
     public func step() {
-        repeat {
-            clk()
-        } while (cpu.getMCycle() > 1 || cpu.getTCycle() > 1) && !cpu.pins.halt
+        instructions += 1
+        cpu.step()
     }
     
     public func clk() {
