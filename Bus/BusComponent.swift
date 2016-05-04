@@ -23,4 +23,8 @@ class BusComponent : BusComponentProtocol {
     
     func write(address: UInt16, value: UInt8) {
     }
+    
+    func dumpFromAddress(fromAddress: Int, count: Int) -> [UInt8] {
+        return Array(count: count, repeatedValue: UInt8(0xFF))
+    }
 }
