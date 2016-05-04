@@ -334,11 +334,14 @@ class ControlUnit {
     }
     
     // MARK: Initialization
-    init(pins: Pins) {
+    init(dataBus: Bus16, pins: Pins) {
         m_cycle = 0
         t_cycle = 0
         machine_cycle = .OpcodeFetch
+        
         self.pins = pins
+        self.dataBus = dataBus
+        
         id_opcode_table = prefix_NONE
         
         opcode_tables = [OpcodeTable](count: 7, repeatedValue: OpcodeTable(count: 0x100, repeatedValue: {}))
@@ -351,5 +354,29 @@ class ControlUnit {
         initOpcodeTableDDCB(&opcode_tables[prefix_DDCB])
         initOpcodeTableFDCB(&opcode_tables[prefix_FDCB])
     }
+
+    // MARK: New emulation non exhaustive
+    let dataBus : Bus16
     
+    func processInstruction(inout regs regs: Registers, inout t_cycle: Int) {
+        self.regs = regs
+        self.t_cycle = t_cycle
+
+        // get opcode at PC into IR register
+        self.regs.ir = dataBus.read(self.regs.pc++)
+        
+        // save bit 7 of R to restore after increment
+        let bit7 = self.regs.r.bit(7)
+        // increment only seven bits
+        self.regs.r.resetBit(7)
+        self.regs.r = self.regs.r + 1 <= 0x7F ? self.regs.r + 1 : 0
+        
+        // restore bit 7
+        self.regs.r.bit(7, newVal: bit7)
+        
+        opcode_tables[id_opcode_table][Int(self.regs.ir)]()
+        
+        regs = self.regs
+        t_cycle = self.t_cycle
+    }
 }
