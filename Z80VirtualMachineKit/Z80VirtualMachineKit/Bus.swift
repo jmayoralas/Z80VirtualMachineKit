@@ -55,14 +55,26 @@ class Bus16 : Bus {
     override func write(address: UInt16, value: UInt8) {
         let index_component = (Int(address) & 0xFFFF) / 1024
         
-        if index_component < paged_components.count {
-            paged_components[index_component].write(address, value: value)
-        }
+        paged_components[index_component].write(address, value: value)
     }
     
     override func read(address: UInt16) -> UInt8 {
         let index_component = (Int(address) & 0xFFFF) / 1024
         
-        return (index_component < paged_components.count) ? paged_components[index_component].read(address) : 0xFF
+        return paged_components[index_component].read(address)
+    }
+    
+    override func dumpFromAddress(fromAddress: Int, count: Int) -> [UInt8] {
+        var index_component = (fromAddress & 0xFFFF) / 1024
+        var address = fromAddress
+        var result = [UInt8]()
+        
+        while result.count < count {
+            result = result + paged_components[index_component].dumpFromAddress(address, count: count - result.count)
+            index_component += 1
+            address += result.count
+        }
+        
+        return result
     }
 }
