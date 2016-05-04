@@ -44,7 +44,7 @@ class Bus16 : Bus {
     override func onComponentsUpdated() {
         for component in bus_components {
             let start = Int(component.getBaseAddress() / 1024)
-            let end = start + component.getBlockSize() / 1024
+            let end = start + component.getBlockSize() / 1024 - 1
             
             for i in start...end {
                 paged_components[i] = component
