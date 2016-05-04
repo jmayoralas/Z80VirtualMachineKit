@@ -80,7 +80,10 @@ import Foundation
     }
     
     public func loadRamAtAddress(address: Int, data: [UInt8]) {
-        memory.poke(address, bytes: data)
+        for (var i = 0; i < data.count; i++) {
+            cpu.dataBus.write(UInt16(address + i), value: data[address + i])
+        }
+        // cpu.dataBus.write(0x000c, value: 0xC3)
     }
     
     public func loadRomAtAddress(address: Int, data: [UInt8]) throws {
@@ -120,27 +123,11 @@ import Foundation
     }
     
     public func dumpMemoryFromAddress(fromAddress: Int, toAddress: Int) -> [UInt8] {
-        return memory.dumpFromAddress(fromAddress, toAddress: toAddress)
+        return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
     }
     
     public func testNewCpu() {
-        let bus = Bus16()
-        
-        let ram_1 = Ram(base_address: 0x0000, block_size: 0x0400)
-        let ram_2 = Ram(base_address: 0x0400, block_size: 0x0400)
-        bus.addBusComponent(ram_1)
-        bus.addBusComponent(ram_2)
-        
-        bus.write(0x0001, value: 0xAA)
-        bus.write(0x03FF, value: 0xAA)
-        bus.write(0x0400, value: 0xBB)
-        bus.write(0x0401, value: 0xBB)
-        
-        print("data : \(bus.read(0x0001).hexStr())")
-        print("data : \(bus.read(0x03FF).hexStr())")
-        print("data : \(bus.read(0x0400).hexStr())")
-        print("data : \(bus.read(0x0401).hexStr())")
-        print("data : \(bus.read(0xF401).hexStr())")
+        cpu.test()
     }
     
     func MemoryWriteAtAddress(address: Int, byte: UInt8) {
