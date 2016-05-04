@@ -25,12 +25,14 @@ class Z80 {
     
     private var prefix: UInt8?
     
-    init() {
-        regs = Registers()
-        pins = Pins()
-        cu = ControlUnit(pins: pins)
+    init(dataBus: Bus16) {
+        self.regs = Registers()
+        self.pins = Pins()
+        self.dataBus = dataBus
         
-        old_busreq = pins.busreq
+        self.cu = ControlUnit(dataBus: dataBus, pins: pins)
+        
+        self.old_busreq = pins.busreq
         
         reset()
     }
@@ -87,11 +89,6 @@ class Z80 {
         
         t_cycle += 1
         T += 1
-        
-        if T == 1000000 {
-            pins.halt = true
-            return
-        }
         
         switch machine_cycle {
         case .SoftIrq:
@@ -367,6 +364,29 @@ class Z80 {
             
         default:
             t_cycle = 0
+        }
+    }
+    
+    // MARK: new emulation non exhaustive
+    var dataBus : Bus16
+    
+    // test new cpu
+    func test() {
+        dataBus.write(0x0001, value: 0xAA)
+        dataBus.write(0x03FF, value: 0xAA)
+        dataBus.write(0x0400, value: 0xBB)
+        
+        print("data : \(dataBus.read(0x0001).hexStr())")
+        print("data : \(dataBus.read(0x03FF).hexStr())")
+        print("data : \(dataBus.read(0x0400).hexStr())")
+    }
+    
+    // gets next opcode from PC and executes it
+    func step() {
+        cu.processInstruction(regs: &regs, t_cycle: &t_cycle)
+        if t_cycle >= 1000000 {
+            pins.halt = true
+            return
         }
     }
 }
