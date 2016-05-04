@@ -25,14 +25,19 @@ import Foundation
     private var old_m1: Bool
     
     override public init() {
-        cpu = Z80()
+        cpu = Z80(dataBus: Bus16())
         old_m1 = cpu.pins.m1
         memory = Memory(pins: cpu.pins)
         io_devices = []
         instructions = -1
+        
         super.init()
         
         memory.delegate = self
+        
+        let ram = Ram(base_address: 0x0000, block_size: 0x10000)
+        ram.delegate = self
+        cpu.dataBus.addBusComponent(ram)
     }
     
     public func reset() {
