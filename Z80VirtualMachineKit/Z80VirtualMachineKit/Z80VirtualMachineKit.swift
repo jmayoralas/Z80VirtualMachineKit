@@ -56,21 +56,6 @@ import Foundation
         cpu.step()
     }
     
-    public func clk() {
-        cpu.clk()
-        memory.clk() // memory's clock line is connected to mreq pin of cpu
-        
-        if cpu.pins.m1 && old_m1 != cpu.pins.m1 {
-            instructions += 1
-        }
-        
-        old_m1 = cpu.pins.m1
-        
-        for io_device in io_devices {
-            io_device.clk()
-        }
-    }
-    
     public func getInstructionsCount() -> Int {
         return instructions < 0 ? 0 : instructions
     }
@@ -98,14 +83,6 @@ import Foundation
         return cpu.getTCycle()
     }
     
-    public func getMCycle() -> Int {
-        return cpu.getMCycle()
-    }
-    
-    public func getTCount() -> Int {
-        return cpu.getTCount()
-    }
-    
     public func getDataBus() -> UInt8 {
         return cpu.pins.data_bus
     }
@@ -124,10 +101,6 @@ import Foundation
     
     public func dumpMemoryFromAddress(fromAddress: Int, toAddress: Int) -> [UInt8] {
         return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
-    }
-    
-    public func testNewCpu() {
-        cpu.test()
     }
     
     func MemoryWriteAtAddress(address: Int, byte: UInt8) {
