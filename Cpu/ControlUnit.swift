@@ -363,7 +363,8 @@ final class ControlUnit {
         self.t_cycle = t_cycle
 
         // get opcode at PC into IR register
-        self.regs.ir = dataBus.read(self.regs.pc++)
+        self.regs.ir = dataBus.read(self.regs.pc)
+        self.regs.pc += 1
         
         // save bit 7 of R to restore after increment
         let bit7 = self.regs.r.bit(7)
