@@ -29,23 +29,20 @@ extension ControlUnit {
             self.regs.bc += 1
         }
         opcodes[0x04] = { // INC B
+            self.t_cycle += 4
             self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x05] = { // DEC B
+            self.t_cycle += 4
             self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
         }
         opcodes[0x06] = { // LD B,N
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .MemoryRead
-                self.pins.address_bus = self.regs.pc
-                self.regs.pc += 1
-            default:
-                self.regs.b = self.pins.data_bus
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 7
+            self.regs.b = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1
         }
         opcodes[0x07] = { // RLCA
+            self.t_cycle += 4
             let PV_backup = self.regs.f.bit(PV)
             let S_backup = self.regs.f.bit(S)
             let Z_backup = self.regs.f.bit(Z)
@@ -55,68 +52,38 @@ extension ControlUnit {
             self.regs.f.bit(Z, newVal: Z_backup)
         }
         opcodes[0x08] = { // EX AF,AF'
+            self.t_cycle += 4
             let af_ = self.regs.af_
             self.regs.af_ = self.regs.af
             self.regs.af = af_
         }
         opcodes[0x09] = { // ADD HL,BC
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .UlaOperation
-            case 2:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.machine_cycle = .UlaOperation
-                }
-            default:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 3 {
-                    let hl = self.addressFromPair(self.regs.h, self.regs.l)
-                    let bc = self.addressFromPair(self.regs.b, self.regs.c)
-                    let result = self.ulaCall16(hl, bc, ulaOp: .Add)
-                    self.regs.h = result.high
-                    self.regs.l = result.low
-                    self.machine_cycle = .OpcodeFetch
-                }
-            }
+            self.t_cycle += 11
+            self.regs.hl = self.ulaCall16(self.regs.hl, self.regs.bc, ulaOp: .Add)
         }
         opcodes[0x0A] = { // LD A,(BC)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.b, self.regs.c)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.a = self.pins.data_bus
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 7
+            self.regs.a = self.dataBus.read(self.regs.bc)
         }
         opcodes[0x0B] = { // DEC BC
-            self.machine_cycle = .TimeWait
-            
-            if self.t_cycle == 6 {
-                self.regs.c = self.regs.c &- 1
-                self.regs.b = self.regs.c == 0xFF ? self.regs.b &- 1 : self.regs.b
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 6
+            self.regs.bc -= 1
         }
         opcodes[0x0C] = { // INC C
+            self.t_cycle += 4
             self.regs.c = self.ulaCall(self.regs.c, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x0D] = { // DEC C
+            self.t_cycle += 4
             self.regs.c = self.ulaCall(self.regs.c, 1, ulaOp: .Sub, ignoreCarry: true)
         }
         opcodes[0x0E] = { // LD C,N
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .MemoryRead
-                self.pins.address_bus = self.regs.pc
-                self.regs.pc += 1
-            default:
-                self.regs.c = self.pins.data_bus
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 7
+            self.regs.c = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1
         }
         opcodes[0x0F] = { // RRCA
+            self.t_cycle += 4
             let PV_backup = self.regs.f.bit(PV)
             let S_backup = self.regs.f.bit(S)
             let Z_backup = self.regs.f.bit(Z)
@@ -127,82 +94,45 @@ extension ControlUnit {
 
         }
         opcodes[0x10] = { // DJNZ N
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.machine_cycle = .MemoryRead
-                    self.pins.address_bus = self.regs.pc
-                    self.regs.pc += 1
-                }
-            case 2:
-                self.control_reg = self.pins.data_bus // preserve data bus
-                self.regs.b -= 1
-                if self.regs.b == 0 {
-                    self.machine_cycle = .OpcodeFetch
-                } else {
-                    self.machine_cycle = .UlaOperation
-                }
-            default:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.regs.pc = UInt16(Int(self.regs.pc) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .OpcodeFetch
-                }
+            self.t_cycle += 8
+            let displ = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1
+            self.regs.b -= 1
+            if self.regs.b != 0 {
+                self.t_cycle += 5
+                self.regs.pc += UInt16(displ.comp2)
             }
         }
         opcodes[0x11] = { // LD DE,&0000
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .MemoryRead
-                self.pins.address_bus = self.regs.pc
-                self.regs.pc += 1
-            case 2:
-                self.regs.e = self.pins.data_bus
-                self.pins.address_bus = self.regs.pc
-                self.regs.pc += 1
-            default:
-                self.regs.d = self.pins.data_bus
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 10
+            self.regs.e = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1
+            self.regs.d = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1
         }
         opcodes[0x12] = { // LD (DE),A
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.d, self.regs.e)
-                self.pins.data_bus = self.regs.a
-                self.machine_cycle = .MemoryWrite
-            default:
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 7
+            self.dataBus.write(self.regs.de, value: self.regs.a)
         }
         opcodes[0x13] = { // INC DE
-            self.machine_cycle = .TimeWait
-            
-            if self.t_cycle == 6 {
-                self.regs.e = self.regs.e &+ 1
-                self.regs.d = self.regs.e == 0 ? self.regs.d &+ 1 : self.regs.d
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 6
+            self.regs.de += 1
         }
         opcodes[0x14] = { // INC D
+            self.t_cycle += 4
             self.regs.d = self.ulaCall(self.regs.d, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x15] = { // DEC D
+            self.t_cycle += 4
             self.regs.d = self.ulaCall(self.regs.d, 1, ulaOp: .Sub, ignoreCarry: true)
         }
         opcodes[0x16] = { // LD D,&00
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .MemoryRead
-                self.pins.address_bus = self.regs.pc
-                self.regs.pc += 1
-            default:
-                self.regs.d = self.pins.data_bus
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 7
+            self.regs.d = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1
         }
         opcodes[0x17] = { // RLA
+            self.t_cycle += 4
             let PV_backup = self.regs.f.bit(PV)
             let S_backup = self.regs.f.bit(S)
             let Z_backup = self.regs.f.bit(Z)
@@ -213,80 +143,37 @@ extension ControlUnit {
 
         }
         opcodes[0x18] = { // JR &00
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .MemoryRead
-                self.pins.address_bus = self.regs.pc
-                self.regs.pc += 1
-            case 2:
-                self.control_reg = self.pins.data_bus // preserve data bus
-                self.machine_cycle = .UlaOperation
-            default:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.regs.pc = UInt16(Int(self.regs.pc) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .OpcodeFetch
-                }
-            }
+            self.t_cycle += 12
+            let displ = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1 + UInt16(displ.comp2)
         }
         opcodes[0x19] = { // ADD HL,DE
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .UlaOperation
-            case 2:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.machine_cycle = .UlaOperation
-                }
-            default:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 3 {
-                    let hl = self.addressFromPair(self.regs.h, self.regs.l)
-                    let de = self.addressFromPair(self.regs.d, self.regs.e)
-                    let result = self.ulaCall16(hl, de, ulaOp: .Add)
-                    self.regs.h = result.high
-                    self.regs.l = result.low
-                    self.machine_cycle = .OpcodeFetch
-                }
-            }
+            self.t_cycle += 11
+            self.regs.hl = self.ulaCall16(self.regs.hl, self.regs.de, ulaOp: .Add)
         }
         opcodes[0x1A] = { // LD A,(DE)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.d, self.regs.e)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.a = self.pins.data_bus
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 7
+            self.regs.a = self.dataBus.read(self.regs.de)
         }
         opcodes[0x1B] = { // DEC DE
-            self.machine_cycle = .TimeWait
-            
-            if self.t_cycle == 6 {
-                self.regs.e = self.regs.e &- 1
-                self.regs.d = self.regs.e == 0xFF ? self.regs.d &- 1 : self.regs.d
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 6
+            self.regs.de -= 1
         }
         opcodes[0x1C] = { // INC E
+            self.t_cycle += 4
             self.regs.e = self.ulaCall(self.regs.e, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x1D] = { // DEC E
+            self.t_cycle += 4
             self.regs.e = self.ulaCall(self.regs.e, 1, ulaOp: .Sub, ignoreCarry: true)
         }
         opcodes[0x1E] = { // LD E,&00
-            switch self.m_cycle {
-            case 1:
-                self.machine_cycle = .MemoryRead
-                self.pins.address_bus = self.regs.pc
-                self.regs.pc += 1
-            default:
-                self.regs.e = self.pins.data_bus
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 7
+            self.regs.e = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1
         }
         opcodes[0x1F] = { // RRA
+            self.t_cycle += 4
             let PV_backup = self.regs.f.bit(PV)
             let Z_backup = self.regs.f.bit(Z)
             let S_backup = self.regs.f.bit(S)
