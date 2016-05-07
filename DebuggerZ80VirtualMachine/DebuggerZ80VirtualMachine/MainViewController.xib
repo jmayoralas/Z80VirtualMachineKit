@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="MainViewController" customModule="DebuggerZ80VirtualMachine" customModuleProvider="target">
@@ -14,7 +14,6 @@
                 <outlet property="BTextField" destination="LXB-WT-rzf" id="aqy-S5-tci"/>
                 <outlet property="CBinTextField" destination="W4B-UO-eBv" id="2aV-7L-JkG"/>
                 <outlet property="CTextField" destination="GSq-HN-wcX" id="iMJ-sE-35n"/>
-                <outlet property="CiclosTextField" destination="GaN-EO-ZML" id="A4Y-qT-UcF"/>
                 <outlet property="DBinTextField" destination="Rgt-vc-bJl" id="dwx-YJ-fP4"/>
                 <outlet property="DTextField" destination="Hji-5H-79x" id="gss-Ka-Lyi"/>
                 <outlet property="DataBusBinTextField" destination="p5c-rd-GKb" id="v40-fi-1Ga"/>
@@ -38,7 +37,6 @@
                 <outlet property="IylTextField" destination="nOj-5s-L1g" id="to5-Ho-CDh"/>
                 <outlet property="LBinTextField" destination="5hp-F5-Vef" id="IPT-lt-DlE"/>
                 <outlet property="LTextField" destination="IEB-yT-BH9" id="knx-J1-L92"/>
-                <outlet property="MTextField" destination="Nqe-KJ-V4t" id="UGG-W4-l5B"/>
                 <outlet property="PcTextField" destination="acV-eA-a6Z" id="L9d-f7-jfF"/>
                 <outlet property="RTextField" destination="juK-FG-dYS" id="WlE-dG-Lfm"/>
                 <outlet property="SpTextField" destination="6fd-ys-8vZ" id="NCK-dM-1mg"/>
@@ -58,22 +56,6 @@
                     <rect key="frame" x="28" y="425" width="26" height="17"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="PC" id="iph-qd-dqA">
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="avA-yc-9hm" userLabel="Label">
-                    <rect key="frame" x="127" y="396" width="16" height="17"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="M" id="aEN-lE-m3j">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nqe-KJ-V4t" customClass="ColorChangeTextField" customModule="DebuggerZ80VirtualMachine" customModuleProvider="target">
-                    <rect key="frame" x="147" y="396" width="66" height="17"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" identifier="PC" title="Label" id="yWA-0t-LOq">
-                        <font key="font" metaFont="systemBold"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -1179,32 +1161,6 @@
                     </buttonCell>
                     <connections>
                         <action selector="resetClick:" target="-2" id="0ep-lf-WdX"/>
-                    </connections>
-                </button>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bdu-LZ-67B" userLabel="Label">
-                    <rect key="frame" x="590" y="303" width="47" height="17"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Ciclos" id="UXi-57-qIR">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GaN-EO-ZML" customClass="ColorChangeTextField" customModule="DebuggerZ80VirtualMachine" customModuleProvider="target">
-                    <rect key="frame" x="641" y="303" width="66" height="17"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" identifier="PC" title="Label" id="oVk-IY-dtr">
-                        <font key="font" metaFont="systemBold"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vk9-Tu-jV6">
-                    <rect key="frame" x="694" y="249" width="77" height="32"/>
-                    <buttonCell key="cell" type="push" title="Test" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="V0v-eY-jFe">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="testClick:" target="-2" id="tBc-WV-dtV"/>
                     </connections>
                 </button>
             </subviews>

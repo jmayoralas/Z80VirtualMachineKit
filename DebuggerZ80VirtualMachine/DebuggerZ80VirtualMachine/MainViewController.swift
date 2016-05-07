@@ -149,18 +149,14 @@ import Z80VirtualMachineKit
         }
     }
     
-    @IBAction func testClick(sender: AnyObject) {
-        vm.testNewCpu()
-    }
-    
     func f5Pressed() {
-        vm.step()
+        vm.run()
         
         self.refreshView()
     }
     
     func f6Pressed() {
-        vm.clk()
+        vm.step()
         
         self.refreshView()
     }
@@ -174,15 +170,12 @@ import Z80VirtualMachineKit
         ITextField!.stringValue = "\(regs.i.hexStr())"
         RTextField!.stringValue = "\(regs.r.hexStr())"
         
-        MTextField!.stringValue = "\(vm.getMCycle())"
         TTextField!.stringValue = "\(vm.getTCycle())"
         
         instructionCounter.stringValue = "\(vm.getInstructionsCount())"
         DataBusTextField!.stringValue = "\(vm.getDataBus().hexStr())"
         DataBusBinTextField!.stringValue = "\(vm.getDataBus().binStr)"
         AddressBusTextField!.stringValue = "\(vm.getAddressBus().hexStr())"
-        
-        CiclosTextField!.stringValue = "\(vm.getTCount())"
         
         ATextField!.stringValue = "\(regs.a.hexStr())"
         ABinTextField!.stringValue = regs.a.binStr
