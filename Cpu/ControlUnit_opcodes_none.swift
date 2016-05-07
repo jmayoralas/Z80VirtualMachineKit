@@ -15,8 +15,10 @@ extension ControlUnit {
         }
         opcodes[0x01] = { // LD BC,&0000
             self.t_cycle += 10
-            self.regs.c = self.dataBus.read(self.regs.pc++)
-            self.regs.b = self.dataBus.read(self.regs.pc++)
+            self.regs.c = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1
+            self.regs.b = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1
         }
         opcodes[0x02] = { // LD (BC),A
             self.t_cycle += 7
@@ -697,7 +699,8 @@ extension ControlUnit {
         }
         opcodes[0x3E] = { // LD A,&00
             self.t_cycle += 7
-            self.regs.a = self.dataBus.read(self.regs.pc++)
+            self.regs.a = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1
         }
         opcodes[0x3F] = { // CCF
             self.regs.f.bit(H, newVal: self.regs.f.bit(C))
@@ -1282,8 +1285,9 @@ extension ControlUnit {
         opcodes[0xC2] = { // JP NZ &0000
             self.t_cycle += 10
             if self.regs.f.bit(Z) == 0 {
-                let address_low = self.dataBus.read(self.regs.pc++)
-                let address_high = self.dataBus.read(self.regs.pc++)
+                let address_low = self.dataBus.read(self.regs.pc)
+                self.regs.pc += 1
+                let address_high = self.dataBus.read(self.regs.pc)
                 self.regs.pc = self.addressFromPair(address_high, address_low)
             } else {
                 self.regs.pc += 2
@@ -1291,8 +1295,9 @@ extension ControlUnit {
         }
         opcodes[0xC3] = { // JP &0000
             self.t_cycle += 10
-            let address_low = self.dataBus.read(self.regs.pc++)
-            let address_high = self.dataBus.read(self.regs.pc++)
+            let address_low = self.dataBus.read(self.regs.pc)
+            self.regs.pc += 1
+            let address_high = self.dataBus.read(self.regs.pc)
             self.regs.pc = self.addressFromPair(address_high, address_low)
         }
         opcodes[0xC4] = { // CALL NZ &0000
