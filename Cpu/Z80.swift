@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Z80 {
+final class Z80 {
     private var regs : Registers
     let pins : Pins
     let cu : ControlUnit
@@ -384,7 +384,7 @@ class Z80 {
     // gets next opcode from PC and executes it
     func step() {
         cu.processInstruction(regs: &regs, t_cycle: &t_cycle)
-        if t_cycle >= 1000000 {
+        if t_cycle >= 4000000 {
             pins.halt = true
             return
         }

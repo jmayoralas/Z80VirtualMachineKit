@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ControlUnit {
+final class ControlUnit {
     // MARK: Parameters
     let pins : Pins
     var regs : Registers!

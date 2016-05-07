@@ -31,7 +31,7 @@ class Bus : BusComponent {
     }
 }
 
-class Bus16 : Bus {
+final class Bus16 : Bus {
     private var paged_components : [BusComponent]
     
     init() {
