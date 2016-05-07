@@ -79,27 +79,15 @@ public extension UInt8 {
     }
     
     func bit(index: Int) -> Int {
-        return Int(self.binArray[7 - index])!
+        return (Int(self) >> index) & 0x01
     }
     
     mutating func setBit(index: Int) {
-        var mask = String()
-        var i = 0
-        for char in "00000000".characters {
-            mask.append((i == 7 - index) ? "1" : char)
-            i += 1
-        }
-        self = self | UInt8(mask.binaryToDecimal)
+        self = self | UInt8(1 << index)
     }
     
     mutating func resetBit(index: Int) {
-        var mask = String()
-        var i = 0
-        for char in "11111111".characters {
-            mask.append((i == 7 - index) ? "0" : char)
-            i += 1
-        }
-        self = self & UInt8(mask.binaryToDecimal)
+        self = self & ~UInt8(1 << index)
     }
     
     var high: UInt8 {
