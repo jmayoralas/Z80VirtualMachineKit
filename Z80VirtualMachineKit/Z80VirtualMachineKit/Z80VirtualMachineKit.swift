@@ -13,7 +13,7 @@ import Foundation
     optional func Z80VMMemoryReadAtAddress(address: Int, byte: UInt8)
 }
 
-@objc public class Z80VirtualMachineKit: NSObject, MemoryChange
+@objc final public class Z80VirtualMachineKit: NSObject, MemoryChange
 {
     public var delegate: Z80VirtualMachineStatus?
     
