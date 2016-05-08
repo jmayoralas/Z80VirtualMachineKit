@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension ControlUnit {
+extension Z80 {
     func initOpcodeTableED(inout opcodes: OpcodeTable) {
         opcodes[0x40] = { // IN B,(C)
             switch self.m_cycle {
@@ -30,7 +30,7 @@ extension ControlUnit {
                 self.regs.f.bit(PV, newVal: self.checkParity(self.pins.data_bus))
                 self.regs.f.resetBit(N)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x41] = { // OUT (C),B
@@ -41,7 +41,7 @@ extension ControlUnit {
                 self.machine_cycle = .IoWrite
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x42] = { // SBC HL,BC
@@ -62,7 +62,7 @@ extension ControlUnit {
                     self.regs.h = result.high
                     self.regs.l = result.low
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -85,12 +85,12 @@ extension ControlUnit {
                 self.pins.data_bus = self.regs.b
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x44] = { // NEG
             self.regs.a = self.ulaCall(0, self.regs.a, ulaOp: .Sub, ignoreCarry: false)
-            self.id_opcode_table = prefix_NONE
+            self.id_opcode_table = table_NONE
         }
         opcodes[0x45] = { // RETN
             switch self.m_cycle {
@@ -106,19 +106,19 @@ extension ControlUnit {
                 self.regs.IFF1 = self.regs.IFF2
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x46] = { // IM 0
             self.regs.int_mode = 0
-            self.id_opcode_table = prefix_NONE
+            self.id_opcode_table = table_NONE
         }
         opcodes[0x47] = { // LD I,A
             self.machine_cycle = .TimeWait
             if self.t_cycle == 5 {
                 self.regs.i = self.regs.a
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x48] = { // IN C,(C)
@@ -141,7 +141,7 @@ extension ControlUnit {
                 self.regs.f.bit(PV, newVal: self.checkParity(self.pins.data_bus))
                 self.regs.f.resetBit(N)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x49] = { // OUT (C),C
@@ -152,7 +152,7 @@ extension ControlUnit {
                 self.machine_cycle = .IoWrite
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x4A] = { // ADC HL,BC
@@ -173,7 +173,7 @@ extension ControlUnit {
                     self.regs.h = result.high
                     self.regs.l = result.low
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -195,7 +195,7 @@ extension ControlUnit {
             default:
                 self.regs.b = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x4C] = { // NEG
@@ -214,7 +214,7 @@ extension ControlUnit {
             default:
                 self.regs.pc = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x4E] = { // IM 0
@@ -225,7 +225,7 @@ extension ControlUnit {
             if self.t_cycle == 5 {
                 self.regs.r = self.regs.a
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x50] = { // IN D,(C)
@@ -248,7 +248,7 @@ extension ControlUnit {
                 self.regs.f.bit(PV, newVal: self.checkParity(self.pins.data_bus))
                 self.regs.f.resetBit(N)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x51] = { // OUT (C),D
@@ -259,7 +259,7 @@ extension ControlUnit {
                 self.machine_cycle = .IoWrite
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x52] = { // SBC HL,DE
@@ -280,7 +280,7 @@ extension ControlUnit {
                     self.regs.h = result.high
                     self.regs.l = result.low
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -303,7 +303,7 @@ extension ControlUnit {
                 self.pins.data_bus = self.regs.d
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x54] = { // NEG
@@ -314,14 +314,14 @@ extension ControlUnit {
         }
         opcodes[0x56] = { // IM 1
             self.regs.int_mode = 1
-            self.id_opcode_table = prefix_NONE
+            self.id_opcode_table = table_NONE
         }
         opcodes[0x57] = { // LD A,I
             self.machine_cycle = .TimeWait
             if self.t_cycle == 5 {
                 self.regs.a = self.regs.i
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x58] = { // IN E,(C)
@@ -344,7 +344,7 @@ extension ControlUnit {
                 self.regs.f.bit(PV, newVal: self.checkParity(self.pins.data_bus))
                 self.regs.f.resetBit(N)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x59] = { // OUT (C),E
@@ -355,7 +355,7 @@ extension ControlUnit {
                 self.machine_cycle = .IoWrite
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x5A] = { // ADC HL,DE
@@ -376,7 +376,7 @@ extension ControlUnit {
                     self.regs.h = result.high
                     self.regs.l = result.low
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -398,7 +398,7 @@ extension ControlUnit {
             default:
                 self.regs.d = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x5C] = { // NEG
@@ -409,14 +409,14 @@ extension ControlUnit {
         }
         opcodes[0x5E] = { // IM 2
             self.regs.int_mode = 2
-            self.id_opcode_table = prefix_NONE
+            self.id_opcode_table = table_NONE
         }
         opcodes[0x5F] = { // LD A,R
             self.machine_cycle = .TimeWait
             if self.t_cycle == 5 {
                 self.regs.a = self.regs.r
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x60] = { // IN H,(C)
@@ -439,7 +439,7 @@ extension ControlUnit {
                 self.regs.f.bit(PV, newVal: self.checkParity(self.pins.data_bus))
                 self.regs.f.resetBit(N)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x61] = { // OUT (C),H
@@ -450,7 +450,7 @@ extension ControlUnit {
                 self.machine_cycle = .IoWrite
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x62] = { // SBC HL,HL
@@ -470,7 +470,7 @@ extension ControlUnit {
                     self.regs.h = result.high
                     self.regs.l = result.low
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -493,7 +493,7 @@ extension ControlUnit {
                 self.pins.data_bus = self.regs.h
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x64] = { // NEG
@@ -531,7 +531,7 @@ extension ControlUnit {
                 }
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x68] = { // IN L,(C)
@@ -554,7 +554,7 @@ extension ControlUnit {
                 self.regs.f.bit(PV, newVal: self.checkParity(self.pins.data_bus))
                 self.regs.f.resetBit(N)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x69] = { // OUT (C),L
@@ -565,7 +565,7 @@ extension ControlUnit {
                 self.machine_cycle = .IoWrite
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x6A] = { // ADC HL,HL
@@ -585,7 +585,7 @@ extension ControlUnit {
                     self.regs.h = result.high
                     self.regs.l = result.low
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -607,7 +607,7 @@ extension ControlUnit {
             default:
                 self.regs.h = self.pins.data_bus
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x6C] = { // NEG
@@ -645,7 +645,7 @@ extension ControlUnit {
                 }
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x70] = { // IN _,(C)
@@ -667,7 +667,7 @@ extension ControlUnit {
                 self.regs.f.bit(PV, newVal: self.checkParity(self.pins.data_bus))
                 self.regs.f.resetBit(N)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x71] = { // OUT (C),_
@@ -678,7 +678,7 @@ extension ControlUnit {
                 self.machine_cycle = .IoWrite
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x72] = { // SBC HL,SP
@@ -698,7 +698,7 @@ extension ControlUnit {
                     self.regs.h = result.high
                     self.regs.l = result.low
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -721,7 +721,7 @@ extension ControlUnit {
                 self.pins.data_bus = self.regs.sp.high
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x74] = { // NEG
@@ -734,7 +734,7 @@ extension ControlUnit {
             self.opcode_tables[self.id_opcode_table][0x56]()
         }
         opcodes[0x77] = { // NOP
-            self.id_opcode_table = prefix_NONE
+            self.id_opcode_table = table_NONE
         }
         opcodes[0x78] = { // IN A,(C)
             switch self.m_cycle {
@@ -756,7 +756,7 @@ extension ControlUnit {
                 self.regs.f.bit(PV, newVal: self.checkParity(self.pins.data_bus))
                 self.regs.f.resetBit(N)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x79] = { // OUT (C),A
@@ -767,7 +767,7 @@ extension ControlUnit {
                 self.machine_cycle = .IoWrite
             default:
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x7A] = { // ADC HL,SP
@@ -787,7 +787,7 @@ extension ControlUnit {
                     self.regs.h = result.high
                     self.regs.l = result.low
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -809,7 +809,7 @@ extension ControlUnit {
             default:
                 self.regs.sp = self.addressFromPair(self.pins.data_bus, self.control_reg)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE
+                self.id_opcode_table = table_NONE
             }
         }
         opcodes[0x7C] = { // NEG
@@ -822,7 +822,7 @@ extension ControlUnit {
             self.opcode_tables[self.id_opcode_table][0x5E]()
         }
         opcodes[0x7F] = { // RLD
-            self.id_opcode_table = prefix_NONE
+            self.id_opcode_table = table_NONE
         }
         opcodes[0xA0] = { // LDI
             switch self.m_cycle {
@@ -854,7 +854,7 @@ extension ControlUnit {
                         self.regs.f.resetBit(PV)
                     }
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -886,7 +886,7 @@ extension ControlUnit {
                         self.regs.f.resetBit(PV)
                     }
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -909,7 +909,7 @@ extension ControlUnit {
                 self.regs.f = f_backup
                 self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE   
+                self.id_opcode_table = table_NONE   
             }
         }
         opcodes[0xA3] = { // OUTI
@@ -931,7 +931,7 @@ extension ControlUnit {
                 self.regs.l = hl.low
                 self.regs.f = f_backup
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE   
+                self.id_opcode_table = table_NONE   
             }
         }
         opcodes[0xA8] = { // LDD
@@ -964,7 +964,7 @@ extension ControlUnit {
                         self.regs.f.resetBit(PV)
                     }
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -996,7 +996,7 @@ extension ControlUnit {
                         self.regs.f.resetBit(PV)
                     }
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -1019,7 +1019,7 @@ extension ControlUnit {
                 self.regs.f = f_backup
                 self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE   
+                self.id_opcode_table = table_NONE   
             }
         }
         opcodes[0xAB] = { // OUTD
@@ -1041,7 +1041,7 @@ extension ControlUnit {
                 self.regs.l = hl.low
                 self.regs.f = f_backup
                 self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = prefix_NONE   
+                self.id_opcode_table = table_NONE   
             }
         }
         opcodes[0xB0] = { // LDIR
@@ -1073,7 +1073,7 @@ extension ControlUnit {
                     } else {
                         self.regs.f.resetBit(PV)
                         self.machine_cycle = .OpcodeFetch
-                        self.id_opcode_table = prefix_NONE
+                        self.id_opcode_table = table_NONE
                     }
                 }
             default:
@@ -1081,7 +1081,7 @@ extension ControlUnit {
                 if self.t_cycle == 5 {
                     self.regs.pc = self.regs.pc - 2
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -1113,7 +1113,7 @@ extension ControlUnit {
                     } else {
                         self.regs.f.resetBit(PV)
                         self.machine_cycle = .OpcodeFetch
-                        self.id_opcode_table = prefix_NONE
+                        self.id_opcode_table = table_NONE
                     }
                 }
             default:
@@ -1121,7 +1121,7 @@ extension ControlUnit {
                 if self.t_cycle == 5 {
                     self.regs.pc = self.regs.pc - 2
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -1148,14 +1148,14 @@ extension ControlUnit {
                     self.regs.f.setBit(PV)
                 } else {
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             default:
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.regs.pc = self.regs.pc - 2
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -1182,14 +1182,14 @@ extension ControlUnit {
                     self.regs.f.setBit(PV)
                 } else {
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             default:
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.regs.pc = self.regs.pc - 2
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -1222,7 +1222,7 @@ extension ControlUnit {
                     } else {
                         self.regs.f.resetBit(PV)
                         self.machine_cycle = .OpcodeFetch
-                        self.id_opcode_table = prefix_NONE
+                        self.id_opcode_table = table_NONE
                     }
                 }
             default:
@@ -1230,7 +1230,7 @@ extension ControlUnit {
                 if self.t_cycle == 5 {
                     self.regs.pc = self.regs.pc - 2
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -1262,7 +1262,7 @@ extension ControlUnit {
                     } else {
                         self.regs.f.resetBit(PV)
                         self.machine_cycle = .OpcodeFetch
-                        self.id_opcode_table = prefix_NONE
+                        self.id_opcode_table = table_NONE
                     }
                 }
             default:
@@ -1270,7 +1270,7 @@ extension ControlUnit {
                 if self.t_cycle == 5 {
                     self.regs.pc = self.regs.pc - 2
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -1297,14 +1297,14 @@ extension ControlUnit {
                     self.regs.f.setBit(PV)
                 } else {
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             default:
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.regs.pc = self.regs.pc - 2
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }
@@ -1331,14 +1331,14 @@ extension ControlUnit {
                     self.regs.f.setBit(PV)
                 } else {
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             default:
                 self.machine_cycle = .TimeWait
                 if self.t_cycle == 5 {
                     self.regs.pc = self.regs.pc - 2
                     self.machine_cycle = .OpcodeFetch
-                    self.id_opcode_table = prefix_NONE
+                    self.id_opcode_table = table_NONE
                 }
             }
         }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension ControlUnit {
+extension Z80 {
     func initOpcodeTableNONE(inout opcodes: OpcodeTable) {
         opcodes[0x00] = { // NOP
             self.t_cycle += 4
@@ -1106,7 +1106,7 @@ extension ControlUnit {
             }
         }
         opcodes[0xCB] = { // PREFIX *** CB ***
-            self.id_opcode_table = prefix_CB
+            self.id_opcode_table = table_CB
         }
         opcodes[0xCC] = { // CALL Z &0000
             switch self.m_cycle {
@@ -1404,7 +1404,13 @@ extension ControlUnit {
             }
         }
         opcodes[0xDD] = { // PREFIX *** DD ***
-            self.id_opcode_table = prefix_DD
+            self.t_cycle += 4
+            self.id_opcode_table = table_XX
+            self.opcode_prefix = 0xDD
+            self.regs.xx = self.regs.ix
+            self.processInstruction()
+            self.regs.ix = self.regs.xx
+            self.id_opcode_table = table_NONE
         }
         opcodes[0xDE] = { // SBC A,&00
             switch self.m_cycle {
@@ -1643,7 +1649,7 @@ extension ControlUnit {
             }
         }
         opcodes[0xED] = { // PREFIX *** ED ***
-            self.id_opcode_table = prefix_ED
+            self.id_opcode_table = table_ED
         }
         opcodes[0xEE] = { // XOR &00
             switch self.m_cycle {
@@ -1856,7 +1862,13 @@ extension ControlUnit {
             }
         }
         opcodes[0xFD] = { // PREFIX *** FD ***
-            self.id_opcode_table = prefix_FD
+            self.t_cycle += 4
+            self.id_opcode_table = table_XX
+            self.opcode_prefix = 0xFD
+            self.regs.xx = self.regs.iy
+            self.processInstruction()
+            self.regs.iy = self.regs.xx
+            self.id_opcode_table = table_NONE
         }
         opcodes[0xFE] = { // CP &00
             switch self.m_cycle {
