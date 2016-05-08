@@ -13,9 +13,26 @@
 		1DD723351C3589BB00178421 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DD723331C3589BB00178421 /* MainMenu.xib */; };
 		1DD723461C35902900178421 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723441C35902900178421 /* MainViewController.swift */; };
 		1DD723471C35902900178421 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DD723451C35902900178421 /* MainViewController.xib */; };
-		1DFFE5101CDE38D100544375 /* Z80VirtualMachineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DFFE50F1CDE38D100544375 /* Z80VirtualMachineKit.framework */; };
-		1DFFE5111CDE38D100544375 /* Z80VirtualMachineKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1DFFE50F1CDE38D100544375 /* Z80VirtualMachineKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1DDA33C91CDF396E00ABC349 /* Z80VirtualMachineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DDA33C81CDF37BB00ABC349 /* Z80VirtualMachineKit.framework */; };
+		1DDA33CA1CDF396E00ABC349 /* Z80VirtualMachineKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1DDA33C81CDF37BB00ABC349 /* Z80VirtualMachineKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1DDA33C71CDF37BB00ABC349 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1DDA33C31CDF37BB00ABC349 /* Z80VirtualMachineKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1DD722D61C35857B00178421;
+			remoteInfo = Z80VirtualMachineKit;
+		};
+		1DDA33CB1CDF396E00ABC349 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1DDA33C31CDF37BB00ABC349 /* Z80VirtualMachineKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 1DD722D51C35857B00178421;
+			remoteInfo = Z80VirtualMachineKit;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		1D1B31831CD7CD04002C05FA /* Embed Frameworks */ = {
@@ -24,7 +41,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				1DFFE5111CDE38D100544375 /* Z80VirtualMachineKit.framework in Embed Frameworks */,
+				1DDA33CA1CDF396E00ABC349 /* Z80VirtualMachineKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -40,7 +57,7 @@
 		1DD723361C3589BB00178421 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1DD723441C35902900178421 /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		1DD723451C35902900178421 /* MainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainViewController.xib; sourceTree = "<group>"; };
-		1DFFE50F1CDE38D100544375 /* Z80VirtualMachineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; name = Z80VirtualMachineKit.framework; path = "/Users/jluis/Library/Developer/Xcode/DerivedData/z80emu-hhiivinjlbxyuohaljndohwrjjuz/Build/Products/Debug/Z80VirtualMachineKit.framework"; sourceTree = "<absolute>"; };
+		1DDA33C31CDF37BB00ABC349 /* Z80VirtualMachineKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Z80VirtualMachineKit.xcodeproj; path = ../Z80VirtualMachineKit/Z80VirtualMachineKit.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,7 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1DFFE5101CDE38D100544375 /* Z80VirtualMachineKit.framework in Frameworks */,
+				1DDA33C91CDF396E00ABC349 /* Z80VirtualMachineKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -58,7 +75,7 @@
 		1DD723231C3589BB00178421 = {
 			isa = PBXGroup;
 			children = (
-				1DFFE50F1CDE38D100544375 /* Z80VirtualMachineKit.framework */,
+				1DDA33C31CDF37BB00ABC349 /* Z80VirtualMachineKit.xcodeproj */,
 				1DD7232E1C3589BB00178421 /* DebuggerZ80VirtualMachine */,
 				1DD7232D1C3589BB00178421 /* Products */,
 			);
@@ -86,6 +103,14 @@
 			path = DebuggerZ80VirtualMachine;
 			sourceTree = "<group>";
 		};
+		1DDA33C41CDF37BB00ABC349 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1DDA33C81CDF37BB00ABC349 /* Z80VirtualMachineKit.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -101,6 +126,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				1DDA33CC1CDF396E00ABC349 /* PBXTargetDependency */,
 			);
 			name = DebuggerZ80VirtualMachine;
 			productName = DebuggerZ80VirtualMachine;
@@ -133,12 +159,28 @@
 			mainGroup = 1DD723231C3589BB00178421;
 			productRefGroup = 1DD7232D1C3589BB00178421 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 1DDA33C41CDF37BB00ABC349 /* Products */;
+					ProjectRef = 1DDA33C31CDF37BB00ABC349 /* Z80VirtualMachineKit.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				1DD7232B1C3589BB00178421 /* DebuggerZ80VirtualMachine */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		1DDA33C81CDF37BB00ABC349 /* Z80VirtualMachineKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Z80VirtualMachineKit.framework;
+			remoteRef = 1DDA33C71CDF37BB00ABC349 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		1DD7232A1C3589BB00178421 /* Resources */ = {
@@ -165,6 +207,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1DDA33CC1CDF396E00ABC349 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Z80VirtualMachineKit;
+			targetProxy = 1DDA33CB1CDF396E00ABC349 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		1DD723331C3589BB00178421 /* MainMenu.xib */ = {
@@ -263,6 +313,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -279,6 +330,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
