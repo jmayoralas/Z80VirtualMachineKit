@@ -55,6 +55,8 @@ public struct Registers {
     public var ixl: UInt8 = 0
     public var iyh: UInt8 = 0
     public var iyl: UInt8 = 0
+    public var xxh: UInt8 = 0
+    public var xxl: UInt8 = 0
 
     // 16 bit registers
     // primary
@@ -106,6 +108,16 @@ public struct Registers {
     public var hl_: UInt16 = 0
     
     // index
+    var xx: UInt16 {
+        get {
+            return UInt16(Int(Int(self.xxh) * 0x100) + Int(self.xxl))
+        }
+        set(newValue) {
+            self.xxh = newValue.high
+            self.xxl = newValue.low
+        }
+    }
+    
     var ix: UInt16 {
         get {
             return UInt16(Int(Int(self.ixh) * 0x100) + Int(self.ixl))
@@ -163,10 +175,9 @@ let PV = 5
 let N = 6
 let C = 7
 
-let prefix_NONE = 0
-let prefix_DD = 1
-let prefix_FD = 2
-let prefix_CB = 3
-let prefix_DDCB = 4
-let prefix_FDCB = 5
-let prefix_ED = 6
+// id opcode table
+let table_NONE = 0
+let table_XX = 1
+let table_CB = 2
+let table_XXCB = 3
+let table_ED = 4
