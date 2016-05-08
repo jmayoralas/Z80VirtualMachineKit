@@ -8,42 +8,14 @@
 
 import Foundation
 
-final class ControlUnit {
-    // MARK: Parameters
-    let pins : Pins
-    var regs : Registers!
-    
-    typealias OpcodeTable = [() -> Void]
-    
-    var opcode_tables : [OpcodeTable]!
-    
-    var id_opcode_table : Int
-    
-    var m_cycle : Int
-    var t_cycle : Int
-    
-    var machine_cycle : MachineCycle
-    
-    var control_reg : UInt8! // backup register to store parameters between t_cycles of execution
-    
-    var irq_kind : IrqKind?
-    
+extension Z80 {
     // MARK: Methods
     func isPrefixed() -> Bool {
-        return (id_opcode_table != prefix_NONE) ? true : false
+        return (id_opcode_table != table_NONE) ? true : false
     }
     
-    func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
-        return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
-    }
-    
-    func processOpcode(inout regs: Registers, _ t_cycle: Int, _ m_cycle: Int, inout _ machine_cycle: MachineCycle) {
-        self.m_cycle = m_cycle
-        self.t_cycle = t_cycle
-        self.regs = regs
-        self.machine_cycle = machine_cycle
-
-        switch machine_cycle {
+    func processOpcode() {
+        switch self.machine_cycle {
         case .NMIrq:
             irq_kind = .NMI
             self.regs.pc -= 1
@@ -71,9 +43,6 @@ final class ControlUnit {
         } else {
             opcode_tables[id_opcode_table][Int(self.regs.ir)]()
         }
-        
-        machine_cycle = self.machine_cycle
-        regs = self.regs
     }
     
     func ulaCall16(operandA: UInt16, _ operandB: UInt16, ulaOp: UlaOp) -> UInt16 {
@@ -331,53 +300,5 @@ final class ControlUnit {
             machine_cycle = .OpcodeFetch
             irq_kind = nil
         }
-    }
-    
-    // MARK: Initialization
-    init(dataBus: Bus16, pins: Pins) {
-        m_cycle = 0
-        t_cycle = 0
-        machine_cycle = .OpcodeFetch
-        
-        self.pins = pins
-        self.dataBus = dataBus
-        
-        id_opcode_table = prefix_NONE
-        
-        opcode_tables = [OpcodeTable](count: 7, repeatedValue: OpcodeTable(count: 0x100, repeatedValue: {}))
-        
-        initOpcodeTableNONE(&opcode_tables[prefix_NONE])
-        initOpcodeTableDD(&opcode_tables[prefix_DD])
-        initOpcodeTableFD(&opcode_tables[prefix_FD])
-        initOpcodeTableCB(&opcode_tables[prefix_CB])
-        initOpcodeTableED(&opcode_tables[prefix_ED])
-        initOpcodeTableDDCB(&opcode_tables[prefix_DDCB])
-        initOpcodeTableFDCB(&opcode_tables[prefix_FDCB])
-    }
-
-    // MARK: New emulation non exhaustive
-    let dataBus : Bus16
-    
-    func processInstruction(inout regs regs: Registers, inout t_cycle: Int) {
-        self.regs = regs
-        self.t_cycle = t_cycle
-
-        // get opcode at PC into IR register
-        self.regs.ir = dataBus.read(self.regs.pc)
-        self.regs.pc += 1
-        
-        // save bit 7 of R to restore after increment
-        let bit7 = self.regs.r.bit(7)
-        // increment only seven bits
-        self.regs.r.resetBit(7)
-        self.regs.r = self.regs.r + 1 <= 0x7F ? self.regs.r + 1 : 0
-        
-        // restore bit 7
-        self.regs.r.bit(7, newVal: bit7)
-        
-        opcode_tables[id_opcode_table][Int(self.regs.ir)]()
-        
-        regs = self.regs
-        t_cycle = self.t_cycle
     }
 }

@@ -8,30 +8,39 @@
 
 import Foundation
 
-final class Z80 {
-    private var regs : Registers
+class Z80 {
+    var regs : Registers
     let pins : Pins
-    let cu : ControlUnit
     
-    var program_end: Bool = false
+    var machine_cycle = MachineCycle.OpcodeFetch // Always start in OpcodeFetch mode
+    var t_cycle = 0
+    var m_cycle = 0
+    var control_reg : UInt8! // backup register to store parameters between t_cycles of execution
     
-    private var opcodes: Array<Void -> Void>!
+    var irq_kind : IrqKind?
     
-    private var machine_cycle = MachineCycle.OpcodeFetch // Always start in OpcodeFetch mode
-    private var t_cycle = 0
-    private var m_cycle = 0
-    private var old_busreq: Bool!
+    var opcode_prefix: UInt8?
     
-    private var prefix: UInt8?
+    typealias OpcodeTable = [() -> Void]
+    
+    var opcode_tables : [OpcodeTable]!
+    
+    var id_opcode_table : Int
     
     init(dataBus: Bus16) {
         self.regs = Registers()
         self.pins = Pins()
         self.dataBus = dataBus
         
-        self.cu = ControlUnit(dataBus: dataBus, pins: pins)
+        id_opcode_table = table_NONE
         
-        self.old_busreq = pins.busreq
+        opcode_tables = [OpcodeTable](count: 5, repeatedValue: OpcodeTable(count: 0x100, repeatedValue: {}))
+        
+        initOpcodeTableNONE(&opcode_tables[table_NONE])
+        initOpcodeTableXX(&opcode_tables[table_XX])
+        initOpcodeTableXXCB(&opcode_tables[table_XXCB])
+        initOpcodeTableCB(&opcode_tables[table_CB])
+        initOpcodeTableED(&opcode_tables[table_ED])
         
         reset()
     }
@@ -65,7 +74,6 @@ final class Z80 {
         m_cycle = 0
         
         machine_cycle = .OpcodeFetch
-        old_busreq = pins.busreq
     }
     
     func org(pc: UInt16) {
@@ -80,15 +88,39 @@ final class Z80 {
         return t_cycle
     }
     
+    func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
+        return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
+    }
+    
     // MARK: new emulation non exhaustive
     var dataBus : Bus16
     
     // gets next opcode from PC and executes it
     func step() {
-        cu.processInstruction(regs: &regs, t_cycle: &t_cycle)
+        processInstruction()
         if t_cycle >= 4000000 {
             pins.halt = true
             return
         }
+    }
+    
+    func processInstruction() {
+        getNextOpcode()
+        opcode_tables[id_opcode_table][Int(regs.ir)]()
+    }
+    
+    func getNextOpcode() {
+        // get opcode at PC into IR register
+        regs.ir = dataBus.read(regs.pc)
+        regs.pc += 1
+        
+        // save bit 7 of R to restore after increment
+        let bit7 = regs.r.bit(7)
+        // increment only seven bits
+        regs.r.resetBit(7)
+        regs.r = regs.r + 1 <= 0x7F ? regs.r + 1 : 0
+        
+        // restore bit 7
+        regs.r.bit(7, newVal: bit7)
     }
 }
