@@ -8,18 +8,19 @@
 
 import Foundation
 
+// t_cycle = 8 ((DD)4, (Op)4)
 extension Z80 {
     func initOpcodeTableXX(inout opcodes: OpcodeTable) {
         opcodes[0x09] = { // ADD xx,BC
-            self.t_cycle += 11
+            self.t_cycle += 7
             self.regs.xx = self.ulaCall16(self.regs.xx, self.regs.bc, ulaOp: .Add)
         }
         opcodes[0x19] = { // ADD xx,DE
-            self.t_cycle += 11
+            self.t_cycle += 7
             self.regs.xx = self.ulaCall16(self.regs.xx, self.regs.de, ulaOp: .Add)
         }
         opcodes[0x21] = { // LD xx,&0000
-            self.t_cycle += 10
+            self.t_cycle += 6
             self.regs.xx = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
             self.regs.pc += 2
         }
@@ -887,9 +888,7 @@ extension Z80 {
             }
         }
         opcodes[0xCB] = {
-            self.t_cycle += 4
             self.id_opcode_table = table_XXCB
-            self.opcode_prefix = 0xCB
             self.regs.pc += 1
             self.processInstruction()
         }

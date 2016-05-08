@@ -19,8 +19,6 @@ class Z80 {
     
     var irq_kind : IrqKind?
     
-    var opcode_prefix: UInt8?
-    
     typealias OpcodeTable = [() -> Void]
     
     var opcode_tables : [OpcodeTable]!
@@ -110,6 +108,8 @@ class Z80 {
     }
     
     func getNextOpcode() {
+        t_cycle += 4
+        
         // get opcode at PC into IR register
         regs.ir = dataBus.read(regs.pc)
         regs.pc += 1

@@ -8,10 +8,12 @@
 
 import Foundation
 
+// t_cycle = 12 ((DD)4, (CB)4, (Op)4,...)
+
 extension Z80 {
     func initOpcodeTableXXCB(inout opcodes: OpcodeTable) {
         opcodes[0x00] = { // rlc (xx+0) -> b
-            self.t_cycle += 15
+            self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc - 2)
             let address = self.regs.xx + UInt16(displ.comp2)
             let data = self.dataBus.read(address)
@@ -19,7 +21,7 @@ extension Z80 {
             self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0x01] = { // rlc (xx+0) -> c
-            self.t_cycle += 15
+            self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc - 2)
             let address = self.regs.xx + UInt16(displ.comp2)
             let data = self.dataBus.read(address)
