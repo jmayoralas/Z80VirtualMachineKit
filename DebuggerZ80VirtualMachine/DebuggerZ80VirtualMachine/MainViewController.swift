@@ -108,6 +108,12 @@ import Z80VirtualMachineKit
         self.refreshView()
     }
 
+    @IBAction func loadTestProgram(sender: AnyObject) {
+        let data : [UInt8] = [0x3E, 0xFE, 0x32, 0x30, 0x00, 0x21, 0x30, 0x00, 0x34, 0x76]
+        vm.loadRamAtAddress(Int(AddressBusTextField.stringValue)!, data: data)
+        _refreshMemoryDump()
+    }
+    
     @IBAction func runClick(sender: AnyObject) {
         vm.run()
         refreshView()
