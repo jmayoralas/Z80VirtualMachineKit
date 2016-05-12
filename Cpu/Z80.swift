@@ -25,6 +25,8 @@ class Z80 {
     
     var id_opcode_table : Int
     
+    var dataBus : Bus16
+    
     init(dataBus: Bus16) {
         self.regs = Registers()
         self.pins = Pins()
@@ -89,9 +91,6 @@ class Z80 {
     func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
         return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
     }
-    
-    // MARK: new emulation non exhaustive
-    var dataBus : Bus16
     
     // gets next opcode from PC and executes it
     func step() {
