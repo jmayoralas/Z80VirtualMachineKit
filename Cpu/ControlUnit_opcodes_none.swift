@@ -12,7 +12,6 @@ import Foundation
 extension Z80 {
     func initOpcodeTableNONE(inout opcodes: OpcodeTable) {
         opcodes[0x00] = { // NOP
-            
         }
         opcodes[0x01] = { // LD BC,&0000
             self.t_cycle += 6
@@ -30,11 +29,9 @@ extension Z80 {
             self.regs.bc += 1
         }
         opcodes[0x04] = { // INC B
-            
             self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x05] = { // DEC B
-            
             self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
         }
         opcodes[0x06] = { // LD B,N
@@ -43,7 +40,6 @@ extension Z80 {
             self.regs.pc += 1
         }
         opcodes[0x07] = { // RLCA
-            
             let PV_backup = self.regs.f.bit(PV)
             let S_backup = self.regs.f.bit(S)
             let Z_backup = self.regs.f.bit(Z)
@@ -53,7 +49,6 @@ extension Z80 {
             self.regs.f.bit(Z, newVal: Z_backup)
         }
         opcodes[0x08] = { // EX AF,AF'
-            
             let af_ = self.regs.af_
             self.regs.af_ = self.regs.af
             self.regs.af = af_
@@ -71,11 +66,9 @@ extension Z80 {
             self.regs.bc -= 1
         }
         opcodes[0x0C] = { // INC C
-            
             self.regs.c = self.ulaCall(self.regs.c, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x0D] = { // DEC C
-            
             self.regs.c = self.ulaCall(self.regs.c, 1, ulaOp: .Sub, ignoreCarry: true)
         }
         opcodes[0x0E] = { // LD C,N
@@ -84,7 +77,6 @@ extension Z80 {
             self.regs.pc += 1
         }
         opcodes[0x0F] = { // RRCA
-            
             let PV_backup = self.regs.f.bit(PV)
             let S_backup = self.regs.f.bit(S)
             let Z_backup = self.regs.f.bit(Z)
@@ -92,7 +84,6 @@ extension Z80 {
             self.regs.f.bit(PV, newVal: PV_backup)
             self.regs.f.bit(S, newVal: S_backup)
             self.regs.f.bit(Z, newVal: Z_backup)
-
         }
         opcodes[0x10] = { // DJNZ N
             self.t_cycle += 4
@@ -120,11 +111,9 @@ extension Z80 {
             self.regs.de += 1
         }
         opcodes[0x14] = { // INC D
-            
             self.regs.d = self.ulaCall(self.regs.d, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x15] = { // DEC D
-            
             self.regs.d = self.ulaCall(self.regs.d, 1, ulaOp: .Sub, ignoreCarry: true)
         }
         opcodes[0x16] = { // LD D,&00
@@ -133,7 +122,6 @@ extension Z80 {
             self.regs.pc += 1
         }
         opcodes[0x17] = { // RLA
-            
             let PV_backup = self.regs.f.bit(PV)
             let S_backup = self.regs.f.bit(S)
             let Z_backup = self.regs.f.bit(Z)
@@ -141,7 +129,6 @@ extension Z80 {
             self.regs.f.bit(PV, newVal: PV_backup)
             self.regs.f.bit(S, newVal: S_backup)
             self.regs.f.bit(Z, newVal: Z_backup)
-
         }
         opcodes[0x18] = { // JR &00
             self.t_cycle += 8
@@ -162,11 +149,9 @@ extension Z80 {
             self.regs.de -= 1
         }
         opcodes[0x1C] = { // INC E
-            
             self.regs.e = self.ulaCall(self.regs.e, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x1D] = { // DEC E
-            
             self.regs.e = self.ulaCall(self.regs.e, 1, ulaOp: .Sub, ignoreCarry: true)
         }
         opcodes[0x1E] = { // LD E,&00
@@ -175,7 +160,6 @@ extension Z80 {
             self.regs.pc += 1
         }
         opcodes[0x1F] = { // RRA
-            
             let PV_backup = self.regs.f.bit(PV)
             let Z_backup = self.regs.f.bit(Z)
             let S_backup = self.regs.f.bit(S)
@@ -183,7 +167,6 @@ extension Z80 {
             self.regs.f.bit(PV, newVal: PV_backup)
             self.regs.f.bit(Z, newVal: Z_backup)
             self.regs.f.bit(S, newVal: S_backup)
-
         }
         opcodes[0x20] = { // JR NZ &00
             self.t_cycle += 3
@@ -213,11 +196,9 @@ extension Z80 {
             self.regs.hl += 1
         }
         opcodes[0x24] = { // INC H
-            
             self.regs.h = self.ulaCall(self.regs.h, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x25] = { // DEC H
-            
             self.regs.h = self.ulaCall(self.regs.h, 1, ulaOp: .Sub, ignoreCarry: true)
         }
         opcodes[0x26] = { // LD H,&00
@@ -235,8 +216,6 @@ extension Z80 {
             - P/V is parity
             - the others flags are altered by definition.
             */
-            
-            
             let sign: Int!
             
             if self.regs.f.bit(N) == 1 {
@@ -295,11 +274,9 @@ extension Z80 {
             self.regs.hl -= 1
         }
         opcodes[0x2C] = { // INC L
-            
             self.regs.l = self.ulaCall(self.regs.l, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x2D] = { // DEC L
-            
             self.regs.l = self.ulaCall(self.regs.l, 1, ulaOp: .Sub, ignoreCarry: true)
         }
         opcodes[0x2E] = { // LD L,&00
@@ -308,7 +285,6 @@ extension Z80 {
             self.regs.pc += 1
         }
         opcodes[0x2F] = { // CPL
-            
             self.regs.a = ~self.regs.a
             self.regs.f.setBit(H)
             self.regs.f.setBit(N)
@@ -354,7 +330,6 @@ extension Z80 {
             self.regs.pc += 1
         }
         opcodes[0x37] = { // SCF
-            
             self.regs.f.setBit(C)
             self.regs.f.resetBit(H)
             self.regs.f.resetBit(N)
@@ -386,7 +361,6 @@ extension Z80 {
             self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x3D] = { // DEC A
-            
             self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Sub, ignoreCarry: true)
         }
         opcodes[0x3E] = { // LD A,&00
@@ -395,7 +369,6 @@ extension Z80 {
             self.regs.pc += 1
         }
         opcodes[0x3F] = { // CCF
-            
             self.regs.f.bit(H, newVal: self.regs.f.bit(C))
             if self.regs.f.bit(C) == 0 {
                 self.regs.f.setBit(C)
@@ -405,27 +378,21 @@ extension Z80 {
             self.regs.f.resetBit(N)
         }
         opcodes[0x40] = { // LD B,B
-            
             self.regs.b = self.regs.b
         }
         opcodes[0x41] = { // LD B,C
-            
             self.regs.b = self.regs.c
         }
         opcodes[0x42] = { // LD B,D
-            
             self.regs.b = self.regs.d
         }
         opcodes[0x43] = { // LD B,E
-            
             self.regs.b = self.regs.e
         }
         opcodes[0x44] = { // LD B,H
-            
             self.regs.b = self.regs.h
         }
         opcodes[0x45] = { // LD B,L
-            
             self.regs.b = self.regs.l
         }
         opcodes[0x46] = { // LD B,(HL)
@@ -433,31 +400,24 @@ extension Z80 {
             self.regs.b = self.dataBus.read(self.regs.hl)
         }
         opcodes[0x47] = { // LD B,A
-            
             self.regs.b = self.regs.a
         }
         opcodes[0x48] = { // LD C,B
-            
             self.regs.c = self.regs.b
         }
         opcodes[0x49] = { // LD C,C
-            
             self.regs.c = self.regs.c
         }
         opcodes[0x4A] = { // LD C,D
-            
             self.regs.c = self.regs.d
         }
         opcodes[0x4B] = { // LD C,E
-            
             self.regs.c = self.regs.e
         }
         opcodes[0x4C] = { // LD C,H
-            
             self.regs.c = self.regs.h
         }
         opcodes[0x4D] = { // LD C,L
-            
             self.regs.c = self.regs.l
         }
         opcodes[0x4E] = { // LD C,(HL)
@@ -465,31 +425,24 @@ extension Z80 {
             self.regs.c = self.dataBus.read(self.regs.hl)
         }
         opcodes[0x4F] = { // LD C,A
-            
             self.regs.c = self.regs.a
         }
         opcodes[0x50] = { // LD D,B
-            
             self.regs.d = self.regs.b
         }
         opcodes[0x51] = { // LD D,C
-            
             self.regs.d = self.regs.c
         }
         opcodes[0x52] = { // LD D,D
-            
             self.regs.d = self.regs.d
         }
         opcodes[0x53] = { // LD D,E
-            
             self.regs.d = self.regs.e
         }
         opcodes[0x54] = { // LD D,H
-            
             self.regs.d = self.regs.h
         }
         opcodes[0x55] = { // LD D,L
-            
             self.regs.d = self.regs.l
         }
         opcodes[0x56] = { // LD D,(HL)
@@ -497,31 +450,24 @@ extension Z80 {
             self.regs.d = self.dataBus.read(self.regs.hl)
         }
         opcodes[0x57] = { // LD D,A
-            
             self.regs.d = self.regs.a
         }
         opcodes[0x58] = { // LD E,B
-            
             self.regs.e = self.regs.b
         }
         opcodes[0x59] = { // LD E,C
-            
             self.regs.e = self.regs.c
         }
         opcodes[0x5A] = { // LD E,D
-            
             self.regs.e = self.regs.d
         }
         opcodes[0x5B] = { // LD E,E
-            
             self.regs.e = self.regs.e
         }
         opcodes[0x5C] = { // LD E,H
-            
             self.regs.e = self.regs.h
         }
         opcodes[0x5D] = { // LD E,L
-            
             self.regs.e = self.regs.l
         }
         opcodes[0x5E] = { // LD E,(HL)
@@ -529,7 +475,6 @@ extension Z80 {
             self.regs.e = self.dataBus.read(self.regs.hl)
         }
         opcodes[0x5F] = { // LD E,A
-            
             self.regs.e = self.regs.a
         }
         opcodes[0x60] = { // LD H,B
