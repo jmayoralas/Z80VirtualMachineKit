@@ -496,14 +496,8 @@ extension Z80 {
             self.regs.h = self.regs.l
         }
         opcodes[0x66] = { // LD H,(HL)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.h = self.pins.data_bus
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.regs.h = self.dataBus.read(self.regs.hl)
         }
         opcodes[0x67] = { // LD H,A
             self.regs.h = self.regs.a
@@ -527,91 +521,42 @@ extension Z80 {
             self.regs.l = self.regs.l
         }
         opcodes[0x6E] = { // LD L,(HL)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.l = self.pins.data_bus
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.regs.l = self.dataBus.read(self.regs.hl)
         }
         opcodes[0x6F] = { // LD L,A
             self.regs.l = self.regs.a
         }
         opcodes[0x70] = { // LD (HL),B
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.pins.data_bus = self.regs.b
-                self.machine_cycle = .MemoryWrite
-            default:
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.dataBus.write(self.regs.hl, value: self.regs.b)
         }
         opcodes[0x71] = { // LD (HL),C
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.pins.data_bus = self.regs.c
-                self.machine_cycle = .MemoryWrite
-            default:
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.dataBus.write(self.regs.hl, value: self.regs.c)
         }
         opcodes[0x72] = { // LD (HL),D
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.pins.data_bus = self.regs.d
-                self.machine_cycle = .MemoryWrite
-            default:
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.dataBus.write(self.regs.hl, value: self.regs.d)
         }
         opcodes[0x73] = { // LD (HL),E
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.pins.data_bus = self.regs.e
-                self.machine_cycle = .MemoryWrite
-            default:
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.dataBus.write(self.regs.hl, value: self.regs.e)
         }
         opcodes[0x74] = { // LD (HL),H
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.pins.data_bus = self.regs.h
-                self.machine_cycle = .MemoryWrite
-            default:
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.dataBus.write(self.regs.hl, value: self.regs.h)
         }
         opcodes[0x75] = { // LD (HL),L
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.pins.data_bus = self.regs.l
-                self.machine_cycle = .MemoryWrite
-            default:
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.dataBus.write(self.regs.hl, value: self.regs.l)
         }
         opcodes[0x76] = { // HALT
-            
             self.pins.halt = true
         }
         opcodes[0x77] = { // LD (HL),A
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.pins.data_bus = self.regs.a
-                self.machine_cycle = .MemoryWrite
-            default:
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.dataBus.write(self.regs.hl, value: self.regs.a)
         }
         opcodes[0x78] = { // LD A,B
             self.regs.a = self.regs.b
@@ -632,14 +577,8 @@ extension Z80 {
             self.regs.a = self.regs.l
         }
         opcodes[0x7E] = { // LD A,(HL)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.a = self.pins.data_bus
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.regs.a = self.dataBus.read(self.regs.hl)
         }
         opcodes[0x7F] = { // LD A,A
             self.regs.a = self.regs.a
@@ -663,14 +602,8 @@ extension Z80 {
             self.regs.a = self.ulaCall(self.regs.a, self.regs.l, ulaOp: .Add, ignoreCarry: false)
         }
         opcodes[0x86] = { // ADD A,(HL)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Add, ignoreCarry: false)
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .Add, ignoreCarry: false)
         }
         opcodes[0x87] = { // ADD A,A
             self.regs.a = self.ulaCall(self.regs.a, self.regs.a, ulaOp: .Add, ignoreCarry: false)
@@ -694,14 +627,8 @@ extension Z80 {
             self.regs.a = self.ulaCall(self.regs.a, self.regs.l, ulaOp: .Adc, ignoreCarry: false)
         }
         opcodes[0x8E] = { // ADC A,(HL)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Adc, ignoreCarry: false)
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .Adc, ignoreCarry: false)
         }
         opcodes[0x8F] = { // ADC A,A
             self.regs.a = self.ulaCall(self.regs.a, self.regs.a, ulaOp: .Adc, ignoreCarry: false)
@@ -725,14 +652,8 @@ extension Z80 {
             self.regs.a = self.ulaCall(self.regs.a, self.regs.l, ulaOp: .Sub, ignoreCarry: false)
         }
         opcodes[0x96] = { // SUB A,(HL)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Sub, ignoreCarry: false)
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .Sub, ignoreCarry: false)
         }
         opcodes[0x97] = { // SBC A,A
             self.regs.a = self.ulaCall(self.regs.a, self.regs.a, ulaOp: .Sub, ignoreCarry: false)
@@ -756,14 +677,8 @@ extension Z80 {
             self.regs.a = self.ulaCall(self.regs.a, self.regs.l, ulaOp: .Sbc, ignoreCarry: false)
         }
         opcodes[0x9E] = { // SBC A,(HL)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Sbc, ignoreCarry: false)
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .Sbc, ignoreCarry: false)
         }
         opcodes[0x9F] = { // SBC A,A
             self.regs.a = self.ulaCall(self.regs.a, self.regs.a, ulaOp: .Sbc, ignoreCarry: false)
@@ -787,14 +702,8 @@ extension Z80 {
             self.regs.a = self.ulaCall(self.regs.a, self.regs.l, ulaOp: .And, ignoreCarry: false)
         }
         opcodes[0xA6] = { // AND (HL)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .And, ignoreCarry: false)
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .And, ignoreCarry: false)
         }
         opcodes[0xA7] = { // AND A
             self.regs.a = self.ulaCall(self.regs.a, self.regs.a, ulaOp: .And, ignoreCarry: false)
@@ -818,14 +727,8 @@ extension Z80 {
             self.regs.a = self.ulaCall(self.regs.a, self.regs.l, ulaOp: .Xor, ignoreCarry: false)
         }
         opcodes[0xAE] = { // XOR (HL)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Xor, ignoreCarry: false)
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .Xor, ignoreCarry: false)
         }
         opcodes[0xAF] = { // XOR A
             self.regs.a = self.ulaCall(self.regs.a, self.regs.a, ulaOp: .Xor, ignoreCarry: false)
@@ -849,14 +752,8 @@ extension Z80 {
             self.regs.a = self.ulaCall(self.regs.a, self.regs.l, ulaOp: .Or, ignoreCarry: false)
         }
         opcodes[0xB6] = { // OR (HL)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.regs.a = self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Or, ignoreCarry: false)
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .Or, ignoreCarry: false)
         }
         opcodes[0xB7] = { // OR A
             self.regs.a = self.ulaCall(self.regs.a, self.regs.a, ulaOp: .Or, ignoreCarry: false)
@@ -880,14 +777,8 @@ extension Z80 {
             self.ulaCall(self.regs.a, self.regs.l, ulaOp: .Sub, ignoreCarry: false)
         }
         opcodes[0xBE] = { // CP (HL)
-            switch self.m_cycle {
-            case 1:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            default:
-                self.ulaCall(self.regs.a, self.pins.data_bus, ulaOp: .Sub, ignoreCarry: false)
-                self.machine_cycle = .OpcodeFetch
-            }
+            self.t_cycle += 3
+            self.ulaCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .Sub, ignoreCarry: false)
         }
         opcodes[0xBF] = { // CP A
             self.ulaCall(self.regs.a, self.regs.a, ulaOp: .Sub, ignoreCarry: false)
