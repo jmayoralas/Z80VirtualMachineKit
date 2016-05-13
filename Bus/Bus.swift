@@ -8,31 +8,29 @@
 
 import Foundation
 
-class Bus : BusComponent {
-    private var bus_components = [BusComponent]()
+protocol Bus : BusComponentBase {
+    var bus_components: [BusComponentBase] { get set }
     
-    func addBusComponent(bus_component: BusComponent) {
+    mutating func addBusComponent(bus_component: BusComponentBase)
+    func deleteBusComponent(bus_component: BusComponentBase)
+    func onComponentsUpdated()
+}
+
+extension Bus {
+    mutating func addBusComponent(bus_component: BusComponentBase) {
         bus_components.append(bus_component)
         onComponentsUpdated()
     }
     
-    func deleteBusComponent(bus_component: BusComponent) {
-        for (index, component) in bus_components.enumerate() {
-            if component === bus_component {
-                bus_components.removeAtIndex(index)
-                onComponentsUpdated()
-                return
-            }
-        }
-    }
-    
-    func onComponentsUpdated() {
-        
+    func deleteBusComponent(bus_component: BusComponentBase) {
+
     }
 }
 
-final class Bus16 : Bus {
-    private var paged_components : [BusComponent]
+final class Bus16 : BusComponent, Bus {
+    var bus_components: [BusComponentBase]
+    private var paged_components : [BusComponentBase]
+    
     
     init() {
         let dummy_component = BusComponent(base_address: 0x0000, block_size: 0x0000)
@@ -41,8 +39,8 @@ final class Bus16 : Bus {
         super.init(base_address: 0x0000, block_size: 0x10000)
     }
     
-    override func onComponentsUpdated() {
-        for component in bus_components {
+    func onComponentsUpdated() {
+        for component in self.bus_components {
             let start = Int(component.getBaseAddress() / 1024)
             let end = start + component.getBlockSize() / 1024 - 1
             

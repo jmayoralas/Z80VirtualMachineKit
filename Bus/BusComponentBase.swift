@@ -11,7 +11,7 @@
 
 import Foundation
 
-protocol BusComponentProtocol {
+protocol BusComponentBase {
     var base_address : UInt16 { get set }
     var block_size : Int { get set }
     
@@ -19,9 +19,10 @@ protocol BusComponentProtocol {
     func getBlockSize() -> Int
     func read(address: UInt16) -> UInt8
     func write(address: UInt16, value: UInt8)
+    func dumpFromAddress(fromAddress: Int, count: Int) -> [UInt8]
 }
 
-extension BusComponentProtocol {
+extension BusComponentBase {
     func getBaseAddress() -> UInt16 {
         return self.base_address
     }
