@@ -8,7 +8,7 @@
 
 import Foundation
 
-final class Ram : BusComponent {
+class Ram : BusComponent {
     var buffer : [UInt8]
     
     var delegate : MemoryChange?
