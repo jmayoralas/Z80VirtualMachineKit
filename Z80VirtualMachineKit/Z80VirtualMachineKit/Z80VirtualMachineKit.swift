@@ -25,7 +25,7 @@ import Foundation
     private var old_m1: Bool
     
     override public init() {
-        cpu = Z80(dataBus: Bus16())
+        cpu = Z80(dataBus: Bus16(), ioBus: Bus16())
         old_m1 = cpu.pins.m1
         memory = Memory(pins: cpu.pins)
         io_devices = []
