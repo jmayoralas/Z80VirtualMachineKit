@@ -11,13 +11,13 @@ import Foundation
 protocol Bus : BusComponentBase {
     var bus_components: [BusComponentBase] { get set }
     
-    mutating func addBusComponent(bus_component: BusComponentBase)
+    func addBusComponent(bus_component: BusComponentBase)
     func deleteBusComponent(bus_component: BusComponentBase)
     func onComponentsUpdated()
 }
 
 extension Bus {
-    mutating func addBusComponent(bus_component: BusComponentBase) {
+    func addBusComponent(bus_component: BusComponentBase) {
         bus_components.append(bus_component)
         onComponentsUpdated()
     }
