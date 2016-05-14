@@ -12,12 +12,14 @@ class ULAMemory : Ram {
     convenience init() {
         self.init(base_address: 0x4000, block_size: 0x4000)
     }
+    
     override func write(address: UInt16, value: UInt8) {
         super.write(address, value: value)
+        memoryWrite(address, value: value)
     }
     
-    func memoryWrite(address: UInt16, value: UInt8) {
-        NSLog("Writing to ULAMemory address: %@, value: %@", address, value.hexStr())
+    private func memoryWrite(address: UInt16, value: UInt8) {
+        NSLog("Writing to ULAMemory address: %@, value: %@", address.hexStr(), value.hexStr())
     }
 }
 
