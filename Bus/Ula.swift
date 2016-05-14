@@ -43,3 +43,8 @@ class ULAIo : BusComponent {
         NSLog("Writing to ULAIo address: %@, value: %@", address, value.hexStr())
     }
 }
+
+final class Ula {
+    let memory = ULAMemory()
+    let io = ULAIo()
+}
