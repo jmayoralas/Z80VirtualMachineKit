@@ -11,7 +11,7 @@
 
 import Foundation
 
-protocol BusComponentBase {
+protocol BusComponentBase: class {
     var base_address : UInt16 { get set }
     var block_size : Int { get set }
     
