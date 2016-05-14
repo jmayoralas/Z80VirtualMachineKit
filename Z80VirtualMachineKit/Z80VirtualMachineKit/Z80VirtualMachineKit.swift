@@ -35,7 +35,18 @@ import Foundation
         
         memory.delegate = self
         
-        let ram = Ram(base_address: 0x0000, block_size: 0x10000)
+        // connect the 16k ROM
+        let rom = Ram(base_address: 0x0000, block_size: 0x4000)
+        rom.delegate = self
+        cpu.dataBus.addBusComponent(rom)
+        
+        // connect the ULA and his 0x4000 k of memory (this is a Spectrum 16k)
+        let ula = Ula()
+        cpu.dataBus.addBusComponent(ula.memory)
+        // cpu.ioBus.addBusComponent(ula.io)
+        
+        // add the upper 32k to emulate a 48k Spectrum
+        let ram = Ram(base_address: 0x8000, block_size: 0x8000)
         ram.delegate = self
         cpu.dataBus.addBusComponent(ram)
     }
