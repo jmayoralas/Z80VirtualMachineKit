@@ -28,7 +28,7 @@ extension Bus {
 }
 
 final class Bus16 : BusComponent, Bus {
-    var bus_components: [BusComponentBase]
+    var bus_components = [BusComponentBase]()
     private var paged_components : [BusComponentBase]
     
     
