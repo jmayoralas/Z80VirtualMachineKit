@@ -51,8 +51,7 @@ final class Bus16 : BusComponent, Bus {
     }
     
     override func write(address: UInt16, value: UInt8) {
-        let index_component = (Int(address) & 0xFFFF) / 1024
-        
+        let index_component = Int(address) / 1024
         paged_components[index_component].write(address, value: value)
     }
     
