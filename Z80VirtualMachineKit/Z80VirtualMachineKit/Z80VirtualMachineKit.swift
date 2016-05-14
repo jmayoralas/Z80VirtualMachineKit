@@ -66,7 +66,7 @@ import Foundation
     
     public func loadRamAtAddress(address: Int, data: [UInt8]) {
         for i in 0..<data.count {
-            cpu.dataBus.write(UInt16(address + i), value: data[address + i])
+            cpu.dataBus.write(UInt16(address + i), value: data[i])
         }
         // cpu.dataBus.write(0x000c, value: 0xC3)
     }
