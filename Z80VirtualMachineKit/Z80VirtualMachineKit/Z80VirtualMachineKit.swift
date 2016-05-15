@@ -21,11 +21,12 @@ import Foundation
     private let cpu : Z80
     private var io_devices : [IODevice]
     private var instructions: Int
+    private var ula = Ula()
     
     private var old_m1: Bool
     
     override public init() {
-        cpu = Z80(dataBus: Bus16(), ioBus: Bus16())
+        cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
         old_m1 = cpu.pins.m1
         memory = Memory(pins: cpu.pins)
         io_devices = []
@@ -36,14 +37,13 @@ import Foundation
         memory.delegate = self
         
         // connect the 16k ROM
-        let rom = Ram(base_address: 0x0000, block_size: 0x4000)
+        let rom = Rom(base_address: 0x0000, block_size: 0x4000)
         rom.delegate = self
         cpu.dataBus.addBusComponent(rom)
         
-        // connect the ULA and his 0x4000 k of memory (this is a Spectrum 16k)
-        let ula = Ula()
+        // connect the ULA and his 16k of memory (this is a Spectrum 16k)
         cpu.dataBus.addBusComponent(ula.memory)
-        // cpu.ioBus.addBusComponent(ula.io)
+        cpu.ioBus.addBusComponent(ula.io)
         
         // add the upper 32k to emulate a 48k Spectrum
         let ram = Ram(base_address: 0x8000, block_size: 0x8000)
