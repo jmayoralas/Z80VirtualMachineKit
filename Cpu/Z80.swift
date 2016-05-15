@@ -26,9 +26,9 @@ class Z80 {
     var id_opcode_table : Int
     
     let dataBus : Bus16
-    let ioBus : Bus16
+    let ioBus : IoBus
     
-    init(dataBus: Bus16, ioBus: Bus16) {
+    init(dataBus: Bus16, ioBus: IoBus) {
         self.regs = Registers()
         self.pins = Pins()
         self.dataBus = dataBus
