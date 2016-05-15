@@ -8,18 +8,11 @@
 
 import Foundation
 
-protocol Bus : BusComponentBase {
-    var bus_components: [BusComponentBase] { get set }
+class BusBase : BusComponent {
+    var bus_components = [BusComponentBase]()
     
-    func addBusComponent(bus_component: BusComponentBase)
-    func deleteBusComponent(bus_component: BusComponentBase)
-    func onComponentsUpdated()
-}
-
-extension Bus {
     func addBusComponent(bus_component: BusComponentBase) {
         bus_components.append(bus_component)
-        onComponentsUpdated()
     }
     
     func deleteBusComponent(bus_component: BusComponentBase) {
@@ -27,10 +20,32 @@ extension Bus {
     }
 }
 
-final class Bus16 : BusComponent, Bus {
-    var bus_components = [BusComponentBase]()
-    private var paged_components : [BusComponentBase]
+final class IoBus: BusBase {
+    private var io_components: [BusComponentBase]
     
+    init() {
+        let dummy_component = BusComponent(base_address: 0x0000, block_size: 0x0000)
+        io_components = Array(count: 0x100, repeatedValue: dummy_component)
+        
+        super.init(base_address: 0x0000, block_size: 0x100)
+    }
+    
+    override func addBusComponent(bus_component: BusComponentBase) {
+        super.addBusComponent(bus_component)
+        io_components[Int(bus_component.getBaseAddress())] = bus_component
+    }
+    
+    override func write(address: UInt16, value: UInt8) {
+        io_components[Int(address)].write(address, value: value)
+    }
+    
+    override func read(address: UInt16) -> UInt8 {
+        return io_components[Int(address)].read(address)
+    }
+}
+
+final class Bus16 : BusBase {
+    private var paged_components : [BusComponentBase]
     
     init() {
         let dummy_component = BusComponent(base_address: 0x0000, block_size: 0x0000)
@@ -39,7 +54,9 @@ final class Bus16 : BusComponent, Bus {
         super.init(base_address: 0x0000, block_size: 0x10000)
     }
     
-    func onComponentsUpdated() {
+    override func addBusComponent(bus_component: BusComponentBase) {
+        super.addBusComponent(bus_component)
+
         for component in self.bus_components {
             let start = Int(component.getBaseAddress() / 1024)
             let end = start + component.getBlockSize() / 1024 - 1
