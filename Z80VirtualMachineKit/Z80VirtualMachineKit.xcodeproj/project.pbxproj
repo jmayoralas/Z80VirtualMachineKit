@@ -12,6 +12,7 @@
 		1D2D381F1CD6570E00DA69B6 /* BusComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2D381E1CD6570E00DA69B6 /* BusComponent.swift */; };
 		1D53EEDB1CE4FC4000AF9A16 /* Ula.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D53EEDA1CE4FC4000AF9A16 /* Ula.swift */; };
 		1D53EEDD1CE502A400AF9A16 /* Bus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D53EEDC1CE502A400AF9A16 /* Bus.swift */; };
+		1DBD6D281CE8D90A000456CB /* Rom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBD6D271CE8D90A000456CB /* Rom.swift */; };
 		1DD722DA1C35857B00178421 /* Z80VirtualMachineKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DD722E21C3585A800178421 /* Z80VirtualMachineKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */; };
 		1DD723131C35871800178421 /* ControlUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723071C35871800178421 /* ControlUnit.swift */; };
@@ -34,6 +35,7 @@
 		1D2D381E1CD6570E00DA69B6 /* BusComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BusComponent.swift; path = ../../Bus/BusComponent.swift; sourceTree = "<group>"; };
 		1D53EEDA1CE4FC4000AF9A16 /* Ula.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Ula.swift; path = ../../Bus/Ula.swift; sourceTree = "<group>"; };
 		1D53EEDC1CE502A400AF9A16 /* Bus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Bus.swift; path = ../../Bus/Bus.swift; sourceTree = "<group>"; };
+		1DBD6D271CE8D90A000456CB /* Rom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Rom.swift; path = ../../Bus/Rom.swift; sourceTree = "<group>"; };
 		1DD722D61C35857B00178421 /* Z80VirtualMachineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Z80VirtualMachineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Z80VirtualMachineKit.h; sourceTree = "<group>"; };
 		1DD722DB1C35857B00178421 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 				1D2D381C1CD655C200DA69B6 /* Ram.swift */,
 				1D2D381E1CD6570E00DA69B6 /* BusComponent.swift */,
 				1D53EEDA1CE4FC4000AF9A16 /* Ula.swift */,
+				1DBD6D271CE8D90A000456CB /* Rom.swift */,
 			);
 			name = Bus;
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 				1D2D381F1CD6570E00DA69B6 /* BusComponent.swift in Sources */,
 				1D2D381D1CD655C200DA69B6 /* Ram.swift in Sources */,
 				1DD7231D1C35871800178421 /* types.swift in Sources */,
+				1DBD6D281CE8D90A000456CB /* Rom.swift in Sources */,
 				1DD723211C3588F200178421 /* IODevice.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
