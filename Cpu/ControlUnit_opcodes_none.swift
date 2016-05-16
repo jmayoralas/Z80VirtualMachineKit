@@ -859,6 +859,8 @@ extension Z80 {
         }
         opcodes[0xCB] = { // PREFIX *** CB ***
             self.id_opcode_table = table_CB
+            self.processInstruction()
+            self.id_opcode_table = table_NONE
         }
         opcodes[0xCC] = { // CALL Z &0000
             self.t_cycle += 6
@@ -1103,6 +1105,8 @@ extension Z80 {
         }
         opcodes[0xED] = { // PREFIX *** ED ***
             self.id_opcode_table = table_ED
+            self.processInstruction()
+            self.id_opcode_table = table_NONE
         }
         opcodes[0xEE] = { // XOR &00
             self.t_cycle += 3
