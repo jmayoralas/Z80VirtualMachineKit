@@ -104,8 +104,10 @@ class Z80 {
     }
     
     func processInstruction() {
-        getNextOpcode()
-        opcode_tables[id_opcode_table][Int(regs.ir)]()
+        repeat {
+            getNextOpcode()
+            opcode_tables[id_opcode_table][Int(regs.ir)]()
+        } while id_opcode_table != table_NONE
     }
     
     func getNextOpcode() {
