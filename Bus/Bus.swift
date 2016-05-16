@@ -36,11 +36,13 @@ final class IoBus: BusBase {
     }
     
     override func write(address: UInt16, value: UInt8) {
-        io_components[Int(address)].write(address, value: value)
+        // port addressed by low byte of address
+        io_components[Int(address & 0x00FF)].write(address, value: value)
     }
     
     override func read(address: UInt16) -> UInt8 {
-        return io_components[Int(address)].read(address)
+        // port addressed by low byte of address
+        return io_components[Int(address & 0x00FF)].read(address)
     }
 }
 
