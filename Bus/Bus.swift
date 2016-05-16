@@ -31,8 +31,20 @@ final class IoBus: BusBase {
     }
     
     override func addBusComponent(bus_component: BusComponentBase) {
+        // only asign non ula bus components to odd ports
+        if bus_component.getBaseAddress() & 0x01 == 1 {
+            io_components[Int(bus_component.getBaseAddress())] = bus_component
+        } else {
+            if bus_component is ULAIo {
+                // even ports belongs to ULA
+                for i in 0..<0x100 {
+                    if (i & 0x01) == 0 {
+                        io_components[i] = bus_component
+                    }
+                }
+            }
+        }
         super.addBusComponent(bus_component)
-        io_components[Int(bus_component.getBaseAddress())] = bus_component
     }
     
     override func write(address: UInt16, value: UInt8) {
