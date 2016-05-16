@@ -60,11 +60,11 @@ final class Ula: UlaDelegate {
     }
     
     func ioRead(address: UInt16) -> UInt8 {
-        NSLog("Reading from ULAIo address: %@", address)
+        NSLog("Reading from ULAIo address: %@", address.hexStr())
         return 0xFF
     }
     
     func ioWrite(address: UInt16, value: UInt8)  {
-        NSLog("Writing to ULAIo address: %@, value: %@", address, value.hexStr())
+        NSLog("Writing to ULAIo address: %@, value: %@", address.hexStr(), value.hexStr())
     }
 }
