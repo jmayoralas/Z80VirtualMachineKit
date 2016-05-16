@@ -8,6 +8,7 @@
 
 import Foundation
 
+// t_cycle = 8 ((CB)4, (Op)4)
 extension Z80 {
     func initOpcodeTableCB(inout opcodes: OpcodeTable) {
         opcodes[0x00] = { // RLC B
@@ -35,20 +36,10 @@ extension Z80 {
             self.id_opcode_table = table_NONE
         }
         opcodes[0x06] = { // RLC (HL)
-            switch self.m_cycle {
-            case 2:
-                self.pins.address_bus = self.addressFromPair(self.regs.h, self.regs.l)
-                self.machine_cycle = .MemoryRead
-            case 3:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus = self.ulaCall(self.pins.data_bus, 1, ulaOp: .Rlc, ignoreCarry: false)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 7
+            var data = self.dataBus.read(self.regs.hl)
+            data = self.ulaCall(data, 1, ulaOp: .Rlc, ignoreCarry: false)
+            self.dataBus.write(self.regs.hl, value: data)
         }
         
         opcodes[0x07] = { // RLC A
