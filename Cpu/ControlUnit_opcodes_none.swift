@@ -913,9 +913,8 @@ extension Z80 {
             }
         }
         opcodes[0xD3] = { // OUT (&00), A
-            // FIX-ME: I need to implement ioBus
             self.t_cycle += 7
-            // self.ioBus.write(self.addressFromPair(self.regs.a, self.dataBus.read(self.regs.pc)), self.regs.a)
+            self.ioBus.write(self.addressFromPair(self.regs.a, self.dataBus.read(self.regs.pc)), value: self.regs.a)
             self.regs.pc += 1
         }
         opcodes[0xD4] = { // CALL NC &0000
@@ -974,9 +973,8 @@ extension Z80 {
             }
         }
         opcodes[0xDB] = { // IN A,(&00)
-            // FIX-ME: I need to implement ioBus
             self.t_cycle += 7
-            // self.regs.a =  self.ioBus.read(self.addressFromPair(self.regs.a, self.dataBus.read(self.regs.pc)))
+            self.regs.a =  self.ioBus.read(self.addressFromPair(self.regs.a, self.dataBus.read(self.regs.pc)))
             self.regs.pc += 1
         }
         opcodes[0xDC] = { // CALL C &0000
