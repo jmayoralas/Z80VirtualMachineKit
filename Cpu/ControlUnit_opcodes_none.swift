@@ -824,8 +824,8 @@ extension Z80 {
         }
         opcodes[0xC5] = { // PUSH BC
             self.t_cycle += 7
-            self.dataBus.write(self.regs.sp, value: self.regs.b)
-            self.dataBus.write(self.regs.sp - 1 , value: self.regs.c)
+            self.dataBus.write(self.regs.sp - 1, value: self.regs.b)
+            self.dataBus.write(self.regs.sp - 2 , value: self.regs.c)
             self.regs.sp -= 2
         }
         opcodes[0xC6] = { // ADD A,&00
@@ -934,8 +934,8 @@ extension Z80 {
         }
         opcodes[0xD5] = { // PUSH DE
             self.t_cycle += 7
-            self.dataBus.write(self.regs.sp, value: self.regs.d)
-            self.dataBus.write(self.regs.sp - 1 , value: self.regs.e)
+            self.dataBus.write(self.regs.sp - 1 , value: self.regs.d)
+            self.dataBus.write(self.regs.sp - 2 , value: self.regs.e)
             self.regs.sp -= 2
         }
         opcodes[0xD6] = { // SUB A,&00
@@ -1051,8 +1051,8 @@ extension Z80 {
         }
         opcodes[0xE5] = { // PUSH HL
             self.t_cycle += 7
-            self.dataBus.write(self.regs.sp, value: self.regs.h)
-            self.dataBus.write(self.regs.sp - 1 , value: self.regs.l)
+            self.dataBus.write(self.regs.sp - 1, value: self.regs.h)
+            self.dataBus.write(self.regs.sp - 2 , value: self.regs.l)
             self.regs.sp -= 2
         }
         opcodes[0xE6] = { // AND &00
@@ -1157,8 +1157,8 @@ extension Z80 {
         }
         opcodes[0xF5] = { // PUSH AF
             self.t_cycle += 7
-            self.dataBus.write(self.regs.sp, value: self.regs.a)
-            self.dataBus.write(self.regs.sp - 1 , value: self.regs.f)
+            self.dataBus.write(self.regs.sp - 1, value: self.regs.a)
+            self.dataBus.write(self.regs.sp - 2 , value: self.regs.f)
             self.regs.sp -= 2
         }
         opcodes[0xF6] = { // OR &00
