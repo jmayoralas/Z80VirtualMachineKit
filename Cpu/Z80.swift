@@ -96,18 +96,18 @@ class Z80 {
     
     // gets next opcode from PC and executes it
     func step() {
-        processInstruction()
-        if t_cycle >= 4000000 {
-            pins.halt = true
-            return
-        }
+        repeat {
+            processInstruction()
+            if t_cycle >= 4000000 {
+                pins.halt = true
+                return
+            }
+        } while id_opcode_table != table_NONE
     }
     
     func processInstruction() {
-        repeat {
-            getNextOpcode()
-            opcode_tables[id_opcode_table][Int(regs.ir)]()
-        } while id_opcode_table != table_NONE
+        getNextOpcode()
+        opcode_tables[id_opcode_table][Int(regs.ir)]()
     }
     
     func getNextOpcode() {
