@@ -102,7 +102,7 @@ import Z80VirtualMachineKit
             }
         }
         
-        dumpAddress = 0x0000
+        dumpAddress = 0x8000
         _refreshMemoryDump()
         
         self.refreshView()
@@ -181,7 +181,7 @@ import Z80VirtualMachineKit
         instructionCounter.stringValue = "\(vm.getInstructionsCount())"
         DataBusTextField!.stringValue = "\(vm.getDataBus().hexStr())"
         DataBusBinTextField!.stringValue = "\(vm.getDataBus().binStr)"
-        AddressBusTextField!.stringValue = "\(vm.getAddressBus().hexStr())"
+        AddressBusTextField!.stringValue = "\(UInt16(dumpAddress).hexStr())"
         
         ATextField!.stringValue = "\(regs.a.hexStr())"
         ABinTextField!.stringValue = regs.a.binStr
