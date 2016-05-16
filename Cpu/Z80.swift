@@ -54,7 +54,7 @@ class Z80 {
         regs.IFF2 = false
         regs.i = 0x00
         regs.r = 0x00
-        regs.sp = 0x7FFF
+        regs.sp = 0xDFFF
 
         pins.data_bus = 0x00
         pins.address_bus = 0x00
