@@ -110,7 +110,7 @@ import Z80VirtualMachineKit
 
     @IBAction func loadTestProgram(sender: AnyObject) {
         let data : [UInt8] = [0x3E, 0xFE, 0x32, 0x30, 0x00, 0x21, 0x30, 0x00, 0x34, 0x76]
-        vm.loadRamAtAddress(Int(AddressBusTextField.stringValue)!, data: data)
+        vm.loadRamAtAddress(Int(strtoul(AddressBusTextField.stringValue, nil, 16)), data: data)
         _refreshMemoryDump()
     }
     
@@ -150,7 +150,7 @@ import Z80VirtualMachineKit
             let data = NSData(contentsOfFile: path!)
             var buffer = [UInt8](count: data!.length, repeatedValue: 0)
             data!.getBytes(&buffer, length: data!.length)
-            vm.loadRamAtAddress(Int(AddressBusTextField.stringValue)!, data: buffer)
+            vm.loadRamAtAddress(Int(strtoul(AddressBusTextField.stringValue, nil, 16)), data: buffer)
             memoryPeeker.reloadData()
         }
     }
