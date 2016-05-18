@@ -25,6 +25,7 @@
 		1DD7231E1C35871800178421 /* Z80.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723121C35871800178421 /* Z80.swift */; };
 		1DD723211C3588F200178421 /* IODevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7231F1C3588F200178421 /* IODevice.swift */; };
 		1DD723221C3588F200178421 /* TestDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723201C3588F200178421 /* TestDevice.swift */; };
+		1DDF0C7B1CEB9E10009142F4 /* BusProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF0C7A1CEB9E10009142F4 /* BusProtocols.swift */; };
 		1DEF3B511CDF814200C2646F /* ControlUnit_opcodes_xx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEF3B501CDF814200C2646F /* ControlUnit_opcodes_xx.swift */; };
 		1DFE1E231CCA8C4900AB6F74 /* memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DFE1E221CCA8C4900AB6F74 /* memory.swift */; };
 /* End PBXBuildFile section */
@@ -50,6 +51,7 @@
 		1DD723121C35871800178421 /* Z80.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Z80.swift; sourceTree = "<group>"; };
 		1DD7231F1C3588F200178421 /* IODevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IODevice.swift; path = ../../IODevice.swift; sourceTree = "<group>"; };
 		1DD723201C3588F200178421 /* TestDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestDevice.swift; path = ../../TestDevice.swift; sourceTree = "<group>"; };
+		1DDF0C7A1CEB9E10009142F4 /* BusProtocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BusProtocols.swift; path = ../../Bus/BusProtocols.swift; sourceTree = "<group>"; };
 		1DEF3B501CDF814200C2646F /* ControlUnit_opcodes_xx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlUnit_opcodes_xx.swift; sourceTree = "<group>"; };
 		1DFE1E221CCA8C4900AB6F74 /* memory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = memory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -74,6 +76,7 @@
 				1D2D381E1CD6570E00DA69B6 /* BusComponent.swift */,
 				1D53EEDA1CE4FC4000AF9A16 /* Ula.swift */,
 				1DBD6D271CE8D90A000456CB /* Rom.swift */,
+				1DDF0C7A1CEB9E10009142F4 /* BusProtocols.swift */,
 			);
 			name = Bus;
 			sourceTree = "<group>";
@@ -204,6 +207,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DDF0C7B1CEB9E10009142F4 /* BusProtocols.swift in Sources */,
 				1DD722E21C3585A800178421 /* Z80VirtualMachineKit.swift in Sources */,
 				1D53EEDD1CE502A400AF9A16 /* Bus.swift in Sources */,
 				1DEF3B511CDF814200C2646F /* ControlUnit_opcodes_xx.swift in Sources */,
