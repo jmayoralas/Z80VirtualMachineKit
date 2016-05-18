@@ -21,12 +21,15 @@ import Foundation
     private let cpu : Z80
     private var io_devices : [IODevice]
     private var instructions: Int
-    private var ula = Ula()
+    private var ula: Ula
     
     private var old_m1: Bool
     
     override public init() {
         cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
+        
+        ula = Ula()
+        
         old_m1 = cpu.pins.m1
         memory = Memory(pins: cpu.pins)
         io_devices = []
@@ -42,6 +45,7 @@ import Foundation
         cpu.dataBus.addBusComponent(rom)
         
         // connect the ULA and his 16k of memory (this is a Spectrum 16k)
+        ula.memory.delegate = self
         cpu.dataBus.addBusComponent(ula.memory)
         cpu.ioBus.addBusComponent(ula.io)
         
