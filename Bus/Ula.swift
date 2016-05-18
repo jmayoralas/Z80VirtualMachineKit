@@ -28,7 +28,7 @@ class ULAMemory : Ram {
     }
 }
 
-class ULAIo : BusComponent {
+class ULAIo : CBusComponent {
     let ulaDelegate: UlaDelegate
     
     init(delegate: UlaDelegate) {

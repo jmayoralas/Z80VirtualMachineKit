@@ -8,7 +8,7 @@
 
 import Foundation
 
-class BusBase : BusComponent {
+class BusBase : CBusComponent {
     var bus_components = [BusComponentBase]()
     
     func addBusComponent(bus_component: BusComponentBase) {
@@ -24,7 +24,7 @@ final class IoBus: BusBase {
     private var io_components: [BusComponentBase]
     
     init() {
-        let dummy_component = BusComponent(base_address: 0x0000, block_size: 0x0000)
+        let dummy_component = CBusComponent(base_address: 0x0000, block_size: 0x0000)
         io_components = Array(count: 0x100, repeatedValue: dummy_component)
         
         super.init(base_address: 0x0000, block_size: 0x100)
@@ -62,7 +62,7 @@ final class Bus16 : BusBase {
     private var paged_components : [BusComponentBase]
     
     init() {
-        let dummy_component = BusComponent(base_address: 0x0000, block_size: 0x0000)
+        let dummy_component = CBusComponent(base_address: 0x0000, block_size: 0x0000)
         paged_components = Array(count: 64, repeatedValue: dummy_component)
         
         super.init(base_address: 0x0000, block_size: 0x10000)

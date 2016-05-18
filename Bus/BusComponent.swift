@@ -8,7 +8,7 @@
 
 import Foundation
 
-class BusComponent : BusComponentBase {
+class CBusComponent : BusComponentBase {
     var base_address : UInt16
     var block_size : Int
     
