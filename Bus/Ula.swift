@@ -14,7 +14,7 @@ protocol UlaDelegate {
     func ioRead(address: UInt16) -> UInt8
 }
 
-class ULAMemory : Ram {
+final class ULAMemory : Ram {
     let ulaDelegate: UlaDelegate
     
     init(delegate: UlaDelegate) {
@@ -28,7 +28,7 @@ class ULAMemory : Ram {
     }
 }
 
-class ULAIo : BusComponent {
+final class ULAIo : BusComponent {
     let ulaDelegate: UlaDelegate
     
     init(delegate: UlaDelegate) {
