@@ -351,6 +351,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = lomocorp.Z80VirtualMachineKit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 			};
 			name = Release;
 		};
