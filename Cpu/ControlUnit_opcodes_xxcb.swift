@@ -1021,2342 +1021,901 @@ extension Z80 {
             self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0x90] = { // res 2,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(2)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.resetBit(2)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0x91] = { // res 2,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(2)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.resetBit(2)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0x92] = { // res 2,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(2)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.resetBit(2)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0x93] = { // res 2,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(2)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.resetBit(2)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0x94] = { // res 2,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(2)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.resetBit(2)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0x95] = { // res 2,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(2)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.resetBit(2)
+            self.dataBus.write(address, value: self.regs.l)
         }
         opcodes[0x96] = { // RES 2,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(2)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.resetBit(2)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0x97] = { // res 2,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(2)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.resetBit(2)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0x98] = { // res 3,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(3)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.resetBit(3)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0x99] = { // res 3,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(3)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.resetBit(3)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0x9A] = { // res 3,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(3)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.resetBit(3)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0x9B] = { // res 3,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(3)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.resetBit(3)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0x9C] = { // res 3,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(3)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.resetBit(3)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0x9D] = { // res 3,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(3)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.resetBit(3)
+            self.dataBus.write(address, value: self.regs.l)
         }
         opcodes[0x9E] = { // RES 3,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(3)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.resetBit(3)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0x9F] = { // res 3,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(3)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.resetBit(3)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xA0] = { // res 4,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(4)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.resetBit(4)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xA1] = { // res 4,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(4)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.resetBit(4)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xA2] = { // res 4,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(4)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.resetBit(4)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xA3] = { // res 4,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(4)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.resetBit(4)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xA4] = { // res 4,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(4)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.resetBit(4)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xA5] = { // res 4,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(4)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.resetBit(4)
+            self.dataBus.write(address, value: self.regs.l)
         }
         opcodes[0xA6] = { // RES 4,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(4)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.resetBit(4)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xA7] = { // res 4,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(4)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.resetBit(4)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xA8] = { // res 5,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(5)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.resetBit(5)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xA9] = { // res 5,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(5)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.resetBit(5)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xAA] = { // res 5,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(5)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.resetBit(5)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xAB] = { // res 5,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(5)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.resetBit(5)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xAC] = { // res 5,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(5)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.resetBit(5)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xAD] = { // res 5,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(5)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.resetBit(5)
+            self.dataBus.write(address, value: self.regs.l)
         }
         opcodes[0xAE] = { // RES 5,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(5)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.resetBit(5)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xAF] = { // res 5,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(5)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.resetBit(5)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xB0] = { // res 6,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(6)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.resetBit(6)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xB1] = { // res 6,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(6)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.resetBit(6)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xB2] = { // res 6,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(6)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.resetBit(6)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xB3] = { // res 6,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(6)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.resetBit(6)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xB4] = { // res 6,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(6)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.resetBit(6)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xB5] = { // res 6,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(6)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.resetBit(6)
+            self.dataBus.write(address, value: self.regs.l)
         }
         opcodes[0xB6] = { // RES 6,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(6)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.resetBit(6)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xB7] = { // res 6,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(6)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.resetBit(6)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xB8] = { // res 7,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(7)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.resetBit(7)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xB9] = { // res 7,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(7)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.resetBit(7)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xBA] = { // res 7,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(7)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.resetBit(7)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xBB] = { // res 7,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(7)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.resetBit(7)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xBC] = { // res 7,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(7)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.resetBit(7)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xBD] = { // res 7,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(7)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.resetBit(7)
+            self.dataBus.write(address, value: self.regs.l)
         }
         opcodes[0xBE] = { // RES 7,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(7)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.resetBit(7)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xBF] = { // res 7,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.resetBit(7)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.resetBit(7)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xC0] = { // set 0,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(0)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.setBit(0)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xC1] = { // set 0,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(0)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.setBit(0)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xC2] = { // set 0,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(0)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.setBit(0)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xC3] = { // set 0,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(0)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.setBit(0)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xC4] = { // set 0,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(0)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.setBit(0)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xC5] = { // set 0,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(0)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.setBit(0)
+            self.dataBus.write(address, value: self.regs.l)
         }
-        opcodes[0xC6] = { // SET 0,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(0)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+        opcodes[0xC6] = { // set 0,(xx+0)
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.setBit(0)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xC7] = { // set 0,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(0)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.setBit(0)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xC8] = { // set 1,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(1)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.setBit(1)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xC9] = { // set 1,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(1)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.setBit(1)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xCA] = { // set 1,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(1)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.setBit(1)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xCB] = { // set 1,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(1)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.setBit(1)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xCC] = { // set 1,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(1)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.setBit(1)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xCD] = { // set 1,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(1)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.setBit(1)
+            self.dataBus.write(address, value: self.regs.l)
         }
-        opcodes[0xCE] = { // SET 1,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(1)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+        opcodes[0xCE] = { // set 1,(xx+0)
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.setBit(1)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xCF] = { // set 1,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(1)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.setBit(1)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xD0] = { // set 2,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(2)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.setBit(2)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xD1] = { // set 2,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(2)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.setBit(2)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xD2] = { // set 2,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(2)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.setBit(2)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xD3] = { // set 2,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(2)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.setBit(2)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xD4] = { // set 2,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(2)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.setBit(2)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xD5] = { // set 2,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(2)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.setBit(2)
+            self.dataBus.write(address, value: self.regs.l)
         }
-        opcodes[0xD6] = { // SET 2,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(2)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+        opcodes[0xD6] = { // set 2,(xx+0)
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.setBit(2)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xD7] = { // set 2,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(2)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.setBit(2)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xD8] = { // set 3,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(3)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.setBit(3)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xD9] = { // set 3,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(3)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.setBit(3)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xDA] = { // set 3,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(3)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.setBit(3)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xDB] = { // set 3,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(3)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.setBit(3)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xDC] = { // set 3,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(3)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.setBit(3)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xDD] = { // set 3,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(3)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.setBit(3)
+            self.dataBus.write(address, value: self.regs.l)
         }
-        opcodes[0xDE] = { // SET 3,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(3)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+        opcodes[0xDE] = { // set 3,(xx+0)
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.setBit(3)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xDF] = { // set 3,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(3)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.setBit(3)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xE0] = { // set 4,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(4)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.setBit(4)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xE1] = { // set 4,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(4)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.setBit(4)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xE2] = { // set 4,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(4)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.setBit(4)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xE3] = { // set 4,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(4)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.setBit(4)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xE4] = { // set 4,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(4)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.setBit(4)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xE5] = { // set 4,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(4)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.setBit(4)
+            self.dataBus.write(address, value: self.regs.l)
         }
-        opcodes[0xE6] = { // SET 4,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(4)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+        opcodes[0xE6] = { // set 4,(xx+0)
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.setBit(4)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xE7] = { // set 4,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(4)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.setBit(4)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xE8] = { // set 5,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(5)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.setBit(5)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xE9] = { // set 5,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(5)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.setBit(5)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xEA] = { // set 5,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(5)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.setBit(5)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xEB] = { // set 5,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(5)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.setBit(5)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xEC] = { // set 5,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(5)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.setBit(5)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xED] = { // set 5,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(5)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.setBit(5)
+            self.dataBus.write(address, value: self.regs.l)
         }
-        opcodes[0xEE] = { // SET 5,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(5)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+        opcodes[0xEE] = { // set 5,(xx+0)
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.setBit(5)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xEF] = { // set 5,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(5)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.setBit(5)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xF0] = { // set 6,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(6)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.setBit(6)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xF1] = { // set 6,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(6)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.setBit(6)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xF2] = { // set 6,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(6)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.setBit(6)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xF3] = { // set 6,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(6)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.setBit(6)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xF4] = { // set 6,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(6)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.setBit(6)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xF5] = { // set 6,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(6)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.setBit(6)
+            self.dataBus.write(address, value: self.regs.l)
         }
-        opcodes[0xF6] = { // SET 6,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(6)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+        opcodes[0xF6] = { // set 6,(xx+0)
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.setBit(6)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xF7] = { // set 6,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(6)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.setBit(6)
+            self.dataBus.write(address, value: self.regs.a)
         }
         opcodes[0xF8] = { // set 7,(xx+0) -> b
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(7)
-                    self.regs.b = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.b = self.dataBus.read(address)
+            self.regs.b.setBit(7)
+            self.dataBus.write(address, value: self.regs.b)
         }
         opcodes[0xF9] = { // set 7,(xx+0) -> c
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(7)
-                    self.regs.c = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.c = self.dataBus.read(address)
+            self.regs.c.setBit(7)
+            self.dataBus.write(address, value: self.regs.c)
         }
         opcodes[0xFA] = { // set 7,(xx+0) -> d
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(7)
-                    self.regs.d = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.d = self.dataBus.read(address)
+            self.regs.d.setBit(7)
+            self.dataBus.write(address, value: self.regs.d)
         }
         opcodes[0xFB] = { // set 7,(xx+0) -> e
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(7)
-                    self.regs.e = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.e = self.dataBus.read(address)
+            self.regs.e.setBit(7)
+            self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0xFC] = { // set 7,(xx+0) -> h
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(7)
-                    self.regs.h = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.h = self.dataBus.read(address)
+            self.regs.h.setBit(7)
+            self.dataBus.write(address, value: self.regs.h)
         }
         opcodes[0xFD] = { // set 7,(xx+0) -> l
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(7)
-                    self.regs.l = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.l = self.dataBus.read(address)
+            self.regs.l.setBit(7)
+            self.dataBus.write(address, value: self.regs.l)
         }
-        opcodes[0xFE] = { // SET 7,(xx+0)
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(7)
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+        opcodes[0xFE] = { // set 7,(xx+0)
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            var data = self.dataBus.read(address)
+            data.setBit(7)
+            self.dataBus.write(address, value: data)
         }
         opcodes[0xFF] = { // set 7,(xx+0) -> a
-            switch self.m_cycle {
-            case 4:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 5 {
-                    self.pins.address_bus = self.addressFromPair(self.regs.xxh, self.regs.xxl)
-                    self.pins.address_bus = UInt16(Int(self.pins.address_bus) + Int(self.control_reg.comp2))
-                    self.machine_cycle = .MemoryRead
-                }
-            case 5:
-                self.machine_cycle = .TimeWait
-                if self.t_cycle == 4 {
-                    self.pins.data_bus.setBit(7)
-                    self.regs.a = self.pins.data_bus
-                    self.machine_cycle = .MemoryWrite
-                }
-            default:
-                self.machine_cycle = .OpcodeFetch
-                self.id_opcode_table = table_NONE
-            }
+            self.t_cycle += 11
+            let displ = self.dataBus.read(self.regs.pc - 2)
+            let address = self.regs.xx + UInt16(displ.comp2)
+            self.regs.a = self.dataBus.read(address)
+            self.regs.a.setBit(7)
+            self.dataBus.write(address, value: self.regs.a)
         }
+
     }
 }
