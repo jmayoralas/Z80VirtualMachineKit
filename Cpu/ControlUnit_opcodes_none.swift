@@ -92,7 +92,7 @@ extension Z80 {
             self.regs.b -= 1
             if self.regs.b != 0 {
                 self.t_cycle += 5
-                self.regs.pc += UInt16(displ.comp2)
+                self.regs.pc += Int(displ.comp2)
             }
         }
         opcodes[0x11] = { // LD DE,&0000
@@ -134,7 +134,7 @@ extension Z80 {
             self.t_cycle += 8
             let displ = self.dataBus.read(self.regs.pc)
             self.regs.pc += 1
-            self.regs.pc = UInt16(Int(self.regs.pc) + Int(displ.comp2))
+            self.regs.pc = Int(Int(self.regs.pc) + Int(displ.comp2))
         }
         opcodes[0x19] = { // ADD HL,DE
             self.t_cycle += 7
@@ -174,7 +174,7 @@ extension Z80 {
             self.regs.pc += 1
             if self.regs.f.bit(Z) == 0 {
                 self.t_cycle += 5
-                self.regs.pc = UInt16(Int(self.regs.pc) + Int(displ.comp2))
+                self.regs.pc = Int(Int(self.regs.pc) + Int(displ.comp2))
             }
         }
         opcodes[0x21] = { // LD HL,&0000
@@ -255,7 +255,7 @@ extension Z80 {
             self.regs.pc += 1
             if self.regs.f.bit(Z) == 1 {
                 self.t_cycle += 5
-                self.regs.pc = UInt16(Int(self.regs.pc) + Int(displ.comp2))
+                self.regs.pc = Int(Int(self.regs.pc) + Int(displ.comp2))
             }
         }
         opcodes[0x29] = { // ADD HL,HL
@@ -295,7 +295,7 @@ extension Z80 {
             self.regs.pc += 1
             if self.regs.f.bit(C) == 0 {
                 self.t_cycle += 5
-                self.regs.pc = UInt16(Int(self.regs.pc) + Int(displ.comp2))
+                self.regs.pc = Int(Int(self.regs.pc) + Int(displ.comp2))
             }
         }
         opcodes[0x31] = { // LD SP,&0000
@@ -340,7 +340,7 @@ extension Z80 {
             self.regs.pc += 1
             if self.regs.f.bit(C) == 1 {
                 self.t_cycle += 5
-                self.regs.pc = UInt16(Int(self.regs.pc) + Int(displ.comp2))
+                self.regs.pc = Int(Int(self.regs.pc) + Int(displ.comp2))
             }
         }
         opcodes[0x39] = { // ADD HL,SP

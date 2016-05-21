@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1DD2280F1CF079550099F6AD /* AddressSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD2280E1CF079550099F6AD /* AddressSpace.swift */; };
+		1DD228111CF07A170099F6AD /* MemoryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD228101CF07A170099F6AD /* MemoryStorage.swift */; };
+		1DD228171CF0884F0099F6AD /* BusComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD228161CF0884F0099F6AD /* BusComponent.swift */; };
+		1DD228191CF08CF00099F6AD /* IOStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD228181CF08CF00099F6AD /* IOStorage.swift */; };
+		1DD2281B1CF08EA40099F6AD /* Bus16.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD2281A1CF08EA40099F6AD /* Bus16.swift */; };
+		1DD2281D1CF08FA20099F6AD /* DummyComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD2281C1CF08FA20099F6AD /* DummyComponent.swift */; };
+		1DD2281F1CF0BCAC0099F6AD /* Ram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD2281E1CF0BCAC0099F6AD /* Ram.swift */; };
 		1DD722DA1C35857B00178421 /* Z80VirtualMachineKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DD722E21C3585A800178421 /* Z80VirtualMachineKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */; };
 		1DD723131C35871800178421 /* ControlUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723071C35871800178421 /* ControlUnit.swift */; };
@@ -17,13 +24,17 @@
 		1DD7231B1C35871800178421 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7230F1C35871800178421 /* extensions.swift */; };
 		1DD7231D1C35871800178421 /* types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723111C35871800178421 /* types.swift */; };
 		1DD7231E1C35871800178421 /* Z80.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723121C35871800178421 /* Z80.swift */; };
-		1DD723211C3588F200178421 /* IODevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7231F1C3588F200178421 /* IODevice.swift */; };
-		1DD723221C3588F200178421 /* TestDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723201C3588F200178421 /* TestDevice.swift */; };
 		1DEF3B511CDF814200C2646F /* ControlUnit_opcodes_xx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEF3B501CDF814200C2646F /* ControlUnit_opcodes_xx.swift */; };
-		1DFE1E231CCA8C4900AB6F74 /* memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DFE1E221CCA8C4900AB6F74 /* memory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1DD2280E1CF079550099F6AD /* AddressSpace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressSpace.swift; path = ../../Protocols/AddressSpace.swift; sourceTree = "<group>"; };
+		1DD228101CF07A170099F6AD /* MemoryStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MemoryStorage.swift; path = ../../Protocols/MemoryStorage.swift; sourceTree = "<group>"; };
+		1DD228161CF0884F0099F6AD /* BusComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BusComponent.swift; path = ../../Protocols/BusComponent.swift; sourceTree = "<group>"; };
+		1DD228181CF08CF00099F6AD /* IOStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IOStorage.swift; path = ../../Protocols/IOStorage.swift; sourceTree = "<group>"; };
+		1DD2281A1CF08EA40099F6AD /* Bus16.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Bus16.swift; path = ../../Bus/Bus16.swift; sourceTree = "<group>"; };
+		1DD2281C1CF08FA20099F6AD /* DummyComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DummyComponent.swift; path = ../../Bus/DummyComponent.swift; sourceTree = "<group>"; };
+		1DD2281E1CF0BCAC0099F6AD /* Ram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Ram.swift; path = ../../Bus/Ram.swift; sourceTree = "<group>"; };
 		1DD722D61C35857B00178421 /* Z80VirtualMachineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Z80VirtualMachineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Z80VirtualMachineKit.h; sourceTree = "<group>"; };
 		1DD722DB1C35857B00178421 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -36,10 +47,7 @@
 		1DD7230F1C35871800178421 /* extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		1DD723111C35871800178421 /* types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = types.swift; sourceTree = "<group>"; };
 		1DD723121C35871800178421 /* Z80.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Z80.swift; sourceTree = "<group>"; };
-		1DD7231F1C3588F200178421 /* IODevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IODevice.swift; path = ../../IODevice.swift; sourceTree = "<group>"; };
-		1DD723201C3588F200178421 /* TestDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestDevice.swift; path = ../../TestDevice.swift; sourceTree = "<group>"; };
 		1DEF3B501CDF814200C2646F /* ControlUnit_opcodes_xx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlUnit_opcodes_xx.swift; sourceTree = "<group>"; };
-		1DFE1E221CCA8C4900AB6F74 /* memory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = memory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,8 +64,22 @@
 		1D2D38191CD50A8500DA69B6 /* Bus */ = {
 			isa = PBXGroup;
 			children = (
+				1DD2281A1CF08EA40099F6AD /* Bus16.swift */,
+				1DD2281C1CF08FA20099F6AD /* DummyComponent.swift */,
+				1DD2281E1CF0BCAC0099F6AD /* Ram.swift */,
 			);
 			name = Bus;
+			sourceTree = "<group>";
+		};
+		1DD2280D1CF078CF0099F6AD /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				1DD2280E1CF079550099F6AD /* AddressSpace.swift */,
+				1DD228101CF07A170099F6AD /* MemoryStorage.swift */,
+				1DD228161CF0884F0099F6AD /* BusComponent.swift */,
+				1DD228181CF08CF00099F6AD /* IOStorage.swift */,
+			);
+			name = Protocols;
 			sourceTree = "<group>";
 		};
 		1DD722CC1C35857A00178421 = {
@@ -79,12 +101,11 @@
 		1DD722D81C35857B00178421 /* Z80VirtualMachineKit */ = {
 			isa = PBXGroup;
 			children = (
+				1DD2280D1CF078CF0099F6AD /* Protocols */,
 				1D2D38191CD50A8500DA69B6 /* Bus */,
 				1DD723061C35871800178421 /* Cpu */,
 				1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */,
 				1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */,
-				1DD7231F1C3588F200178421 /* IODevice.swift */,
-				1DD723201C3588F200178421 /* TestDevice.swift */,
 				1DD722DB1C35857B00178421 /* Info.plist */,
 			);
 			path = Z80VirtualMachineKit;
@@ -100,7 +121,6 @@
 				1DD7230B1C35871800178421 /* ControlUnit_opcodes_ed.swift */,
 				1DD7230E1C35871800178421 /* ControlUnit_opcodes_none.swift */,
 				1DD7230F1C35871800178421 /* extensions.swift */,
-				1DFE1E221CCA8C4900AB6F74 /* memory.swift */,
 				1DD723111C35871800178421 /* types.swift */,
 				1DD723121C35871800178421 /* Z80.swift */,
 			);
@@ -189,16 +209,20 @@
 				1DD722E21C3585A800178421 /* Z80VirtualMachineKit.swift in Sources */,
 				1DEF3B511CDF814200C2646F /* ControlUnit_opcodes_xx.swift in Sources */,
 				1DD7231A1C35871800178421 /* ControlUnit_opcodes_none.swift in Sources */,
-				1DFE1E231CCA8C4900AB6F74 /* memory.swift in Sources */,
+				1DD2280F1CF079550099F6AD /* AddressSpace.swift in Sources */,
 				1DD723131C35871800178421 /* ControlUnit.swift in Sources */,
 				1DD723141C35871800178421 /* ControlUnit_opcodes_cb.swift in Sources */,
 				1DD723171C35871800178421 /* ControlUnit_opcodes_ed.swift in Sources */,
 				1DD7231E1C35871800178421 /* Z80.swift in Sources */,
-				1DD723221C3588F200178421 /* TestDevice.swift in Sources */,
+				1DD2281B1CF08EA40099F6AD /* Bus16.swift in Sources */,
 				1DD723161C35871800178421 /* ControlUnit_opcodes_xxcb.swift in Sources */,
 				1DD7231B1C35871800178421 /* extensions.swift in Sources */,
+				1DD228171CF0884F0099F6AD /* BusComponent.swift in Sources */,
+				1DD228111CF07A170099F6AD /* MemoryStorage.swift in Sources */,
 				1DD7231D1C35871800178421 /* types.swift in Sources */,
-				1DD723211C3588F200178421 /* IODevice.swift in Sources */,
+				1DD2281F1CF0BCAC0099F6AD /* Ram.swift in Sources */,
+				1DD2281D1CF08FA20099F6AD /* DummyComponent.swift in Sources */,
+				1DD228191CF08CF00099F6AD /* IOStorage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

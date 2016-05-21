@@ -18,7 +18,7 @@ extension SequenceType where Self.Generator.Element: Hashable {
     }
 }
 
-public extension UInt16 {
+public extension Int {
     func hexStr() -> String {
         return (String(NSString(format:"%04X", self)))
     }

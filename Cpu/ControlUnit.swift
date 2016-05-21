@@ -45,7 +45,7 @@ extension Z80 {
         }
     }
     
-    func ulaCall16(operandA: UInt16, _ operandB: UInt16, ulaOp: UlaOp) -> UInt16 {
+    func ulaCall16(operandA: Int, _ operandB: Int, ulaOp: UlaOp) -> Int {
         let f_old = regs.f
         
         let result_l = ulaCall(operandA.low, operandB.low, ulaOp: ulaOp, ignoreCarry: false)
@@ -246,7 +246,7 @@ extension Z80 {
         return (data.parity == 0) ? 1 : 0 // 1 -> Even parity, 0 -> Odd parity
     }
 
-    func rst(address: UInt16) {
+    func rst(address: Int) {
         let last_t_cycle : Int
         if irq_kind != nil && irq_kind! != .NMI {
             last_t_cycle = 7

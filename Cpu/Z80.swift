@@ -25,8 +25,8 @@ class Z80 {
     
     var id_opcode_table : Int
     
-    let dataBus : Bus16
-    let ioBus : IoBus
+    var dataBus : Bus16
+    var ioBus : IoBus
     
     init(dataBus: Bus16, ioBus: IoBus) {
         self.regs = Registers()
@@ -55,6 +55,7 @@ class Z80 {
         regs.i = 0x00
         regs.r = 0x00
         regs.sp = 0xDFFF
+        regs.ir = 0x00
 
         pins.data_bus = 0x00
         pins.address_bus = 0x00
@@ -78,7 +79,7 @@ class Z80 {
         machine_cycle = .OpcodeFetch
     }
     
-    func org(pc: UInt16) {
+    func org(pc: Int) {
         regs.pc = pc
     }
     
@@ -90,8 +91,8 @@ class Z80 {
         return t_cycle
     }
     
-    func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
-        return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
+    func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> Int {
+        return Int(val_h) * 0x100 + Int(val_l)
     }
     
     // gets next opcode from PC and executes it

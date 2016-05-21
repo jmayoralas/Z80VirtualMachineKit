@@ -132,7 +132,7 @@ import Z80VirtualMachineKit
     }
     
     @IBAction func setPcClick(sender: AnyObject) {
-        vm.setPc(UInt16(strtoul(PcTextField.stringValue, nil, 16)))
+        vm.setPc(Int(strtoul(PcTextField.stringValue, nil, 16)))
     }
     
     @IBAction func gotoClick(sender: AnyObject) {
@@ -181,7 +181,7 @@ import Z80VirtualMachineKit
         instructionCounter.stringValue = "\(vm.getInstructionsCount())"
         DataBusTextField!.stringValue = "\(vm.getDataBus().hexStr())"
         DataBusBinTextField!.stringValue = "\(vm.getDataBus().binStr)"
-        AddressBusTextField!.stringValue = "\(UInt16(dumpAddress).hexStr())"
+        AddressBusTextField!.stringValue = "\(Int(dumpAddress).hexStr())"
         
         ATextField!.stringValue = "\(regs.a.hexStr())"
         ABinTextField!.stringValue = regs.a.binStr
@@ -234,7 +234,7 @@ import Z80VirtualMachineKit
         
         switch tableColumn!.identifier {
         case "Addr":
-            cellView.textField!.stringValue = "\(UInt16(dumpAddress + row * 0x10).hexStr())"
+            cellView.textField!.stringValue = "\(Int(dumpAddress + row * 0x10).hexStr())"
         case "Ascii":
             cellView.textField!.stringValue = ""
             let address = row * 0x10

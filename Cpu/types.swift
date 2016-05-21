@@ -9,7 +9,7 @@
 import Foundation
 
 class Pins {
-    var address_bus: UInt16 = 0
+    var address_bus: Int = 0
     var data_bus: UInt8 = 0
     var busack: Bool = false
     var busreq: Bool = false
@@ -60,9 +60,9 @@ public struct Registers {
 
     // 16 bit registers
     // primary
-    var af: UInt16 {
+    var af: Int {
         get {
-            return UInt16(Int(Int(self.a) * 0x100) + Int(self.f))
+            return Int(Int(Int(self.a) * 0x100) + Int(self.f))
         }
         set(newValue) {
             self.a = newValue.high
@@ -70,9 +70,9 @@ public struct Registers {
         }
     }
 
-    var bc: UInt16 {
+    var bc: Int {
         get {
-            return UInt16(Int(Int(self.b) * 0x100) + Int(self.c))
+            return Int(Int(Int(self.b) * 0x100) + Int(self.c))
         }
         set(newValue) {
             self.b = newValue.high
@@ -80,9 +80,9 @@ public struct Registers {
         }
     }
 
-    var hl: UInt16 {
+    var hl: Int {
         get {
-            return UInt16(Int(Int(self.h) * 0x100) + Int(self.l))
+            return Int(Int(Int(self.h) * 0x100) + Int(self.l))
         }
         set(newValue) {
             self.h = newValue.high
@@ -90,9 +90,9 @@ public struct Registers {
         }
     }
 
-    var de: UInt16 {
+    var de: Int {
         get {
-            return UInt16(Int(Int(self.d) * 0x100) + Int(self.e))
+            return Int(Int(Int(self.d) * 0x100) + Int(self.e))
         }
         set(newValue) {
             self.d = newValue.high
@@ -102,15 +102,15 @@ public struct Registers {
     
     // Alternate Register Set
     // accumulator
-    public var af_: UInt16 = 0
-    public var bc_: UInt16 = 0
-    public var de_: UInt16 = 0
-    public var hl_: UInt16 = 0
+    public var af_: Int = 0
+    public var bc_: Int = 0
+    public var de_: Int = 0
+    public var hl_: Int = 0
     
     // index
-    var xx: UInt16 {
+    var xx: Int {
         get {
-            return UInt16(Int(Int(self.xxh) * 0x100) + Int(self.xxl))
+            return Int(Int(Int(self.xxh) * 0x100) + Int(self.xxl))
         }
         set(newValue) {
             self.xxh = newValue.high
@@ -118,9 +118,9 @@ public struct Registers {
         }
     }
     
-    var ix: UInt16 {
+    var ix: Int {
         get {
-            return UInt16(Int(Int(self.ixh) * 0x100) + Int(self.ixl))
+            return Int(Int(Int(self.ixh) * 0x100) + Int(self.ixl))
         }
         set(newValue) {
             self.ixh = newValue.high
@@ -128,9 +128,9 @@ public struct Registers {
         }
     }
     
-    var iy: UInt16 {
+    var iy: Int {
         get {
-            return UInt16(Int(Int(self.iyh) * 0x100) + Int(self.iyl))
+            return Int(Int(Int(self.iyh) * 0x100) + Int(self.iyl))
         }
         set(newValue) {
             self.iyh = newValue.high
@@ -139,10 +139,10 @@ public struct Registers {
     }
     
     // Stack Pointer
-    public var sp: UInt16 = 0
+    public var sp: Int = 0
     
     // Program Counter
-    public var pc: UInt16 = 0
+    public var pc: Int = 0
     
     // Internal software-controlled interrupt enable
     public var IFF1 : Bool = false

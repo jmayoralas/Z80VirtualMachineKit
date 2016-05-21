@@ -75,7 +75,7 @@ extension Z80 {
             self.t_cycle += 15
             let displ = self.dataBus.read(self.regs.pc)
             self.regs.pc += 1
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             let data = self.ulaCall(self.dataBus.read(address), 1, ulaOp: .Add, ignoreCarry: true)
             self.dataBus.write(address, value: data)
         }
@@ -83,14 +83,14 @@ extension Z80 {
             self.t_cycle += 15
             let displ = self.dataBus.read(self.regs.pc)
             self.regs.pc += 1
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             let data = self.ulaCall(self.dataBus.read(address), 1, ulaOp: .Sub, ignoreCarry: true)
             self.dataBus.write(address, value: data)
         }
         opcodes[0x36] = { // LD (xx+0),&00
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.dataBus.write(address, value: self.dataBus.read(self.regs.pc + 1))
             self.regs.pc += 2
         }
@@ -107,7 +107,7 @@ extension Z80 {
         opcodes[0x46] = { // LD B,(xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.b = self.dataBus.read(address)
             self.regs.pc += 1
         }
@@ -120,7 +120,7 @@ extension Z80 {
         opcodes[0x4E] = { // LD C,(xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.c = self.dataBus.read(address)
             self.regs.pc += 1
         }
@@ -133,7 +133,7 @@ extension Z80 {
         opcodes[0x56] = { // LD D,(xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.d = self.dataBus.read(address)
             self.regs.pc += 1
         }
@@ -146,7 +146,7 @@ extension Z80 {
         opcodes[0x5E] = { // LD E,(xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.e = self.dataBus.read(address)
             self.regs.pc += 1
         }
@@ -171,7 +171,7 @@ extension Z80 {
         opcodes[0x66] = { // LD H,(xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.h = self.dataBus.read(address)
             self.regs.pc += 1
         }
@@ -199,7 +199,7 @@ extension Z80 {
         opcodes[0x6E] = { // LD L,(xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.l = self.dataBus.read(address)
             self.regs.pc += 1
         }
@@ -209,49 +209,49 @@ extension Z80 {
         opcodes[0x70] = { // LD (xx+0),B
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.dataBus.write(address, value: self.regs.b)
             self.regs.pc += 1
         }
         opcodes[0x71] = { // LD (xx+0),C
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.dataBus.write(address, value: self.regs.c)
             self.regs.pc += 1
         }
         opcodes[0x72] = { // LD (xx+0),D
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.dataBus.write(address, value: self.regs.d)
             self.regs.pc += 1
         }
         opcodes[0x73] = { // LD (xx+0),E
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.dataBus.write(address, value: self.regs.e)
             self.regs.pc += 1
         }
         opcodes[0x74] = { // LD (xx+0),H
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.dataBus.write(address, value: self.regs.h)
             self.regs.pc += 1
         }
         opcodes[0x75] = { // LD (xx+0),L
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.dataBus.write(address, value: self.regs.l)
             self.regs.pc += 1
         }
         opcodes[0x77] = { // LD (xx+0),A
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.dataBus.write(address, value: self.regs.a)
             self.regs.pc += 1
         }
@@ -264,7 +264,7 @@ extension Z80 {
         opcodes[0x7E] = { // LD A,(xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.a = self.dataBus.read(address)
             self.regs.pc += 1
         }
@@ -277,7 +277,7 @@ extension Z80 {
         opcodes[0x86] = { // ADD A,(xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(address), ulaOp: .Add, ignoreCarry: false)
             self.regs.pc += 1
         }
@@ -290,7 +290,7 @@ extension Z80 {
         opcodes[0x8E] = { // ADC A,(xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(address), ulaOp: .Adc, ignoreCarry: false)
             self.regs.pc += 1
         }
@@ -303,7 +303,7 @@ extension Z80 {
         opcodes[0x96] = { // SUB A,(xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(address), ulaOp: .Sub, ignoreCarry: false)
             self.regs.pc += 1
         }
@@ -316,7 +316,7 @@ extension Z80 {
         opcodes[0x9E] = { // SBC A,(xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(address), ulaOp: .Sbc, ignoreCarry: false)
             self.regs.pc += 1
         }
@@ -329,7 +329,7 @@ extension Z80 {
         opcodes[0xA6] = { // AND (xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(address), ulaOp: .And, ignoreCarry: false)
             self.regs.pc += 1
         }
@@ -342,7 +342,7 @@ extension Z80 {
         opcodes[0xAE] = { // XOR (xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(address), ulaOp: .Xor, ignoreCarry: false)
             self.regs.pc += 1
         }
@@ -355,7 +355,7 @@ extension Z80 {
         opcodes[0xB6] = { // OR (xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(address), ulaOp: .Or, ignoreCarry: false)
             self.regs.pc += 1
         }
@@ -368,7 +368,7 @@ extension Z80 {
         opcodes[0xBE] = { // CP (xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
-            let address = UInt16(Int(self.regs.xx) + Int(displ.comp2))
+            let address = Int(Int(self.regs.xx) + Int(displ.comp2))
             self.ulaCall(self.regs.a, self.dataBus.read(address), ulaOp: .Sub, ignoreCarry: false)
             self.regs.pc += 1
         }
