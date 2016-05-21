@@ -83,7 +83,6 @@ import Foundation
         for i in 0..<data.count {
             cpu.dataBus.write(UInt16(address + i), value: data[i])
         }
-        // cpu.dataBus.write(0x000c, value: 0xC3)
     }
     
     public func loadRomAtAddress(address: Int, data: [UInt8]) throws {
