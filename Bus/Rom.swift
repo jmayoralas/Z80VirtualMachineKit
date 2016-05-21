@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Rom: Ram {
+final class Rom: Ram {
     override func write(address: UInt16, value: UInt8) {
         // do nothing
     }
