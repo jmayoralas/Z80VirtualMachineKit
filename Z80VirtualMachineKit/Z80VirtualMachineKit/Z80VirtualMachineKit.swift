@@ -19,7 +19,6 @@ import Foundation
     
     private let memory : Memory
     private let cpu : Z80
-    private var io_devices : [IODevice]
     private var instructions: Int
     private var ula: Ula
     
@@ -32,7 +31,6 @@ import Foundation
         
         old_m1 = cpu.pins.m1
         memory = Memory(pins: cpu.pins)
-        io_devices = []
         instructions = -1
         
         super.init()
@@ -76,7 +74,7 @@ import Foundation
     }
     
     public func addIoDevice(port: UInt8) {
-        io_devices.append(IODevice(pins: cpu.pins, port: port))
+        cpu.ioBus.addBusComponent(GenericIODevice(base_address: UInt16(port), block_size: 1))
     }
     
     public func loadRamAtAddress(address: Int, data: [UInt8]) {
