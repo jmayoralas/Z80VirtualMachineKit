@@ -8,6 +8,11 @@
 
 import Foundation
 
+@objc protocol MemoryChange {
+    optional func MemoryWriteAtAddress(address: Int, byte: UInt8)
+    optional func MemoryReadAtAddress(address: Int, byte: UInt8)
+}
+
 protocol MemoryProtocol : class, BusComponentBase {
     var buffer: [UInt8] { get set }
     var delegate : MemoryChange? { get set }
