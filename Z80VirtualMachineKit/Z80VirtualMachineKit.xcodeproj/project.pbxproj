@@ -25,7 +25,6 @@
 		1DD7231D1C35871800178421 /* types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723111C35871800178421 /* types.swift */; };
 		1DD7231E1C35871800178421 /* Z80.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723121C35871800178421 /* Z80.swift */; };
 		1DEF3B511CDF814200C2646F /* ControlUnit_opcodes_xx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEF3B501CDF814200C2646F /* ControlUnit_opcodes_xx.swift */; };
-		1DFE1E231CCA8C4900AB6F74 /* memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DFE1E221CCA8C4900AB6F74 /* memory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,7 +48,6 @@
 		1DD723111C35871800178421 /* types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = types.swift; sourceTree = "<group>"; };
 		1DD723121C35871800178421 /* Z80.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Z80.swift; sourceTree = "<group>"; };
 		1DEF3B501CDF814200C2646F /* ControlUnit_opcodes_xx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlUnit_opcodes_xx.swift; sourceTree = "<group>"; };
-		1DFE1E221CCA8C4900AB6F74 /* memory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = memory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,7 +113,6 @@
 				1DD7230B1C35871800178421 /* ControlUnit_opcodes_ed.swift */,
 				1DD7230E1C35871800178421 /* ControlUnit_opcodes_none.swift */,
 				1DD7230F1C35871800178421 /* extensions.swift */,
-				1DFE1E221CCA8C4900AB6F74 /* memory.swift */,
 				1DD723111C35871800178421 /* types.swift */,
 				1DD723121C35871800178421 /* Z80.swift */,
 			);
@@ -207,7 +204,6 @@
 				1DEF3B511CDF814200C2646F /* ControlUnit_opcodes_xx.swift in Sources */,
 				1DD7231A1C35871800178421 /* ControlUnit_opcodes_none.swift in Sources */,
 				1D53EEDB1CE4FC4000AF9A16 /* Ula.swift in Sources */,
-				1DFE1E231CCA8C4900AB6F74 /* memory.swift in Sources */,
 				1DD723131C35871800178421 /* ControlUnit.swift in Sources */,
 				1DD723141C35871800178421 /* ControlUnit_opcodes_cb.swift in Sources */,
 				1DD723171C35871800178421 /* ControlUnit_opcodes_ed.swift in Sources */,
