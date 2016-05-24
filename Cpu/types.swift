@@ -151,10 +151,6 @@ public struct Registers {
     public var int_mode : Int = 0
 }
 
-enum MachineCycle: Int {
-    case OpcodeFetch = 1, MemoryRead, MemoryWrite, IoRead, IoWrite, UlaOperation, TimeWait, SoftIrq, NMIrq
-}
-
 enum UlaOp {
     case Add, Adc, Sub, Sbc, And, Or, Xor, Rlc, Rrc, Rl, Rr, Sla, Sra, Sll, Srl, Sls, Bit
 }

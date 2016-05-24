@@ -17,7 +17,6 @@ import Foundation
 {
     public var delegate: Z80VirtualMachineStatus?
     
-    private let memory : Memory
     private let cpu : Z80
     private var instructions: Int
     private var ula: Ula
@@ -30,12 +29,9 @@ import Foundation
         ula = Ula()
         
         old_m1 = cpu.pins.m1
-        memory = Memory(pins: cpu.pins)
         instructions = -1
         
         super.init()
-        
-        memory.delegate = self
         
         // connect the 16k ROM
         let rom = Rom(base_address: 0x0000, block_size: 0x4000)
@@ -84,7 +80,7 @@ import Foundation
     }
     
     public func loadRomAtAddress(address: Int, data: [UInt8]) throws {
-        try memory.loadRomAtAddress(address, data: data)
+        // try memory.loadRomAtAddress(address, data: data)
     }
     
     public func getCpuRegs() -> Registers {
@@ -108,7 +104,7 @@ import Foundation
     }
     
     public func clearMemory() {
-        memory.clear()
+        // memory.clear()
     }
     
     public func dumpMemoryFromAddress(fromAddress: Int, toAddress: Int) -> [UInt8] {

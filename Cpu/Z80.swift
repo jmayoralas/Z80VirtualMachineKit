@@ -12,9 +12,7 @@ class Z80 {
     var regs : Registers
     let pins : Pins
     
-    var machine_cycle = MachineCycle.OpcodeFetch // Always start in OpcodeFetch mode
     var t_cycle = 0
-    var m_cycle = 0
     var control_reg : UInt8! // backup register to store parameters between t_cycles of execution
     
     var irq_kind : IrqKind?
@@ -73,9 +71,6 @@ class Z80 {
         pins.wr = false
         
         t_cycle = 0
-        m_cycle = 0
-        
-        machine_cycle = .OpcodeFetch
     }
     
     func org(pc: UInt16) {

@@ -14,37 +14,6 @@ extension Z80 {
         return (id_opcode_table != table_NONE) ? true : false
     }
     
-    func processOpcode() {
-        switch self.machine_cycle {
-        case .NMIrq:
-            irq_kind = .NMI
-            self.regs.pc -= 1
-        case .SoftIrq:
-            irq_kind = .Soft
-        default:
-            break
-        }
-        
-        if let irq = irq_kind {
-            if irq == .Soft {
-                switch regs.int_mode {
-                case 0:
-                    opcode_tables[id_opcode_table][Int(self.regs.ir)]()
-                case 1:
-                    rst(0x0038)
-                case 2:
-                    mode2SoftIrq()
-                default:
-                    break
-                }
-            } else {
-                rst(0x0066)
-            }
-        } else {
-            opcode_tables[id_opcode_table][Int(self.regs.ir)]()
-        }
-    }
-    
     func ulaCall16(operandA: UInt16, _ operandB: UInt16, ulaOp: UlaOp) -> UInt16 {
         let f_old = regs.f
         
@@ -247,58 +216,15 @@ extension Z80 {
     }
 
     func rst(address: UInt16) {
-        let last_t_cycle : Int
-        if irq_kind != nil && irq_kind! != .NMI {
-            last_t_cycle = 7
-        } else {
-            last_t_cycle = 5
-        }
-        switch m_cycle {
-        case 1:
-            machine_cycle = .TimeWait
-            if t_cycle == last_t_cycle {
-                regs.sp -= 1
-                pins.address_bus = self.regs.sp
-                pins.data_bus = self.regs.pc.high
-                machine_cycle = .MemoryWrite
-            }
-        case 2:
-            regs.sp -= 1
-            pins.address_bus = self.regs.sp
-            pins.data_bus = self.regs.pc.low
-        default:
-            regs.pc = address
-            machine_cycle = .OpcodeFetch
-            irq_kind = nil
-        }
+        t_cycle += 11
+        dataBus.write(regs.sp - 1, value: regs.pc.high)
+        dataBus.write(regs.sp - 2, value: regs.pc.low)
+        regs.sp -= 2
+        regs.pc = address
+        irq_kind = nil
     }
     
     func mode2SoftIrq() {
-        switch m_cycle {
-        case 1:
-            machine_cycle = .TimeWait
-            if t_cycle == 7 {
-                control_reg = pins.data_bus
-                control_reg.resetBit(0)
-                regs.sp -= 1
-                pins.address_bus = regs.sp
-                pins.data_bus = regs.pc.high
-                machine_cycle = .MemoryWrite
-            }
-        case 2:
-            regs.sp -= 1
-            pins.address_bus = self.regs.sp
-            pins.data_bus = self.regs.pc.low
-        case 3:
-            pins.address_bus = addressFromPair(regs.i, control_reg)
-            machine_cycle = .MemoryRead
-        case 4:
-            control_reg = pins.data_bus
-            pins.address_bus += 1
-        default:
-            regs.pc = addressFromPair(pins.data_bus, control_reg)
-            machine_cycle = .OpcodeFetch
-            irq_kind = nil
-        }
+        // FIX-ME: must implement mode2 irq
     }
 }
