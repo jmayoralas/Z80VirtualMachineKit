@@ -55,6 +55,7 @@ import Z80VirtualMachineKit
     @IBOutlet weak var IylTextField: ColorChangeTextField!
     @IBOutlet weak var IylBinTextField: ColorChangeTextField!
     @IBOutlet weak var memoryPeeker: NSTableView!
+    @IBOutlet weak var VMScreen: NSImageView!
     
     var dumpAddress: Int!
     var memoryDump: [UInt8]!
@@ -248,5 +249,9 @@ import Z80VirtualMachineKit
         }
         
         return cellView
+    }
+    
+    func Z80VMScreenRefresh(data: NSData) {
+        VMScreen.image = NSImage(data: data)
     }
 }
