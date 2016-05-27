@@ -11,6 +11,7 @@ import Foundation
 @objc public protocol Z80VirtualMachineStatus {
     optional func Z80VMMemoryWriteAtAddress(address: Int, byte: UInt8)
     optional func Z80VMMemoryReadAtAddress(address: Int, byte: UInt8)
+    optional func Z80VMScreenRefresh(data: NSData)
 }
 
 @objc final public class Z80VirtualMachineKit: NSObject, MemoryChange
