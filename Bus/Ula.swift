@@ -8,6 +8,10 @@
 
 import Foundation
 
+protocol UlaPostProcessor {
+    func onUpdateScreenData(data: NSData)
+}
+
 protocol UlaDelegate {
     func memoryWrite(address: UInt16, value: UInt8)
     func ioWrite(address: UInt16, value: UInt8)
@@ -48,6 +52,8 @@ final class ULAIo : BusComponent {
 final class Ula: UlaDelegate {
     var memory: ULAMemory!
     var io: ULAIo!
+    var screen: NSData!
+    var delegate: UlaPostProcessor?
     
     init() {
         memory = ULAMemory(delegate: self)
@@ -57,6 +63,7 @@ final class Ula: UlaDelegate {
     func memoryWrite(address: UInt16, value: UInt8) {
         NSLog("Writing to ULAMemory address: %@, value: %@", address.hexStr(), value.hexStr())
         NSLog("in ula memory: %@", memory.read(address).hexStr())
+        delegate?.onUpdateScreenData(screen)
     }
     
     func ioRead(address: UInt16) -> UInt8 {
