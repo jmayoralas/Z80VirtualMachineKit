@@ -11,10 +11,10 @@ import Foundation
 @objc public protocol Z80VirtualMachineStatus {
     optional func Z80VMMemoryWriteAtAddress(address: Int, byte: UInt8)
     optional func Z80VMMemoryReadAtAddress(address: Int, byte: UInt8)
-    optional func Z80VMScreenRefresh(data: NSData)
+    optional func Z80VMScreenRefresh(image: NSImage)
 }
 
-@objc final public class Z80VirtualMachineKit: NSObject, MemoryChange
+@objc final public class Z80VirtualMachineKit: NSObject, MemoryChange, UlaPostProcessor
 {
     public var delegate: Z80VirtualMachineStatus?
     
@@ -41,6 +41,7 @@ import Foundation
         
         // connect the ULA and his 16k of memory (this is a Spectrum 16k)
         ula.memory.delegate = self
+        ula.delegate = self
         cpu.dataBus.addBusComponent(ula.memory)
         cpu.ioBus.addBusComponent(ula.io)
         
@@ -118,5 +119,9 @@ import Foundation
     
     func MemoryReadAtAddress(address: Int, byte: UInt8) {
         delegate?.Z80VMMemoryReadAtAddress?(address, byte: byte)
+    }
+    
+    func onUpdateScreenData(image: NSImage) {
+        delegate?.Z80VMScreenRefresh?(image)
     }
 }

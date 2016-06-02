@@ -251,7 +251,7 @@ import Z80VirtualMachineKit
         return cellView
     }
     
-    func Z80VMScreenRefresh(data: NSData) {
-        VMScreen.image = NSImage(data: data)
+    func Z80VMScreenRefresh(image: NSImage) {
+        VMScreen.image = image
     }
 }
