@@ -15,6 +15,12 @@ private struct PixelData {
     var b:UInt8
 }
 
+private struct Attribute {
+    var flashing: Bool
+    var paperColor: PixelData
+    var inkColor: PixelData
+}
+
 protocol UlaPostProcessor {
     func onUpdateScreenData(image: NSImage)
 }
@@ -101,25 +107,16 @@ final class Ula: UlaDelegate {
             let y = (Int(((local_address.high & 0b00011000) << 3) | ((local_address.low & 0b11100000) >> 5) | ((local_address.high & 0b00000111) << 3)))
             
             let attribute_address = 0x5800 + x + (y / 8) * 32
-            let attribute = Int(memory.read(UInt16(attribute_address)))
-            let paperColor = colorTable[(attribute >> 3) & 0b00001111]
-            let inkColor = colorTable[((attribute >> 3) & 0b00001000) | (attribute & 0b00000111)]
+            let attribute = getAttribute(Int(memory.read(UInt16(attribute_address))))
             
-            let index = (y + 24) * 320 + x * 8 + 32
-            
-            var j = 0
-            
-            for i in (0...7).reverse() {
-                screen[index + j] = ((Int(value) & 1 << i) > 0) ? inkColor : paperColor
-                j += 1
-            }
+            fillScreenEightBitLineAt(char: x, line: y, value: value, attribute: attribute)
         } else {
             // attr area
+            let attribute = getAttribute(Int(value))
+            updateCharAtOffset(Int(local_address) & 0x7FF, attribute: attribute)
         }
         
-        let img = imageFromARGB32Bitmap(screen, width: 320, height: 240)
-        
-        delegate?.onUpdateScreenData(img)
+        delegate?.onUpdateScreenData(imageFromARGB32Bitmap(screen, width: 320, height: 240))
     }
     
     func ioRead(address: UInt16) -> UInt8 {
@@ -129,6 +126,28 @@ final class Ula: UlaDelegate {
     
     func ioWrite(address: UInt16, value: UInt8)  {
         NSLog("Writing to ULAIo address: %@, value: %@", address.hexStr(), value.hexStr())
+    }
+    
+    private func updateCharAtOffset(offset: Int, attribute: Attribute) {
+        let y = (offset / 32) * 8
+        let x = offset % 32
+        
+        let line_address: UInt16 = UInt16(0x4000 + y * 32 + x)
+        
+        for i in 0...7 {
+            fillScreenEightBitLineAt(char: x, line: y + i, value: memory.read(line_address + UInt16(i * 32)), attribute: attribute)
+        }
+    }
+    
+    private func fillScreenEightBitLineAt(char x: Int, line y: Int, value: UInt8, attribute: Attribute) {
+        let index = (y + 24) * 320 + x * 8 + 32
+        
+        var j = 0
+        
+        for i in (0...7).reverse() {
+            screen[index + j] = ((Int(value) & 1 << i) > 0) ? attribute.inkColor : attribute.paperColor
+            j += 1
+        }
     }
     
     private func imageFromARGB32Bitmap(pixels:[PixelData], width:Int, height:Int) -> NSImage {
@@ -157,5 +176,13 @@ final class Ula: UlaDelegate {
         )
         
         return NSImage(CGImage: cgim!, size: NSZeroSize)
+    }
+    
+    private func getAttribute(value: Int) -> Attribute {
+        return Attribute(
+            flashing: (value & 0b10000000) > 0 ? true : false,
+            paperColor: colorTable[(value >> 3) & 0b00001111],
+            inkColor: colorTable[((value >> 3) & 0b00001000) | (value & 0b00000111)]
+        )
     }
 }
