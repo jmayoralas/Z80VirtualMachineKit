@@ -157,9 +157,11 @@ import Z80VirtualMachineKit
     }
     
     func f5Pressed() {
-        vm.run()
-        
-        self.refreshView()
+        let queue = dispatch_get_global_queue(Int(QOS_CLASS_USER_INITIATED.rawValue), 0)
+        dispatch_async(queue) {
+            self.vm.run()
+            self.refreshView()
+        }
     }
     
     func f6Pressed() {
