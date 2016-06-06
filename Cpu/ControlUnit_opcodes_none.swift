@@ -16,9 +16,9 @@ extension Z80 {
         opcodes[0x01] = { // LD BC,&0000
             self.t_cycle += 6
             self.regs.c = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
             self.regs.b = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x02] = { // LD (BC),A
             self.t_cycle += 3
@@ -26,7 +26,7 @@ extension Z80 {
         }
         opcodes[0x03] = { // INC BC
             self.t_cycle += 2
-            self.regs.bc += 1
+            self.regs.bc = self.regs.bc &+ 1
         }
         opcodes[0x04] = { // INC B
             self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Add, ignoreCarry: true)
@@ -37,7 +37,7 @@ extension Z80 {
         opcodes[0x06] = { // LD B,N
             self.t_cycle += 3
             self.regs.b = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x07] = { // RLCA
             let PV_backup = self.regs.f.bit(PV)
@@ -63,7 +63,7 @@ extension Z80 {
         }
         opcodes[0x0B] = { // DEC BC
             self.t_cycle += 2
-            self.regs.bc -= 1
+            self.regs.bc = self.regs.bc &- 1
         }
         opcodes[0x0C] = { // INC C
             self.regs.c = self.ulaCall(self.regs.c, 1, ulaOp: .Add, ignoreCarry: true)
@@ -74,7 +74,7 @@ extension Z80 {
         opcodes[0x0E] = { // LD C,N
             self.t_cycle += 3
             self.regs.c = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x0F] = { // RRCA
             let PV_backup = self.regs.f.bit(PV)
@@ -88,19 +88,19 @@ extension Z80 {
         opcodes[0x10] = { // DJNZ N
             self.t_cycle += 4
             let displ = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
-            self.regs.b -= 1
+            self.regs.pc = self.regs.pc &+ 1
+            self.regs.b = self.regs.b &- 1
             if self.regs.b != 0 {
                 self.t_cycle += 5
-                self.regs.pc += UInt16(displ.comp2)
+                self.regs.pc = UInt16(Int(self.regs.pc) &+ Int(displ.comp2))
             }
         }
         opcodes[0x11] = { // LD DE,&0000
             self.t_cycle += 6
             self.regs.e = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
             self.regs.d = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x12] = { // LD (DE),A
             self.t_cycle += 3
@@ -108,7 +108,7 @@ extension Z80 {
         }
         opcodes[0x13] = { // INC DE
             self.t_cycle += 2
-            self.regs.de += 1
+            self.regs.de = self.regs.de &+ 1
         }
         opcodes[0x14] = { // INC D
             self.regs.d = self.ulaCall(self.regs.d, 1, ulaOp: .Add, ignoreCarry: true)
@@ -119,7 +119,7 @@ extension Z80 {
         opcodes[0x16] = { // LD D,&00
             self.t_cycle += 3
             self.regs.d = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x17] = { // RLA
             let PV_backup = self.regs.f.bit(PV)
@@ -133,8 +133,8 @@ extension Z80 {
         opcodes[0x18] = { // JR &00
             self.t_cycle += 8
             let displ = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
-            self.regs.pc = UInt16(Int(self.regs.pc) + Int(displ.comp2))
+            self.regs.pc = self.regs.pc &+ 1
+            self.regs.pc = UInt16(Int(self.regs.pc) &+ Int(displ.comp2))
         }
         opcodes[0x19] = { // ADD HL,DE
             self.t_cycle += 7
@@ -146,7 +146,7 @@ extension Z80 {
         }
         opcodes[0x1B] = { // DEC DE
             self.t_cycle += 2
-            self.regs.de -= 1
+            self.regs.de = self.regs.de &- 1
         }
         opcodes[0x1C] = { // INC E
             self.regs.e = self.ulaCall(self.regs.e, 1, ulaOp: .Add, ignoreCarry: true)
@@ -157,7 +157,7 @@ extension Z80 {
         opcodes[0x1E] = { // LD E,&00
             self.t_cycle += 3
             self.regs.e = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x1F] = { // RRA
             let PV_backup = self.regs.f.bit(PV)
@@ -171,29 +171,29 @@ extension Z80 {
         opcodes[0x20] = { // JR NZ &00
             self.t_cycle += 3
             let displ = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
             if self.regs.f.bit(Z) == 0 {
                 self.t_cycle += 5
-                self.regs.pc = UInt16(Int(self.regs.pc) + Int(displ.comp2))
+                self.regs.pc = UInt16(Int(self.regs.pc) &+ Int(displ.comp2))
             }
         }
         opcodes[0x21] = { // LD HL,&0000
             self.t_cycle += 6
             self.regs.l = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
             self.regs.h = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x22] = { // LD (&0000),HL
             self.t_cycle += 12
-            let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
             self.dataBus.write(address, value: self.regs.l)
             self.dataBus.write(address + 1, value: self.regs.h)
         }
         opcodes[0x23] = { // INC HL
             self.t_cycle += 2
-            self.regs.hl += 1
+            self.regs.hl = self.regs.hl &+ 1
         }
         opcodes[0x24] = { // INC H
             self.regs.h = self.ulaCall(self.regs.h, 1, ulaOp: .Add, ignoreCarry: true)
@@ -204,7 +204,7 @@ extension Z80 {
         opcodes[0x26] = { // LD H,&00
             self.t_cycle += 3
             self.regs.h = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x27] = { // DAA
             /*
@@ -252,10 +252,10 @@ extension Z80 {
         opcodes[0x28] = { // JR Z &00
             self.t_cycle += 3
             let displ = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
             if self.regs.f.bit(Z) == 1 {
                 self.t_cycle += 5
-                self.regs.pc = UInt16(Int(self.regs.pc) + Int(displ.comp2))
+                self.regs.pc = UInt16(Int(self.regs.pc) &+ Int(displ.comp2))
             }
         }
         opcodes[0x29] = { // ADD HL,HL
@@ -264,14 +264,14 @@ extension Z80 {
         }
         opcodes[0x2A] = { // LD HL,(&0000)
             self.t_cycle += 12
-            let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
             self.regs.l = self.dataBus.read(address)
             self.regs.h = self.dataBus.read(address + 1)
         }
         opcodes[0x2B] = { // DEC HL
             self.t_cycle += 2
-            self.regs.hl -= 1
+            self.regs.hl = self.regs.hl &- 1
         }
         opcodes[0x2C] = { // INC L
             self.regs.l = self.ulaCall(self.regs.l, 1, ulaOp: .Add, ignoreCarry: true)
@@ -282,7 +282,7 @@ extension Z80 {
         opcodes[0x2E] = { // LD L,&00
             self.t_cycle += 3
             self.regs.l = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x2F] = { // CPL
             self.regs.a = ~self.regs.a
@@ -292,25 +292,25 @@ extension Z80 {
         opcodes[0x30] = { // JR NC &00
             self.t_cycle += 3
             let displ = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
             if self.regs.f.bit(C) == 0 {
                 self.t_cycle += 5
-                self.regs.pc = UInt16(Int(self.regs.pc) + Int(displ.comp2))
+                self.regs.pc = UInt16(Int(self.regs.pc) &+ Int(displ.comp2))
             }
         }
         opcodes[0x31] = { // LD SP,&0000
             self.t_cycle += 6
-            self.regs.sp = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            self.regs.sp = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
         }
         opcodes[0x32] = { // LD (&0000),A
             self.t_cycle += 9
-            self.dataBus.write(self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc)), value: self.regs.a)
-            self.regs.pc += 2
+            self.dataBus.write(self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc)), value: self.regs.a)
+            self.regs.pc = self.regs.pc &+ 2
         }
         opcodes[0x33] = { // INC SP
             self.t_cycle += 2
-            self.regs.hl += 1
+            self.regs.hl = self.regs.hl &+ 1
         }
         opcodes[0x34] = { // INC (HL)
             self.t_cycle += 7
@@ -327,7 +327,7 @@ extension Z80 {
         opcodes[0x36] = { // LD (HL),&00
             self.t_cycle += 6
             self.dataBus.write(self.regs.hl, value: self.dataBus.read(self.regs.pc))
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x37] = { // SCF
             self.regs.f.setBit(C)
@@ -337,10 +337,10 @@ extension Z80 {
         opcodes[0x38] = { // JR C &00
             self.t_cycle += 3
             let displ = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
             if self.regs.f.bit(C) == 1 {
                 self.t_cycle += 5
-                self.regs.pc = UInt16(Int(self.regs.pc) + Int(displ.comp2))
+                self.regs.pc = UInt16(Int(self.regs.pc) &+ Int(displ.comp2))
             }
         }
         opcodes[0x39] = { // ADD HL,SP
@@ -349,12 +349,12 @@ extension Z80 {
         }
         opcodes[0x3A] = { // LD A,(&0000)
             self.t_cycle += 9
-            self.regs.a = self.dataBus.read(self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc)))
-            self.regs.pc += 2
+            self.regs.a = self.dataBus.read(self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc)))
+            self.regs.pc = self.regs.pc &+ 2
         }
         opcodes[0x3B] = { // DEC SP
             self.t_cycle += 2
-            self.regs.sp -= 1
+            self.regs.sp = self.regs.sp &- 1
         }
         opcodes[0x3C] = { // INC A
             self.t_cycle += 2
@@ -366,7 +366,7 @@ extension Z80 {
         opcodes[0x3E] = { // LD A,&00
             self.t_cycle += 3
             self.regs.a = self.dataBus.read(self.regs.pc)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x3F] = { // CCF
             self.regs.f.bit(H, newVal: self.regs.f.bit(C))
@@ -787,51 +787,51 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(Z) == 0 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp + 1))
-                self.regs.sp += 2
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.sp = self.regs.sp &+ 2
             }
         }
         opcodes[0xC1] = { // POP BC
             self.t_cycle += 6
             self.regs.c = self.dataBus.read(self.regs.sp)
-            self.regs.b = self.dataBus.read(self.regs.sp + 1)
-            self.regs.sp += 2
+            self.regs.b = self.dataBus.read(self.regs.sp &+ 1)
+            self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0xC2] = { // JP NZ &0000
             self.t_cycle += 10
             if self.regs.f.bit(Z) == 0 {
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xC3] = { // JP &0000
             self.t_cycle += 10
-            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
         }
         opcodes[0xC4] = { // CALL NZ &0000
             self.t_cycle += 6
             if self.regs.f.bit(Z) == 0 {
-                let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
                 self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp - 1, value: self.regs.pc.low)
-                self.regs.sp -= 2
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xC5] = { // PUSH BC
             self.t_cycle += 7
-            self.dataBus.write(self.regs.sp - 1, value: self.regs.b)
-            self.dataBus.write(self.regs.sp - 2 , value: self.regs.c)
-            self.regs.sp -= 2
+            self.dataBus.write(self.regs.sp &- 1, value: self.regs.b)
+            self.dataBus.write(self.regs.sp &- 2 , value: self.regs.c)
+            self.regs.sp = self.regs.sp &- 2
         }
         opcodes[0xC6] = { // ADD A,&00
             self.t_cycle += 3
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.pc), ulaOp: .Add, ignoreCarry: false)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xC7] = { // RST &00
             self.rst(0x0000)
@@ -840,21 +840,21 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(Z) == 1 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp + 1))
-                self.regs.sp += 2
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.sp = self.regs.sp &+ 2
             }
         }
         opcodes[0xC9] = { // RET
             self.t_cycle += 10
-            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp + 1))
-            self.regs.sp += 2
+            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+            self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0xCA] = { // JP Z &0000
             self.t_cycle += 10
             if self.regs.f.bit(Z) == 1 {
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xCB] = { // PREFIX *** CB ***
@@ -865,29 +865,29 @@ extension Z80 {
         opcodes[0xCC] = { // CALL Z &0000
             self.t_cycle += 6
             if self.regs.f.bit(Z) == 1 {
-                let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
                 self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp - 1, value: self.regs.pc.low)
-                self.regs.sp -= 2
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xCD] = { // CALL &0000
             self.t_cycle += 13
-            let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
             self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-            self.dataBus.write(self.regs.sp - 1, value: self.regs.pc.low)
-            self.regs.sp -= 2
+            self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+            self.regs.sp = self.regs.sp &- 2
             self.regs.pc = address
         }
         opcodes[0xCE] = { // ADC A,&00
             self.t_cycle += 3
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.pc), ulaOp: .Adc, ignoreCarry: false)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xCF] = { // RST &08
             self.rst(0x0008)
@@ -896,52 +896,52 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(C) == 0 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp + 1))
-                self.regs.sp += 2
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.sp = self.regs.sp &+ 2
             }
         }
         opcodes[0xD1] = { // POP DE
             self.t_cycle += 6
             self.regs.e = self.dataBus.read(self.regs.sp)
-            self.regs.d = self.dataBus.read(self.regs.sp + 1)
-            self.regs.sp += 2
+            self.regs.d = self.dataBus.read(self.regs.sp &+ 1)
+            self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0xD2] = { // JP NC &0000
             self.t_cycle += 10
             if self.regs.f.bit(C) == 0 {
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xD3] = { // OUT (&00), A
             self.t_cycle += 7
             self.ioBus.write(self.addressFromPair(self.regs.a, self.dataBus.read(self.regs.pc)), value: self.regs.a)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xD4] = { // CALL NC &0000
             self.t_cycle += 6
             if self.regs.f.bit(C) == 0 {
-                let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
                 self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp - 1, value: self.regs.pc.low)
-                self.regs.sp -= 2
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xD5] = { // PUSH DE
             self.t_cycle += 7
-            self.dataBus.write(self.regs.sp - 1 , value: self.regs.d)
-            self.dataBus.write(self.regs.sp - 2 , value: self.regs.e)
-            self.regs.sp -= 2
+            self.dataBus.write(self.regs.sp &- 1 , value: self.regs.d)
+            self.dataBus.write(self.regs.sp &- 2 , value: self.regs.e)
+            self.regs.sp = self.regs.sp &- 2
         }
         opcodes[0xD6] = { // SUB A,&00
             self.t_cycle += 3
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.pc), ulaOp: .Sub, ignoreCarry: false)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xD7] = { // RST &10
             self.rst(0x0010)
@@ -950,8 +950,8 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(C) == 1 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp + 1))
-                self.regs.sp += 2
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.sp = self.regs.sp &+ 2
             }
         }
         opcodes[0xD9] = { // EXX
@@ -969,27 +969,27 @@ extension Z80 {
         opcodes[0xDA] = { // JP C &0000
             self.t_cycle += 10
             if self.regs.f.bit(C) == 1 {
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xDB] = { // IN A,(&00)
             self.t_cycle += 7
             self.regs.a =  self.ioBus.read(self.addressFromPair(self.regs.a, self.dataBus.read(self.regs.pc)))
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xDC] = { // CALL C &0000
             self.t_cycle += 6
             if self.regs.f.bit(C) == 1 {
-                let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
                 self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp - 1, value: self.regs.pc.low)
-                self.regs.sp -= 2
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xDD] = { // PREFIX *** DD ***
@@ -1002,7 +1002,7 @@ extension Z80 {
         opcodes[0xDE] = { // SBC A,&00
             self.t_cycle += 3
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.pc), ulaOp: .Sbc, ignoreCarry: false)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xDF] = { // RST &18
             self.rst(0x0018)
@@ -1011,54 +1011,54 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(PV) == 0 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp + 1))
-                self.regs.sp += 2
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.sp = self.regs.sp &+ 2
             }
         }
         opcodes[0xE1] = { // POP HL
             self.t_cycle += 6
             self.regs.l = self.dataBus.read(self.regs.sp)
-            self.regs.h = self.dataBus.read(self.regs.sp + 1)
-            self.regs.sp += 2
+            self.regs.h = self.dataBus.read(self.regs.sp &+ 1)
+            self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0xE2] = { // JP PO &0000
             self.t_cycle += 10
             if self.regs.f.bit(PV) == 0 {
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xE3] = { // EX (SP), HL
             self.t_cycle = 15
             let hl = self.regs.hl
-            self.regs.hl = self.addressFromPair(self.dataBus.read(self.regs.sp + 1), self.dataBus.read(self.regs.sp))
+            self.regs.hl = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
             self.dataBus.write(self.regs.sp, value: hl.low)
-            self.dataBus.write(self.regs.sp + 1, value: hl.high)
+            self.dataBus.write(self.regs.sp &+ 1, value: hl.high)
         }
         opcodes[0xE4] = { // CALL PO &0000
             self.t_cycle += 6
             if self.regs.f.bit(PV) == 0 {
-                let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
                 self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp - 1, value: self.regs.pc.low)
-                self.regs.sp -= 2
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xE5] = { // PUSH HL
             self.t_cycle += 7
-            self.dataBus.write(self.regs.sp - 1, value: self.regs.h)
-            self.dataBus.write(self.regs.sp - 2 , value: self.regs.l)
-            self.regs.sp -= 2
+            self.dataBus.write(self.regs.sp &- 1, value: self.regs.h)
+            self.dataBus.write(self.regs.sp &- 2 , value: self.regs.l)
+            self.regs.sp = self.regs.sp &- 2
         }
         opcodes[0xE6] = { // AND &00
             self.t_cycle += 3
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.pc), ulaOp: .And, ignoreCarry: false)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xE7] = { // RST &20
             self.rst(0x0020)
@@ -1067,8 +1067,8 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(PV) == 1 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp + 1))
-                self.regs.sp += 2
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.sp = self.regs.sp &+ 2
             }
         }
         opcodes[0xE9] = { // JP (HL)
@@ -1077,9 +1077,9 @@ extension Z80 {
         opcodes[0xEA] = { // JP PE &0000
             self.t_cycle += 10
             if self.regs.f.bit(PV) == 1 {
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xEB] = { // EX DE, HL
@@ -1093,14 +1093,14 @@ extension Z80 {
         opcodes[0xEC] = { // CALL PE &0000
             self.t_cycle += 6
             if self.regs.f.bit(PV) == 1 {
-                let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
                 self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp - 1, value: self.regs.pc.low)
-                self.regs.sp -= 2
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xED] = { // PREFIX *** ED ***
@@ -1111,7 +1111,7 @@ extension Z80 {
         opcodes[0xEE] = { // XOR &00
             self.t_cycle += 3
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.pc), ulaOp: .Xor, ignoreCarry: false)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xEF] = { // RST &28
             self.rst(0x0028)
@@ -1120,22 +1120,22 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(S) == 0 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp + 1))
-                self.regs.sp += 2
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.sp = self.regs.sp &+ 2
             }
         }
         opcodes[0xF1] = { // POP AF
             self.t_cycle += 6
             self.regs.f = self.dataBus.read(self.regs.sp)
-            self.regs.a = self.dataBus.read(self.regs.sp + 1)
-            self.regs.sp += 2
+            self.regs.a = self.dataBus.read(self.regs.sp &+ 1)
+            self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0xF2] = { // JP P &0000
             self.t_cycle += 10
             if self.regs.f.bit(S) == 0 {
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xF3] = { // DI
@@ -1145,26 +1145,26 @@ extension Z80 {
         opcodes[0xF4] = { // CALL P &0000
             self.t_cycle += 6
             if self.regs.f.bit(S) == 0 {
-                let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
                 self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp - 1, value: self.regs.pc.low)
-                self.regs.sp -= 2
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xF5] = { // PUSH AF
             self.t_cycle += 7
-            self.dataBus.write(self.regs.sp - 1, value: self.regs.a)
-            self.dataBus.write(self.regs.sp - 2 , value: self.regs.f)
-            self.regs.sp -= 2
+            self.dataBus.write(self.regs.sp &- 1, value: self.regs.a)
+            self.dataBus.write(self.regs.sp &- 2 , value: self.regs.f)
+            self.regs.sp = self.regs.sp &- 2
         }
         opcodes[0xF6] = { // OR &00
             self.t_cycle += 3
             self.regs.a = self.ulaCall(self.regs.a, self.dataBus.read(self.regs.pc), ulaOp: .Or, ignoreCarry: false)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xF7] = { // RST &30
             self.rst(0x0030)
@@ -1173,8 +1173,8 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(S) == 1 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp + 1))
-                self.regs.sp += 2
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.sp = self.regs.sp &+ 2
             }
         }
         opcodes[0xF9] = { // LD SP, HL
@@ -1184,9 +1184,9 @@ extension Z80 {
         opcodes[0xFA] = { // JP M &0000
             self.t_cycle += 10
             if self.regs.f.bit(S) == 1 {
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xFB] = { // EI
@@ -1196,14 +1196,14 @@ extension Z80 {
         opcodes[0xFC] = { // CALL M &0000
             self.t_cycle += 6
             if self.regs.f.bit(S) == 1 {
-                let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
+                let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
                 self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp - 1, value: self.regs.pc.low)
-                self.regs.sp -= 2
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
-                self.regs.pc += 2
+                self.regs.pc = self.regs.pc &+ 2
             }
         }
         opcodes[0xFD] = { // PREFIX *** FD ***
@@ -1216,7 +1216,7 @@ extension Z80 {
         opcodes[0xFE] = { // CP &00
             self.t_cycle += 3
             self.ulaCall(self.regs.a, self.dataBus.read(self.regs.pc), ulaOp: .Sub, ignoreCarry: false)
-            self.regs.pc += 1
+            self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xFF] = { // RST &38
             self.rst(0x0038)

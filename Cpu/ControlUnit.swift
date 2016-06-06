@@ -219,7 +219,7 @@ extension Z80 {
         t_cycle += 11
         dataBus.write(regs.sp - 1, value: regs.pc.high)
         dataBus.write(regs.sp - 2, value: regs.pc.low)
-        regs.sp -= 2
+        regs.sp = regs.sp &- 2
         regs.pc = address
         irq_kind = nil
     }

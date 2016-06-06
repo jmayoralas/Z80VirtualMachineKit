@@ -39,8 +39,8 @@ extension Z80 {
         }
         opcodes[0x43] = { // LD (&0000),BC
             self.t_cycle += 12
-            let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
             self.dataBus.write(address, value: self.regs.c)
             self.dataBus.write(address + 1, value: self.regs.b)
         }
@@ -49,8 +49,8 @@ extension Z80 {
         }
         opcodes[0x45] = { // RETN
             self.t_cycle += 6
-            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp + 1), self.dataBus.read(self.regs.sp))
-            self.regs.sp += 2
+            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
+            self.regs.sp = self.regs.sp &+ 2
             self.regs.IFF1 = self.regs.IFF2
         }
         opcodes[0x46] = { // IM 0
@@ -88,8 +88,8 @@ extension Z80 {
         }
         opcodes[0x4B] = { // LD BC,(&0000)
             self.t_cycle += 12
-            let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
             self.regs.c = self.dataBus.read(address)
             self.regs.b = self.dataBus.read(address + 1)
         }
@@ -98,8 +98,8 @@ extension Z80 {
         }
         opcodes[0x4D] = { // RETI #TO-DO: signal an I/O device that the interrupt routine is completed
             self.t_cycle += 6
-            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp + 1), self.dataBus.read(self.regs.sp))
-            self.regs.sp += 2
+            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
+            self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0x4E] = { // IM 0
             self.opcode_tables[self.id_opcode_table][0x46]()
@@ -136,8 +136,8 @@ extension Z80 {
         }
         opcodes[0x53] = { // LD (&0000),DE
             self.t_cycle += 12
-            let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
             self.dataBus.write(address, value: self.regs.e)
             self.dataBus.write(address + 1, value: self.regs.d)
         }
@@ -182,8 +182,8 @@ extension Z80 {
         }
         opcodes[0x5B] = { // LD DE,(&0000)
             self.t_cycle += 12
-            let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
             self.regs.e = self.dataBus.read(address)
             self.regs.d = self.dataBus.read(address + 1)
         }
@@ -228,8 +228,8 @@ extension Z80 {
         }
         opcodes[0x63] = { // LD (&0000),HL
             self.t_cycle += 12
-            let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
             self.dataBus.write(address, value: self.regs.l)
             self.dataBus.write(address + 1, value: self.regs.h)
         }
@@ -287,8 +287,8 @@ extension Z80 {
         }
         opcodes[0x6B] = { // LD HL,(&0000)
             self.t_cycle += 12
-            let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
             self.regs.l = self.dataBus.read(address)
             self.regs.h = self.dataBus.read(address + 1)
         }
@@ -344,8 +344,8 @@ extension Z80 {
         }
         opcodes[0x73] = { // LD (&0000),SP
             self.t_cycle += 12
-            let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
             self.dataBus.write(address, value: self.regs.sp.low)
             self.dataBus.write(address + 1, value: self.regs.sp.high)
         }
@@ -389,8 +389,8 @@ extension Z80 {
         }
         opcodes[0x7B] = { // LD SP,(&0000)
             self.t_cycle += 12
-            let address = self.addressFromPair(self.dataBus.read(self.regs.pc + 1), self.dataBus.read(self.regs.pc))
-            self.regs.pc += 2
+            let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
+            self.regs.pc = self.regs.pc &+ 2
             self.regs.sp = self.addressFromPair(self.dataBus.read(address + 1), self.dataBus.read(address))
         }
         opcodes[0x7C] = { // NEG
@@ -523,7 +523,7 @@ extension Z80 {
             self.regs.f.resetBit(PV)
             if self.regs.bc != 0 {
                 self.t_cycle += 5
-                self.regs.pc -= 2
+                self.regs.pc = self.regs.pc &- 2
             }
         }
         opcodes[0xB1] = { // CPIR
@@ -536,7 +536,7 @@ extension Z80 {
             self.regs.f.resetBit(PV)
             if self.regs.bc != 0 && self.regs.f.bit(Z) == 0 {
                 self.t_cycle += 5
-                self.regs.pc -= 2
+                self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
             }
         }
@@ -549,7 +549,7 @@ extension Z80 {
             self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
             if self.regs.b != 0 {
                 self.t_cycle += 5
-                self.regs.pc -= 2
+                self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
             }
         }
@@ -562,7 +562,7 @@ extension Z80 {
             self.regs.f = f_backup
             if self.regs.b != 0 {
                 self.t_cycle += 5
-                self.regs.pc -= 2
+                self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
             }
         }
@@ -579,7 +579,7 @@ extension Z80 {
             self.regs.f.resetBit(PV)
             if self.regs.bc != 0 {
                 self.t_cycle += 5
-                self.regs.pc -= 2
+                self.regs.pc = self.regs.pc &- 2
             }
         }
         opcodes[0xB9] = { // CPDR
@@ -592,7 +592,7 @@ extension Z80 {
             self.regs.f.resetBit(PV)
             if self.regs.bc != 0 && self.regs.f.bit(Z) == 0 {
                 self.t_cycle += 5
-                self.regs.pc -= 2
+                self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
             }
         }
@@ -605,7 +605,7 @@ extension Z80 {
             self.regs.b = self.ulaCall(self.regs.b, 1, ulaOp: .Sub, ignoreCarry: true)
             if self.regs.b != 0 {
                 self.t_cycle += 5
-                self.regs.pc -= 2
+                self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
             }
         }
@@ -618,7 +618,7 @@ extension Z80 {
             self.regs.f = f_backup
             if self.regs.b != 0 {
                 self.t_cycle += 5
-                self.regs.pc -= 2
+                self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
             }
         }

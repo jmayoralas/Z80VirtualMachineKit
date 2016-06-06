@@ -110,7 +110,7 @@ class Z80 {
         
         // get opcode at PC into IR register
         regs.ir = dataBus.read(regs.pc)
-        regs.pc += 1
+        regs.pc = regs.pc &+ 1
         
         // save bit 7 of R to restore after increment
         let bit7 = regs.r.bit(7)
