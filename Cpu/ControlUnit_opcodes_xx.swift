@@ -28,7 +28,7 @@ extension Z80 {
             self.t_cycle += 12
             let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             self.dataBus.write(address, value: self.regs.xxl)
-            self.dataBus.write(address + 1, value: self.regs.xxh)
+            self.dataBus.write(address &+ 1, value: self.regs.xxh)
             self.regs.pc = self.regs.pc &+ 2
         }
         opcodes[0x23] = { // INC xx
@@ -53,7 +53,7 @@ extension Z80 {
         opcodes[0x2A] = { // LD xx,(&0000)
             self.t_cycle += 12
             let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
-            self.regs.xx = self.addressFromPair(self.dataBus.read(address + 1), self.dataBus.read(address))
+            self.regs.xx = self.addressFromPair(self.dataBus.read(address &+ 1), self.dataBus.read(address))
             self.regs.pc = self.regs.pc &+ 2
         }
         opcodes[0x2B] = { // DEC xx

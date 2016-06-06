@@ -42,7 +42,7 @@ extension Z80 {
             let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             self.regs.pc = self.regs.pc &+ 2
             self.dataBus.write(address, value: self.regs.c)
-            self.dataBus.write(address + 1, value: self.regs.b)
+            self.dataBus.write(address &+ 1, value: self.regs.b)
         }
         opcodes[0x44] = { // NEG
             self.regs.a = self.ulaCall(0, self.regs.a, ulaOp: .Sub, ignoreCarry: false)
@@ -91,7 +91,7 @@ extension Z80 {
             let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             self.regs.pc = self.regs.pc &+ 2
             self.regs.c = self.dataBus.read(address)
-            self.regs.b = self.dataBus.read(address + 1)
+            self.regs.b = self.dataBus.read(address &+ 1)
         }
         opcodes[0x4C] = { // NEG
             self.opcode_tables[self.id_opcode_table][0x44]()
@@ -139,7 +139,7 @@ extension Z80 {
             let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             self.regs.pc = self.regs.pc &+ 2
             self.dataBus.write(address, value: self.regs.e)
-            self.dataBus.write(address + 1, value: self.regs.d)
+            self.dataBus.write(address &+ 1, value: self.regs.d)
         }
         opcodes[0x54] = { // NEG
             self.opcode_tables[self.id_opcode_table][0x44]()
@@ -185,7 +185,7 @@ extension Z80 {
             let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             self.regs.pc = self.regs.pc &+ 2
             self.regs.e = self.dataBus.read(address)
-            self.regs.d = self.dataBus.read(address + 1)
+            self.regs.d = self.dataBus.read(address &+ 1)
         }
         opcodes[0x5C] = { // NEG
             self.opcode_tables[self.id_opcode_table][0x44]()
@@ -231,7 +231,7 @@ extension Z80 {
             let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             self.regs.pc = self.regs.pc &+ 2
             self.dataBus.write(address, value: self.regs.l)
-            self.dataBus.write(address + 1, value: self.regs.h)
+            self.dataBus.write(address &+ 1, value: self.regs.h)
         }
         opcodes[0x64] = { // NEG
             self.opcode_tables[self.id_opcode_table][0x44]()
@@ -290,7 +290,7 @@ extension Z80 {
             let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             self.regs.pc = self.regs.pc &+ 2
             self.regs.l = self.dataBus.read(address)
-            self.regs.h = self.dataBus.read(address + 1)
+            self.regs.h = self.dataBus.read(address &+ 1)
         }
         opcodes[0x6C] = { // NEG
             self.opcode_tables[self.id_opcode_table][0x44]()
@@ -347,7 +347,7 @@ extension Z80 {
             let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             self.regs.pc = self.regs.pc &+ 2
             self.dataBus.write(address, value: self.regs.sp.low)
-            self.dataBus.write(address + 1, value: self.regs.sp.high)
+            self.dataBus.write(address &+ 1, value: self.regs.sp.high)
         }
         opcodes[0x74] = { // NEG
             self.opcode_tables[self.id_opcode_table][0x44]()
@@ -391,7 +391,7 @@ extension Z80 {
             self.t_cycle += 12
             let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             self.regs.pc = self.regs.pc &+ 2
-            self.regs.sp = self.addressFromPair(self.dataBus.read(address + 1), self.dataBus.read(address))
+            self.regs.sp = self.addressFromPair(self.dataBus.read(address &+ 1), self.dataBus.read(address))
         }
         opcodes[0x7C] = { // NEG
             self.opcode_tables[self.id_opcode_table][0x44]()
