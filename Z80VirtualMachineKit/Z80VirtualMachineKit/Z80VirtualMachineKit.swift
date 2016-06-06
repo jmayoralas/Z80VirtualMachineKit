@@ -14,7 +14,7 @@ import Foundation
     optional func Z80VMScreenRefresh(image: NSImage)
 }
 
-@objc final public class Z80VirtualMachineKit: NSObject, MemoryChange, UlaPostProcessor
+@objc final public class Z80VirtualMachineKit: NSObject, MemoryChange
 {
     public var delegate: Z80VirtualMachineStatus?
     
@@ -26,7 +26,6 @@ import Foundation
     
     override public init() {
         cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
-        
         ula = Ula()
         
         old_m1 = cpu.pins.m1
@@ -41,7 +40,6 @@ import Foundation
         
         // connect the ULA and his 16k of memory (this is a Spectrum 16k)
         ula.memory.delegate = self
-        ula.delegate = self
         cpu.dataBus.addBusComponent(ula.memory)
         cpu.ioBus.addBusComponent(ula.io)
         
@@ -60,6 +58,8 @@ import Foundation
         repeat {
             step()
         } while !cpu.pins.halt // && instructions <= 6200
+        
+        delegate?.Z80VMScreenRefresh?(ula.getScreen())
     }
     
     public func step() {
@@ -119,9 +119,5 @@ import Foundation
     
     func MemoryReadAtAddress(address: Int, byte: UInt8) {
         delegate?.Z80VMMemoryReadAtAddress?(address, byte: byte)
-    }
-    
-    func onUpdateScreenData(image: NSImage) {
-        delegate?.Z80VMScreenRefresh?(image)
     }
 }
