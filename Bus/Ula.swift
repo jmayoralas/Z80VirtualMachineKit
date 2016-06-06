@@ -21,10 +21,6 @@ private struct Attribute {
     var inkColor: PixelData
 }
 
-protocol UlaPostProcessor {
-    func onUpdateScreenData(image: NSImage)
-}
-
 protocol UlaDelegate {
     func memoryWrite(address: UInt16, value: UInt8)
     func ioWrite(address: UInt16, value: UInt8)
@@ -65,7 +61,6 @@ final class ULAIo : BusComponent {
 final class Ula: UlaDelegate {
     var memory: ULAMemory!
     var io: ULAIo!
-    var delegate: UlaPostProcessor?
     
     private let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
     private let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedFirst.rawValue)
@@ -115,8 +110,6 @@ final class Ula: UlaDelegate {
             let attribute = getAttribute(Int(value))
             updateCharAtOffset(Int(local_address) & 0x7FF, attribute: attribute)
         }
-        
-        delegate?.onUpdateScreenData(imageFromARGB32Bitmap(screen, width: 320, height: 240))
     }
     
     func ioRead(address: UInt16) -> UInt8 {
@@ -126,6 +119,10 @@ final class Ula: UlaDelegate {
     
     func ioWrite(address: UInt16, value: UInt8)  {
         NSLog("Writing to ULAIo address: %@, value: %@", address.hexStr(), value.hexStr())
+    }
+    
+    func getScreen() -> NSImage {
+        return imageFromARGB32Bitmap(screen, width: 320, height: 240)
     }
     
     private func updateCharAtOffset(offset: Int, attribute: Attribute) {
