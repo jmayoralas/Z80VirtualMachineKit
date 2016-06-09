@@ -12,9 +12,10 @@ import Foundation
     optional func Z80VMMemoryWriteAtAddress(address: Int, byte: UInt8)
     optional func Z80VMMemoryReadAtAddress(address: Int, byte: UInt8)
     optional func Z80VMScreenRefresh(image: NSImage)
+    optional func Z80VMEmulationHalted()
 }
 
-@objc final public class Z80VirtualMachineKit: NSObject, MemoryChange
+@objc final public class Z80VirtualMachineKit: NSObject, MemoryChange, Z80Delegate
 {
     public var delegate: Z80VirtualMachineStatus?
     
@@ -22,13 +23,10 @@ import Foundation
     private var instructions: Int
     private var ula: Ula
     
-    private var old_m1: Bool
-    
     override public init() {
         cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
         ula = Ula()
         
-        old_m1 = cpu.pins.m1
         instructions = -1
         
         super.init()
@@ -40,6 +38,8 @@ import Foundation
         
         // connect the ULA and his 16k of memory (this is a Spectrum 16k)
         ula.memory.delegate = self
+        cpu.delegate = self
+        
         cpu.dataBus.addBusComponent(ula.memory)
         cpu.ioBus.addBusComponent(ula.io)
         
@@ -55,11 +55,20 @@ import Foundation
     }
     
     public func run() {
-        repeat {
-            step()
-        } while !cpu.pins.halt // && instructions <= 6200
+        let queue = dispatch_get_global_queue(Int(QOS_CLASS_USER_INITIATED.rawValue), 0)
         
-        delegate?.Z80VMScreenRefresh?(ula.getScreen())
+        dispatch_async(queue) {
+            repeat {
+                self.step()
+            } while !self.cpu.halted // && instructions <= 6200
+            
+            self.delegate?.Z80VMScreenRefresh?(self.ula.getScreen())
+            self.delegate?.Z80VMEmulationHalted?()
+        }
+    }
+    
+    public func stop() {
+        cpu.halted = true;
     }
     
     public func step() {
@@ -93,14 +102,6 @@ import Foundation
         return cpu.getTCycle()
     }
     
-    public func getDataBus() -> UInt8 {
-        return cpu.pins.data_bus
-    }
-    
-    public func getAddressBus() -> UInt16 {
-        return cpu.pins.address_bus
-    }
-    
     public func setPc(pc: UInt16) {
         cpu.org(pc)
     }
@@ -119,5 +120,9 @@ import Foundation
     
     func MemoryReadAtAddress(address: Int, byte: UInt8) {
         delegate?.Z80VMMemoryReadAtAddress?(address, byte: byte)
+    }
+    
+    func frameCompleted() {
+        delegate?.Z80VMScreenRefresh?(ula.getScreen())
     }
 }
