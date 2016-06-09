@@ -16,8 +16,6 @@
                 <outlet property="CTextField" destination="GSq-HN-wcX" id="iMJ-sE-35n"/>
                 <outlet property="DBinTextField" destination="Rgt-vc-bJl" id="dwx-YJ-fP4"/>
                 <outlet property="DTextField" destination="Hji-5H-79x" id="gss-Ka-Lyi"/>
-                <outlet property="DataBusBinTextField" destination="p5c-rd-GKb" id="v40-fi-1Ga"/>
-                <outlet property="DataBusTextField" destination="Glq-Ci-bDq" id="agB-rT-46k"/>
                 <outlet property="EBinTextField" destination="P4f-0B-lfe" id="WTk-7E-xqd"/>
                 <outlet property="ETextField" destination="btF-HP-Crj" id="qgZ-Wg-DNJ"/>
                 <outlet property="FBinTextField" destination="InZ-rR-gVf" id="Ina-9M-LqC"/>
@@ -416,30 +414,6 @@
                 <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gXU-er-KFv" customClass="ColorChangeTextField" customModule="DebuggerZ80VirtualMachine" customModuleProvider="target">
                     <rect key="frame" x="627" y="724" width="46" height="22"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="C6k-IJ-yIx">
-                        <font key="font" metaFont="systemBold"/>
-                        <color key="textColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="27X-Vh-fF3">
-                    <rect key="frame" x="574" y="755" width="63" height="17"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Data Bus" id="PV9-T2-rjY">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Glq-Ci-bDq" customClass="ColorChangeTextField" customModule="DebuggerZ80VirtualMachine" customModuleProvider="target">
-                    <rect key="frame" x="643" y="752" width="29" height="22"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="kxx-gc-1Jn">
-                        <font key="font" metaFont="systemBold"/>
-                        <color key="textColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="p5c-rd-GKb" customClass="ColorChangeTextField" customModule="DebuggerZ80VirtualMachine" customModuleProvider="target">
-                    <rect key="frame" x="680" y="752" width="85" height="22"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="QWB-Rv-ERZ">
                         <font key="font" metaFont="systemBold"/>
                         <color key="textColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

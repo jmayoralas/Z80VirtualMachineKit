@@ -23,8 +23,6 @@ import Z80VirtualMachineKit
     
     @IBOutlet weak var instructionCounter: NSTextField!
     
-    @IBOutlet weak var DataBusTextField: ColorChangeTextField!
-    @IBOutlet weak var DataBusBinTextField: ColorChangeTextField!
     @IBOutlet weak var AddressBusTextField: ColorChangeTextField!
     
     @IBOutlet weak var CiclosTextField: ColorChangeTextField!
@@ -117,8 +115,6 @@ import Z80VirtualMachineKit
     
     @IBAction func runClick(sender: AnyObject) {
         vm.run()
-        refreshView()
-        _refreshMemoryDump()
     }
     
     @IBAction func resetClick(sender: AnyObject) {
@@ -157,11 +153,7 @@ import Z80VirtualMachineKit
     }
     
     func f5Pressed() {
-        let queue = dispatch_get_global_queue(Int(QOS_CLASS_USER_INITIATED.rawValue), 0)
-        dispatch_async(queue) {
-            self.vm.run()
-            self.refreshView()
-        }
+        runClick(self)
     }
     
     func f6Pressed() {
@@ -182,8 +174,6 @@ import Z80VirtualMachineKit
         TTextField!.stringValue = "\(vm.getTCycle())"
         
         instructionCounter.stringValue = "\(vm.getInstructionsCount())"
-        DataBusTextField!.stringValue = "\(vm.getDataBus().hexStr())"
-        DataBusBinTextField!.stringValue = "\(vm.getDataBus().binStr)"
         AddressBusTextField!.stringValue = "\(UInt16(dumpAddress).hexStr())"
         
         ATextField!.stringValue = "\(regs.a.hexStr())"
@@ -255,5 +245,9 @@ import Z80VirtualMachineKit
     
     func Z80VMScreenRefresh(image: NSImage) {
         VMScreen.image = image
+    }
+    
+    func Z80VMEmulationHalted() {
+        refreshView()
     }
 }
