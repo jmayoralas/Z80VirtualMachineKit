@@ -552,7 +552,7 @@ extension Z80 {
             self.dataBus.write(self.regs.hl, value: self.regs.l)
         }
         opcodes[0x76] = { // HALT
-            self.pins.halt = true
+            self.halted = true
         }
         opcodes[0x77] = { // LD (HL),A
             self.t_cycle += 3
