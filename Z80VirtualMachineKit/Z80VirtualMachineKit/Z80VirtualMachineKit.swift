@@ -19,16 +19,11 @@ import Foundation
 {
     public var delegate: Z80VirtualMachineStatus?
     
-    private let cpu : Z80
-    private var instructions: Int
-    private var ula: Ula
+    private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
+    private var instructions = -1
+    private var ula = Ula()
     
     override public init() {
-        cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
-        ula = Ula()
-        
-        instructions = -1
-        
         super.init()
         
         // connect the 16k ROM
