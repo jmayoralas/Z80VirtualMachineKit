@@ -8,6 +8,10 @@
 
 import Foundation
 
+public enum RomErrors: ErrorType {
+    case BufferLimitReach
+}
+
 @objc public protocol Z80VirtualMachineStatus {
     optional func Z80VMMemoryWriteAtAddress(address: Int, byte: UInt8)
     optional func Z80VMMemoryReadAtAddress(address: Int, byte: UInt8)
@@ -22,12 +26,12 @@ import Foundation
     private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
     private var instructions = -1
     private var ula = Ula()
+    private let rom = Rom(base_address: 0x0000, block_size: 0x4000)
     
     override public init() {
         super.init()
         
         // connect the 16k ROM
-        let rom = Rom(base_address: 0x0000, block_size: 0x4000)
         rom.delegate = self
         cpu.dataBus.addBusComponent(rom)
         
@@ -50,6 +54,8 @@ import Foundation
     }
     
     public func run() {
+        cpu.halted = false
+        
         let queue = dispatch_get_global_queue(Int(QOS_CLASS_USER_INITIATED.rawValue), 0)
         
         dispatch_async(queue) {
@@ -86,7 +92,7 @@ import Foundation
     }
     
     public func loadRomAtAddress(address: Int, data: [UInt8]) throws {
-        // try memory.loadRomAtAddress(address, data: data)
+        try rom.loadData(data, atAddress: address)
     }
     
     public func getCpuRegs() -> Registers {
