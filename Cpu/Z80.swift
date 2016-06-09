@@ -86,13 +86,7 @@ class Z80 {
         let old_t_cycle = t_cycle
         
         repeat {
-            
             processInstruction()
-            
-            if t_cycle >= 4000000 {
-                halted = true
-                return
-            }
         } while id_opcode_table != table_NONE
         
         frameTics += t_cycle - old_t_cycle
