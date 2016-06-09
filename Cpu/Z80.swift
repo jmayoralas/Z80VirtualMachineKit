@@ -8,27 +8,33 @@
 
 import Foundation
 
+protocol Z80Delegate {
+    func frameCompleted()
+}
+
 class Z80 {
+    typealias OpcodeTable = [() -> Void]
+    
     var regs : Registers
-    let pins : Pins
     
     var t_cycle = 0
-    var control_reg : UInt8! // backup register to store parameters between t_cycles of execution
+    var halted: Bool = false;
     
     var irq_kind : IrqKind?
-    
-    typealias OpcodeTable = [() -> Void]
     
     var opcode_tables : [OpcodeTable]!
     
     var id_opcode_table : Int
     
+    var frameTics: Int = 0;
+    
     let dataBus : Bus16
     let ioBus : IoBus
     
+    var delegate: Z80Delegate?
+    
     init(dataBus: Bus16, ioBus: IoBus) {
         self.regs = Registers()
-        self.pins = Pins()
         self.dataBus = dataBus
         self.ioBus = ioBus
         
@@ -53,22 +59,6 @@ class Z80 {
         regs.i = 0x00
         regs.r = 0x00
         regs.sp = 0xDFFF
-
-        pins.data_bus = 0x00
-        pins.address_bus = 0x00
-        pins.busack = false
-        pins.busreq = false
-        pins.halt = false
-        pins.int = false
-        pins.iorq = false
-        pins.m1 = false
-        pins.mreq = false
-        pins.nmi = false
-        pins.rd = false
-        pins.reset = false
-        pins.rfsh = false
-        pins.wait = false
-        pins.wr = false
         
         t_cycle = 0
     }
@@ -91,13 +81,23 @@ class Z80 {
     
     // gets next opcode from PC and executes it
     func step() {
+        let old_t_cycle = t_cycle
+        
         repeat {
+            
             processInstruction()
+            
             if t_cycle >= 4000000 {
-                pins.halt = true
+                halted = true
                 return
             }
         } while id_opcode_table != table_NONE
+        
+        frameTics += t_cycle - old_t_cycle
+        if frameTics >= 69888 {
+            delegate?.frameCompleted()
+            frameTics -= 69888
+        }
     }
     
     func processInstruction() {
