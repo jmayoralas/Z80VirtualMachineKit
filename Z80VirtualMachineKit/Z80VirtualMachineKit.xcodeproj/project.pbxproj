@@ -13,6 +13,7 @@
 		1D53EEDB1CE4FC4000AF9A16 /* Ula.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D53EEDA1CE4FC4000AF9A16 /* Ula.swift */; };
 		1D53EEDD1CE502A400AF9A16 /* Bus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D53EEDC1CE502A400AF9A16 /* Bus.swift */; };
 		1D74EEC91CF35998004B5748 /* GenericIODevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D74EEC81CF35998004B5748 /* GenericIODevice.swift */; };
+		1DBABA921D09BE2500E631D5 /* Ula.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBABA911D09BE2500E631D5 /* Ula.swift */; };
 		1DBD6D281CE8D90A000456CB /* Rom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBD6D271CE8D90A000456CB /* Rom.swift */; };
 		1DD722DA1C35857B00178421 /* Z80VirtualMachineKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DD722E21C3585A800178421 /* Z80VirtualMachineKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */; };
@@ -34,6 +35,7 @@
 		1D53EEDA1CE4FC4000AF9A16 /* Ula.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Ula.swift; path = ../../Bus/Ula.swift; sourceTree = "<group>"; };
 		1D53EEDC1CE502A400AF9A16 /* Bus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Bus.swift; path = ../../Bus/Bus.swift; sourceTree = "<group>"; };
 		1D74EEC81CF35998004B5748 /* GenericIODevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GenericIODevice.swift; path = ../../Bus/GenericIODevice.swift; sourceTree = "<group>"; };
+		1DBABA911D09BE2500E631D5 /* Ula.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Ula.swift; path = ../../Ula/Ula.swift; sourceTree = "<group>"; };
 		1DBD6D271CE8D90A000456CB /* Rom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Rom.swift; path = ../../Bus/Rom.swift; sourceTree = "<group>"; };
 		1DD722D61C35857B00178421 /* Z80VirtualMachineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Z80VirtualMachineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Z80VirtualMachineKit.h; sourceTree = "<group>"; };
@@ -64,15 +66,23 @@
 		1D2D38191CD50A8500DA69B6 /* Bus */ = {
 			isa = PBXGroup;
 			children = (
+				1D53EEDA1CE4FC4000AF9A16 /* Ula.swift */,
 				1D53EEDC1CE502A400AF9A16 /* Bus.swift */,
 				1D2D381A1CD5102D00DA69B6 /* BusComponentBase.swift */,
 				1D2D381C1CD655C200DA69B6 /* Ram.swift */,
 				1D2D381E1CD6570E00DA69B6 /* BusComponent.swift */,
-				1D53EEDA1CE4FC4000AF9A16 /* Ula.swift */,
 				1DBD6D271CE8D90A000456CB /* Rom.swift */,
 				1D74EEC81CF35998004B5748 /* GenericIODevice.swift */,
 			);
 			name = Bus;
+			sourceTree = "<group>";
+		};
+		1DBABA901D09BDBF00E631D5 /* Ula */ = {
+			isa = PBXGroup;
+			children = (
+				1DBABA911D09BE2500E631D5 /* Ula.swift */,
+			);
+			name = Ula;
 			sourceTree = "<group>";
 		};
 		1DD722CC1C35857A00178421 = {
@@ -94,6 +104,7 @@
 		1DD722D81C35857B00178421 /* Z80VirtualMachineKit */ = {
 			isa = PBXGroup;
 			children = (
+				1DBABA901D09BDBF00E631D5 /* Ula */,
 				1D2D38191CD50A8500DA69B6 /* Bus */,
 				1DD723061C35871800178421 /* Cpu */,
 				1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */,
@@ -202,6 +213,7 @@
 				1D74EEC91CF35998004B5748 /* GenericIODevice.swift in Sources */,
 				1D53EEDD1CE502A400AF9A16 /* Bus.swift in Sources */,
 				1DEF3B511CDF814200C2646F /* ControlUnit_opcodes_xx.swift in Sources */,
+				1DBABA921D09BE2500E631D5 /* Ula.swift in Sources */,
 				1DD7231A1C35871800178421 /* ControlUnit_opcodes_none.swift in Sources */,
 				1D53EEDB1CE4FC4000AF9A16 /* Ula.swift in Sources */,
 				1DD723131C35871800178421 /* ControlUnit.swift in Sources */,
