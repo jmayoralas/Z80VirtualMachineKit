@@ -13,6 +13,8 @@ protocol Z80Delegate {
 }
 
 class Z80 {
+    private let TICS_PER_FRAME = 69888
+    
     typealias OpcodeTable = [() -> Void]
     
     var regs : Registers
@@ -94,9 +96,9 @@ class Z80 {
         } while id_opcode_table != table_NONE
         
         frameTics += t_cycle - old_t_cycle
-        if frameTics >= 69888 {
+        if frameTics >= TICS_PER_FRAME {
             delegate?.frameCompleted()
-            frameTics -= 69888
+            frameTics -= TICS_PER_FRAME
         }
     }
     
