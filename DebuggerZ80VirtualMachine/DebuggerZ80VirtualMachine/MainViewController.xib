@@ -1138,20 +1138,30 @@
                         <action selector="resetClick:" target="-2" id="0ep-lf-WdX"/>
                     </connections>
                 </button>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6KB-QK-lRU">
+                <button verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="6KB-QK-lRU">
                     <rect key="frame" x="621" y="619" width="129" height="32"/>
-                    <buttonCell key="cell" type="push" title="Load Test Prog." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="W0F-CM-LIt">
+                    <buttonCell key="cell" type="push" title="Load ROM" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="W0F-CM-LIt">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="loadTestProgram:" target="-2" id="6hz-8e-7Tz"/>
+                        <action selector="loadProgramClick:" target="-2" id="M0t-Bo-6hT"/>
                     </connections>
                 </button>
                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oAe-Dh-xZH">
                     <rect key="frame" x="201" y="17" width="379" height="321"/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" id="DqS-qQ-hFU"/>
                 </imageView>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fsq-TO-Jn2">
+                    <rect key="frame" x="135" y="721" width="64" height="32"/>
+                    <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jbS-yF-6wO">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="stopClick:" target="-2" id="rJW-pA-yFs"/>
+                    </connections>
+                </button>
             </subviews>
             <point key="canvasLocation" x="617" y="643.5"/>
         </customView>

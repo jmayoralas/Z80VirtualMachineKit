@@ -117,6 +117,10 @@ import Z80VirtualMachineKit
         vm.run()
     }
     
+    @IBAction func stopClick(sender: NSButton) {
+        vm.stop()
+    }
+    
     @IBAction func resetClick(sender: AnyObject) {
         vm.reset()
         refreshView()
@@ -147,8 +151,29 @@ import Z80VirtualMachineKit
             let data = NSData(contentsOfFile: path!)
             var buffer = [UInt8](count: data!.length, repeatedValue: 0)
             data!.getBytes(&buffer, length: data!.length)
-            vm.loadRamAtAddress(Int(strtoul(AddressBusTextField.stringValue, nil, 16)), data: buffer)
+            
+            let address = Int(strtoul(AddressBusTextField.stringValue, nil, 16))
+            if (sender as! NSButton).tag == 1 {
+                let alert = NSAlert()
+                alert.alertStyle = NSAlertStyle.CriticalAlertStyle
+                alert.addButtonWithTitle("OK")
+                
+                do {
+                    try vm.loadRomAtAddress(address, data: buffer)
+                } catch RomErrors.BufferLimitReach {
+                    alert.messageText = "Memory full !!"
+                    alert.runModal()
+                } catch {
+                    alert.messageText = "Unknown error !!"
+                    alert.runModal()
+                }
+                
+            } else {
+                vm.loadRamAtAddress(address, data: buffer)
+            }
+            
             memoryPeeker.reloadData()
+            _refreshMemoryDump()
         }
     }
     
