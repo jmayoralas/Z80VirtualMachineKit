@@ -60,6 +60,7 @@ final class Ula: UlaDelegate {
     }
     
     func memoryWrite(address: UInt16, value: UInt8) {
+        NSLog("W: %@ -> %@", value.hexStr(), address.hexStr())
         let local_address = address & 0x3FFF
         if local_address > 0x1AFF {
             return
@@ -82,7 +83,7 @@ final class Ula: UlaDelegate {
     }
     
     func ioRead(address: UInt16) -> UInt8 {
-        NSLog("Reading from ULAIo address: %@", address.hexStr())
+        // NSLog("Reading from ULAIo address: %@", address.hexStr())
         return 0xFF
     }
     
