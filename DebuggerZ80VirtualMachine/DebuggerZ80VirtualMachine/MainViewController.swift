@@ -159,7 +159,7 @@ import Z80VirtualMachineKit
                 alert.addButtonWithTitle("OK")
                 
                 do {
-                    try vm.loadRomAtAddress(address, data: buffer)
+                    try vm.loadRomAtAddress(0x0000, data: buffer)
                 } catch RomErrors.BufferLimitReach {
                     alert.messageText = "Memory full !!"
                     alert.runModal()
