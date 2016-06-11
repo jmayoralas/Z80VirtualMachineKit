@@ -46,6 +46,8 @@ public enum RomErrors: ErrorType {
         let ram = Ram(base_address: 0x8000, block_size: 0x8000)
         ram.delegate = self
         cpu.dataBus.addBusComponent(ram)
+        
+        cpu.reset()
     }
     
     public func reset() {
