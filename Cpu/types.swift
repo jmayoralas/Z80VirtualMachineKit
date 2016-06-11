@@ -10,35 +10,35 @@ import Foundation
 
 public struct Registers {
     // Instruction Registers
-    public var ir: UInt8 = 0
-    public var ir_: UInt8 = 0
+    public var ir: UInt8 = 0xFF
+    public var ir_: UInt8 = 0xFF
     
     // Main Register Set
     // accumulator
-    public var a: UInt8 = 0
-    public var b: UInt8 = 0
-    public var d: UInt8 = 0
-    public var h: UInt8 = 0
+    public var a: UInt8 = 0xFF
+    public var b: UInt8 = 0xFF
+    public var d: UInt8 = 0xFF
+    public var h: UInt8 = 0xFF
     
     // flags
-    public var f: UInt8 = 0
-    public var c: UInt8 = 0
-    public var e: UInt8 = 0
-    public var l: UInt8 = 0
+    public var f: UInt8 = 0xFF
+    public var c: UInt8 = 0xFF
+    public var e: UInt8 = 0xFF
+    public var l: UInt8 = 0xFF
     
     // Interrupt Vector
-    public var i: UInt8 = 0
+    public var i: UInt8 = 0xFF
     
     // Memory Refresh
-    public var r: UInt8 = 0
+    public var r: UInt8 = 0xFF
     
     // Index Registers
-    public var ixh: UInt8 = 0
-    public var ixl: UInt8 = 0
-    public var iyh: UInt8 = 0
-    public var iyl: UInt8 = 0
-    public var xxh: UInt8 = 0
-    public var xxl: UInt8 = 0
+    public var ixh: UInt8 = 0xFF
+    public var ixl: UInt8 = 0xFF
+    public var iyh: UInt8 = 0xFF
+    public var iyl: UInt8 = 0xFF
+    public var xxh: UInt8 = 0xFF
+    public var xxl: UInt8 = 0xFF
 
     // 16 bit registers
     // primary
@@ -84,10 +84,10 @@ public struct Registers {
     
     // Alternate Register Set
     // accumulator
-    public var af_: UInt16 = 0
-    public var bc_: UInt16 = 0
-    public var de_: UInt16 = 0
-    public var hl_: UInt16 = 0
+    public var af_: UInt16 = 0xFFFF
+    public var bc_: UInt16 = 0xFFFF
+    public var de_: UInt16 = 0xFFFF
+    public var hl_: UInt16 = 0xFFFF
     
     // index
     var xx: UInt16 {
@@ -121,7 +121,7 @@ public struct Registers {
     }
     
     // Stack Pointer
-    public var sp: UInt16 = 0
+    public var sp: UInt16 = 0xFFFF
     
     // Program Counter
     public var pc: UInt16 = 0

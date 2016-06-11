@@ -55,12 +55,28 @@ class Z80 {
     
     func reset() {
         regs.pc = 0x0000
+        
         regs.int_mode = 0
+        
         regs.IFF1 = false
         regs.IFF2 = false
+        
         regs.i = 0x00
         regs.r = 0x00
-        regs.sp = 0xDFFF
+        
+        regs.sp = 0xFFFF
+        
+        regs.af = 0xFFFF
+        regs.bc = 0xFFFF
+        regs.de = 0xFFFF
+        regs.hl = 0xFFFF
+        regs.ix = 0xFFFF
+        regs.iy = 0xFFFF
+        
+        regs.af_ = 0xFFFF
+        regs.bc_ = 0xFFFF
+        regs.de_ = 0xFFFF
+        regs.hl_ = 0xFFFF
         
         t_cycle = 0
     }
