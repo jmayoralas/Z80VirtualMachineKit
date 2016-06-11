@@ -63,7 +63,7 @@ public enum RomErrors: ErrorType {
         dispatch_async(queue) {
             repeat {
                 self.step()
-            } while !self.cpu.halted // && instructions <= 6200
+            } while !self.cpu.halted
             
             self.delegate?.Z80VMScreenRefresh?(self.ula.getScreen())
             self.delegate?.Z80VMEmulationHalted?()
