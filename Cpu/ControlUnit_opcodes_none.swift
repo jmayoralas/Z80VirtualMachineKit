@@ -798,7 +798,7 @@ extension Z80 {
             self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0xC2] = { // JP NZ &0000
-            self.t_cycle += 10
+            self.t_cycle += 6
             if self.regs.f.bit(Z) == 0 {
                 self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
@@ -806,7 +806,7 @@ extension Z80 {
             }
         }
         opcodes[0xC3] = { // JP &0000
-            self.t_cycle += 10
+            self.t_cycle += 6
             self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
         }
         opcodes[0xC4] = { // CALL NZ &0000
@@ -850,7 +850,7 @@ extension Z80 {
             self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0xCA] = { // JP Z &0000
-            self.t_cycle += 10
+            self.t_cycle += 6
             if self.regs.f.bit(Z) == 1 {
                 self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
@@ -907,7 +907,7 @@ extension Z80 {
             self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0xD2] = { // JP NC &0000
-            self.t_cycle += 10
+            self.t_cycle += 6
             if self.regs.f.bit(C) == 0 {
                 self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
@@ -967,7 +967,7 @@ extension Z80 {
             
         }
         opcodes[0xDA] = { // JP C &0000
-            self.t_cycle += 10
+            self.t_cycle += 6
             if self.regs.f.bit(C) == 1 {
                 self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
@@ -1022,7 +1022,7 @@ extension Z80 {
             self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0xE2] = { // JP PO &0000
-            self.t_cycle += 10
+            self.t_cycle += 6
             if self.regs.f.bit(PV) == 0 {
                 self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
@@ -1075,7 +1075,7 @@ extension Z80 {
             self.regs.pc = self.addressFromPair(self.regs.h, self.regs.l)
         }
         opcodes[0xEA] = { // JP PE &0000
-            self.t_cycle += 10
+            self.t_cycle += 6
             if self.regs.f.bit(PV) == 1 {
                 self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
@@ -1131,7 +1131,7 @@ extension Z80 {
             self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0xF2] = { // JP P &0000
-            self.t_cycle += 10
+            self.t_cycle += 6
             if self.regs.f.bit(S) == 0 {
                 self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
@@ -1182,7 +1182,7 @@ extension Z80 {
             self.regs.sp = self.regs.hl
         }
         opcodes[0xFA] = { // JP M &0000
-            self.t_cycle += 10
+            self.t_cycle += 6
             if self.regs.f.bit(S) == 1 {
                 self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             } else {
