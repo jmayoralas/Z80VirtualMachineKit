@@ -8,24 +8,6 @@
 
 import Foundation
 
-class Pins {
-    var address_bus: UInt16 = 0
-    var data_bus: UInt8 = 0
-    var busack: Bool = false
-    var busreq: Bool = false
-    var halt: Bool = false
-    var int: Bool = false
-    var iorq: Bool = false
-    var m1: Bool = false
-    var mreq: Bool = false
-    var nmi: Bool = false // positive edge triggered (false -> true)
-    var rd: Bool = false
-    var reset: Bool = false
-    var rfsh: Bool = false
-    var wait: Bool = false
-    var wr: Bool = false
-}
-
 public struct Registers {
     // Instruction Registers
     public var ir: UInt8 = 0
