@@ -24,7 +24,7 @@ public enum RomErrors: ErrorType {
     public var delegate: Z80VirtualMachineStatus?
     
     private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
-    private var instructions = -1
+    private var instructions = 0
     private var ula = Ula()
     private let rom = Rom(base_address: 0x0000, block_size: 0x4000)
     
@@ -52,7 +52,7 @@ public enum RomErrors: ErrorType {
     
     public func reset() {
         cpu.reset()
-        instructions = -1
+        instructions = 0
     }
     
     public func run() {
