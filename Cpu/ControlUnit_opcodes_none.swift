@@ -54,7 +54,7 @@ extension Z80 {
             self.regs.af = af_
         }
         opcodes[0x09] = { // ADD HL,BC
-            self.t_cycle += 3
+            self.t_cycle += 7
             self.regs.hl = self.ulaCall16(self.regs.hl, self.regs.bc, ulaOp: .Add)
         }
         opcodes[0x0A] = { // LD A,(BC)
