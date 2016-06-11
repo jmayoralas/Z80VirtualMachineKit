@@ -814,8 +814,8 @@ extension Z80 {
             if self.regs.f.bit(Z) == 0 {
                 let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
-                self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.high)
+                self.dataBus.write(self.regs.sp &- 2, value: self.regs.pc.low)
                 self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
@@ -867,8 +867,8 @@ extension Z80 {
             if self.regs.f.bit(Z) == 1 {
                 let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
-                self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.high)
+                self.dataBus.write(self.regs.sp &- 2, value: self.regs.pc.low)
                 self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
@@ -879,8 +879,8 @@ extension Z80 {
             self.t_cycle += 13
             let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
             self.regs.pc = self.regs.pc &+ 2
-            self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-            self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+            self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.high)
+            self.dataBus.write(self.regs.sp &- 2, value: self.regs.pc.low)
             self.regs.sp = self.regs.sp &- 2
             self.regs.pc = address
         }
@@ -924,8 +924,8 @@ extension Z80 {
             if self.regs.f.bit(C) == 0 {
                 let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
-                self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.high)
+                self.dataBus.write(self.regs.sp &- 2, value: self.regs.pc.low)
                 self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
@@ -984,8 +984,8 @@ extension Z80 {
             if self.regs.f.bit(C) == 1 {
                 let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
-                self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.high)
+                self.dataBus.write(self.regs.sp &- 2, value: self.regs.pc.low)
                 self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
@@ -1041,8 +1041,8 @@ extension Z80 {
             if self.regs.f.bit(PV) == 0 {
                 let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
-                self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.high)
+                self.dataBus.write(self.regs.sp &- 2, value: self.regs.pc.low)
                 self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
@@ -1095,8 +1095,8 @@ extension Z80 {
             if self.regs.f.bit(PV) == 1 {
                 let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
-                self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.high)
+                self.dataBus.write(self.regs.sp &- 2, value: self.regs.pc.low)
                 self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
@@ -1147,8 +1147,8 @@ extension Z80 {
             if self.regs.f.bit(S) == 0 {
                 let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
-                self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.high)
+                self.dataBus.write(self.regs.sp &- 2, value: self.regs.pc.low)
                 self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
@@ -1198,8 +1198,8 @@ extension Z80 {
             if self.regs.f.bit(S) == 1 {
                 let address = self.addressFromPair(self.dataBus.read(self.regs.pc &+ 1), self.dataBus.read(self.regs.pc))
                 self.t_cycle += 7
-                self.dataBus.write(self.regs.sp, value: self.regs.pc.high)
-                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.low)
+                self.dataBus.write(self.regs.sp &- 1, value: self.regs.pc.high)
+                self.dataBus.write(self.regs.sp &- 2, value: self.regs.pc.low)
                 self.regs.sp = self.regs.sp &- 2
                 self.regs.pc = address
             } else {
