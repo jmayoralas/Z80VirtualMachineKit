@@ -787,7 +787,7 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(Z) == 0 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
                 self.regs.sp = self.regs.sp &+ 2
             }
         }
@@ -840,13 +840,13 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(Z) == 1 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
                 self.regs.sp = self.regs.sp &+ 2
             }
         }
         opcodes[0xC9] = { // RET
             self.t_cycle += 6
-            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
             self.regs.sp = self.regs.sp &+ 2
         }
         opcodes[0xCA] = { // JP Z &0000
@@ -896,7 +896,7 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(C) == 0 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
                 self.regs.sp = self.regs.sp &+ 2
             }
         }
@@ -950,7 +950,7 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(C) == 1 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
                 self.regs.sp = self.regs.sp &+ 2
             }
         }
@@ -1011,7 +1011,7 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(PV) == 0 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
                 self.regs.sp = self.regs.sp &+ 2
             }
         }
@@ -1067,7 +1067,7 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(PV) == 1 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
                 self.regs.sp = self.regs.sp &+ 2
             }
         }
@@ -1120,7 +1120,7 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(S) == 0 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
                 self.regs.sp = self.regs.sp &+ 2
             }
         }
@@ -1173,7 +1173,7 @@ extension Z80 {
             self.t_cycle += 1
             if self.regs.f.bit(S) == 1 {
                 self.t_cycle += 6
-                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
+                self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
                 self.regs.sp = self.regs.sp &+ 2
             }
         }
