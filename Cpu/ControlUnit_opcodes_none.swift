@@ -845,7 +845,7 @@ extension Z80 {
             }
         }
         opcodes[0xC9] = { // RET
-            self.t_cycle += 10
+            self.t_cycle += 6
             self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp), self.dataBus.read(self.regs.sp &+ 1))
             self.regs.sp = self.regs.sp &+ 2
         }
