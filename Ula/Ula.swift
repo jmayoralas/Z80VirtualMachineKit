@@ -60,7 +60,8 @@ final class Ula: UlaDelegate {
     }
     
     func memoryWrite(address: UInt16, value: UInt8) {
-        NSLog("W: %@ -> %@", value.hexStr(), address.hexStr())
+        NSLog("W: %@ -> %@ (%@)", value.hexStr(), address.hexStr(), value.binStr)
+        
         let local_address = address & 0x3FFF
         if local_address > 0x1AFF {
             return
@@ -69,7 +70,7 @@ final class Ula: UlaDelegate {
         if local_address < 0x1800 {
             // bitmap area
             let x = Int((local_address.low & 0b00011111))
-            let y = (Int(((local_address.high & 0b00011000) << 3) | ((local_address.low & 0b11100000) >> 5) | ((local_address.high & 0b00000111) << 3)))
+            let y = Int(((local_address.high & 0b00011000) << 3) | ((local_address.low & 0b11100000) >> 2) | (local_address.high & 0b00000111))
             
             let attribute_address = 0x5800 + x + (y / 8) * 32
             let attribute = getAttribute(Int(memory.read(UInt16(attribute_address))))
@@ -83,7 +84,7 @@ final class Ula: UlaDelegate {
     }
     
     func ioRead(address: UInt16) -> UInt8 {
-        // NSLog("Reading from ULAIo address: %@", address.hexStr())
+        NSLog("Reading from ULAIo address: %@", address.hexStr())
         return 0xFF
     }
     
