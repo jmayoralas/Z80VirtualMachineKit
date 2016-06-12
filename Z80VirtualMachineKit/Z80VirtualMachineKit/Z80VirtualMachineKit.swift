@@ -110,7 +110,16 @@ public enum RomErrors: ErrorType {
     }
     
     public func clearMemory() {
-        // memory.clear()
+        for address in 0x4000...0xFFFF {
+            if (0x5800 <= address) && (address < 0x5B00) {
+                cpu.dataBus.write(UInt16(address), value: 0x38)
+            } else {
+                cpu.dataBus.write(UInt16(address), value: 0x00)
+            }
+            
+        }
+        
+        delegate?.Z80VMScreenRefresh?(ula.getScreen())
     }
     
     public func dumpMemoryFromAddress(fromAddress: Int, toAddress: Int) -> [UInt8] {
