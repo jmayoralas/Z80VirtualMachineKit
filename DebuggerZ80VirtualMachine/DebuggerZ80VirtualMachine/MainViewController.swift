@@ -101,7 +101,7 @@ import Z80VirtualMachineKit
             }
         }
         
-        dumpAddress = 0x8000
+        dumpAddress = 0x0000
         _refreshMemoryDump()
         
         self.refreshView()
@@ -130,6 +130,7 @@ import Z80VirtualMachineKit
     @IBAction func clearMemoryClick(sender: AnyObject) {
         vm.clearMemory()
         _refreshMemoryDump()
+        
     }
     
     @IBAction func setPcClick(sender: AnyObject) {
