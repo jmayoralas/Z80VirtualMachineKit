@@ -76,7 +76,13 @@ public enum RomErrors: ErrorType {
     
     public func step() {
         instructions += 1
+        
         cpu.step()
+/*
+        if instructions == 610 {
+            cpu.halted = true
+        }
+*/
     }
     
     public func getInstructionsCount() -> Int {
