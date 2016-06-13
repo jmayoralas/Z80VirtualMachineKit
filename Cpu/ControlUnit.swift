@@ -182,7 +182,18 @@ extension Z80 {
             
         case .Bit:
             result = operandA
-            if operandA.bit(Int(operandB)) == 0 { regs.f.setBit(Z) } else { regs.f.resetBit(Z) }
+            if operandA.bit(Int(operandB)) == 0 {
+                regs.f.setBit(Z)
+                regs.f.setBit(PV)
+            } else {
+                regs.f.resetBit(Z)
+                regs.f.resetBit(PV)
+                if operandB == 7 {
+                    regs.f.setBit(S)
+                }
+            }
+            regs.f.setBit(H)
+            regs.f.resetBit(N)
             
         default:
             break
