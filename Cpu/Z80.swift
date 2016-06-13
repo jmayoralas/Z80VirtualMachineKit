@@ -124,13 +124,15 @@ class Z80 {
         regs.ir = dataBus.read(regs.pc)
         regs.pc = regs.pc &+ 1
         
-        // save bit 7 of R to restore after increment
-        let bit7 = regs.r.bit(7)
-        // increment only seven bits
-        regs.r.resetBit(7)
-        regs.r = regs.r + 1 <= 0x7F ? regs.r + 1 : 0
-        
-        // restore bit 7
-        regs.r.bit(7, newVal: bit7)
+        if regs.ir != 0xCB || id_opcode_table == table_NONE {
+            // save bit 7 of R to restore after increment
+            let bit7 = regs.r.bit(7)
+            // increment only seven bits
+            regs.r.resetBit(7)
+            regs.r = regs.r + 1 <= 0x7F ? regs.r + 1 : 0
+            
+            // restore bit 7
+            regs.r.bit(7, newVal: bit7)
+        }
     }
 }
