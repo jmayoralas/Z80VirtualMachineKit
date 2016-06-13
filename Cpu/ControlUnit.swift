@@ -54,7 +54,11 @@ extension Z80 {
         case .Add:
             result = operandA &+ operandB &+ old_carry
             
-            if result.low < operandA.low {regs.f.setBit(H)} else {regs.f.resetBit(H)} // H (Half Carry)
+            if (result.low < operandA.low) || ((result.low == operandA.low) && (operandB > 0)) {
+                regs.f.setBit(H)
+            } else {
+                regs.f.resetBit(H)
+            } // H (Half Carry)
             regs.f.resetBit(N) // N (Add)
             regs.f.bit(PV, newVal: checkOverflow(operandA, operandB, result: result, ulaOp: ulaOp))
             
@@ -72,7 +76,13 @@ extension Z80 {
         case .Sub:
             result = operandA &- operandB &- old_carry
             
-            if result.low > operandA.low {regs.f.setBit(H)} else {regs.f.resetBit(H)} // H (Half Carry)
+            // H (Half Carry)
+            if (result.low > operandA.low) || ((result.low == operandA.low) && operandB > 0) {
+                regs.f.setBit(H)
+            } else {
+                regs.f.resetBit(H)
+            }
+            
             regs.f.setBit(N) // N (Substract)
             regs.f.bit(PV, newVal: checkOverflow(operandA, operandB, result: result, ulaOp: ulaOp))
             
