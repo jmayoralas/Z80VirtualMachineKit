@@ -1030,7 +1030,7 @@ extension Z80 {
             }
         }
         opcodes[0xE3] = { // EX (SP), HL
-            self.t_cycle = 15
+            self.t_cycle += 15
             let hl = self.regs.hl
             self.regs.hl = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
             self.dataBus.write(self.regs.sp, value: hl.low)
