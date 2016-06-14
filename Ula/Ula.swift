@@ -60,8 +60,6 @@ final class Ula: UlaDelegate {
     }
     
     func memoryWrite(address: UInt16, value: UInt8) {
-        NSLog("W: %@ -> %@ (%@)", value.hexStr(), address.hexStr(), value.binStr)
-        
         let local_address = address & 0x3FFF
         if local_address > 0x1AFF {
             return
@@ -100,16 +98,16 @@ final class Ula: UlaDelegate {
         let y = (offset / 32) * 8
         let x = offset % 32
         
-        let line_address: UInt16 = UInt16(0x4000 + y * 32 + x)
+        let line_address = UInt16(0x4000 + y * 32 + x)
+        let line_address_corrected = (line_address & 0xF800) | ((line_address & 0x700) >> 3) | ((line_address & 0xE0) << 3) | (line_address & 0x1F)
         
         for i in 0...7 {
-            fillScreenEightBitLineAt(char: x, line: y + i, value: memory.read(line_address + UInt16(i * 32)), attribute: attribute)
+            fillScreenEightBitLineAt(char: x, line: y + i, value: memory.read(line_address_corrected + UInt16(i * 0x100)), attribute: attribute)
         }
     }
     
     private func fillScreenEightBitLineAt(char x: Int, line y: Int, value: UInt8, attribute: Attribute) {
         let index = (y + 24) * 320 + x * 8 + 32
-        
         var j = 0
         
         for i in (0...7).reverse() {
