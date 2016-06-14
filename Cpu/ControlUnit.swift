@@ -53,13 +53,14 @@ extension Z80 {
             fallthrough
         case .Add:
             result = operandA &+ operandB &+ old_carry
-            
-            if (result.low < operandA.low) || ((result.low == operandA.low) && (operandB > 0)) {
+
+            if (UInt8(operandA.low &+ operandB.low &+ old_carry) & 0xF0 > 0) {
                 regs.f.setBit(H)
             } else {
                 regs.f.resetBit(H)
-            } // H (Half Carry)
-            regs.f.resetBit(N) // N (Add)
+            }
+            
+            regs.f.resetBit(N)
             regs.f.bit(PV, newVal: checkOverflow(operandA, operandB, result: result, ulaOp: ulaOp))
             
             if !ignoreCarry {
@@ -74,10 +75,10 @@ extension Z80 {
             old_carry = UInt8(regs.f.bit(C))
             fallthrough
         case .Sub:
-            result = operandA &- operandB &- old_carry
+            result = UInt8(operandA &- operandB &- old_carry)
             
             // H (Half Carry)
-            if (result.low > operandA.low) || ((result.low == operandA.low) && operandB > 0) {
+            if (UInt8(operandA.low &- operandB.low &- old_carry) & 0xF0 > 0) {
                 regs.f.setBit(H)
             } else {
                 regs.f.resetBit(H)
