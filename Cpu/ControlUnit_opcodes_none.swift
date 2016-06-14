@@ -357,7 +357,6 @@ extension Z80 {
             self.regs.sp = self.regs.sp &- 1
         }
         opcodes[0x3C] = { // INC A
-            self.t_cycle += 2
             self.regs.a = self.ulaCall(self.regs.a, 1, ulaOp: .Add, ignoreCarry: true)
         }
         opcodes[0x3D] = { // DEC A
