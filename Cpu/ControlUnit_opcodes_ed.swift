@@ -575,14 +575,13 @@ extension Z80 {
             self.regs.hl = self.ulaCall16(self.regs.hl, 1, ulaOp: .Sub)
             self.regs.bc = self.ulaCall16(self.regs.bc, 1, ulaOp: .Sub)
             self.regs.f = f_backup
+            self.regs.f.resetBit(H)
+            self.regs.f.resetBit(N)
+            self.regs.f.resetBit(PV)
             if self.regs.bc != 0 {
                 self.t_cycle += 5
                 self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
-            } else {
-                self.regs.f.resetBit(H)
-                self.regs.f.resetBit(N)
-                self.regs.f.resetBit(PV)
             }
         }
         opcodes[0xB9] = { // CPDR
