@@ -237,7 +237,7 @@ extension Z80 {
     }
 
     func rst(address: UInt16) {
-        t_cycle += 11
+        t_cycle += 7
         dataBus.write(regs.sp - 1, value: regs.pc.high)
         dataBus.write(regs.sp - 2, value: regs.pc.low)
         regs.sp = regs.sp &- 2
