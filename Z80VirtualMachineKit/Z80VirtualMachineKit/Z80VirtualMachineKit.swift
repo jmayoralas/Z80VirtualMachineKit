@@ -8,63 +8,81 @@
 
 import Foundation
 
+public enum RomErrors: ErrorType {
+    case BufferLimitReach
+}
+
 @objc public protocol Z80VirtualMachineStatus {
     optional func Z80VMMemoryWriteAtAddress(address: Int, byte: UInt8)
     optional func Z80VMMemoryReadAtAddress(address: Int, byte: UInt8)
+    optional func Z80VMScreenRefresh(image: NSImage)
+    optional func Z80VMEmulationHalted()
 }
 
-@objc public class Z80VirtualMachineKit: NSObject, MemoryChange
+@objc final public class Z80VirtualMachineKit: NSObject, MemoryChange, Z80Delegate
 {
     public var delegate: Z80VirtualMachineStatus?
     
-    private let memory : Memory
-    private let cpu : Z80
-    private var io_devices : [IODevice]
-    private var instructions: Int
-    
-    private var old_m1: Bool
+    private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
+    private var instructions = 0
+    private var ula = Ula()
+    private let rom = Rom(base_address: 0x0000, block_size: 0x4000)
     
     override public init() {
-        cpu = Z80()
-        old_m1 = cpu.pins.m1
-        memory = Memory(pins: cpu.pins)
-        io_devices = []
-        instructions = -1
         super.init()
         
-        memory.delegate = self
+        // connect the 16k ROM
+        rom.delegate = self
+        cpu.dataBus.addBusComponent(rom)
+        
+        // connect the ULA and his 16k of memory (this is a Spectrum 16k)
+        ula.memory.delegate = self
+        cpu.delegate = self
+        
+        cpu.dataBus.addBusComponent(ula.memory)
+        cpu.ioBus.addBusComponent(ula.io)
+        
+        // add the upper 32k to emulate a 48k Spectrum
+        let ram = Ram(base_address: 0x8000, block_size: 0x8000)
+        ram.delegate = self
+        cpu.dataBus.addBusComponent(ram)
+        
+        cpu.reset()
     }
     
     public func reset() {
         cpu.reset()
-        instructions = -1
+        instructions = 0
     }
     
     public func run() {
-        repeat {
-            step()
-        } while !cpu.pins.halt // && instructions <= 6200
+        cpu.halted = false
+        
+        let queue = dispatch_get_global_queue(Int(QOS_CLASS_USER_INITIATED.rawValue), 0)
+        
+        dispatch_async(queue) {
+            repeat {
+                self.step()
+            } while !self.cpu.halted
+            
+            self.delegate?.Z80VMScreenRefresh?(self.ula.getScreen())
+            self.delegate?.Z80VMEmulationHalted?()
+        }
+    }
+    
+    public func stop() {
+        cpu.halted = true;
     }
     
     public func step() {
-        repeat {
-            clk()
-        } while (cpu.getMCycle() > 1 || cpu.getTCycle() > 1) && !cpu.pins.halt
-    }
-    
-    public func clk() {
-        cpu.clk()
-        memory.clk() // memory's clock line is connected to mreq pin of cpu
+        instructions += 1
         
-        if cpu.pins.m1 && old_m1 != cpu.pins.m1 {
-            instructions += 1
+        cpu.step()
+/*
+        if instructions == 877130 {
+            cpu.halted = true
         }
-        
-        old_m1 = cpu.pins.m1
-        
-        for io_device in io_devices {
-            io_device.clk()
-        }
+*/
     }
     
     public func getInstructionsCount() -> Int {
@@ -72,15 +90,17 @@ import Foundation
     }
     
     public func addIoDevice(port: UInt8) {
-        io_devices.append(IODevice(pins: cpu.pins, port: port))
+        cpu.ioBus.addBusComponent(GenericIODevice(base_address: UInt16(port), block_size: 1))
     }
     
     public func loadRamAtAddress(address: Int, data: [UInt8]) {
-        memory.poke(address, bytes: data)
+        for i in 0..<data.count {
+            cpu.dataBus.write(UInt16(address + i), value: data[i])
+        }
     }
     
     public func loadRomAtAddress(address: Int, data: [UInt8]) throws {
-        try memory.loadRomAtAddress(address, data: data)
+        try rom.loadData(data, atAddress: address)
     }
     
     public func getCpuRegs() -> Registers {
@@ -91,32 +111,25 @@ import Foundation
         return cpu.getTCycle()
     }
     
-    public func getMCycle() -> Int {
-        return cpu.getMCycle()
-    }
-    
-    public func getTCount() -> Int {
-        return cpu.getTCount()
-    }
-    
-    public func getDataBus() -> UInt8 {
-        return cpu.pins.data_bus
-    }
-    
-    public func getAddressBus() -> UInt16 {
-        return cpu.pins.address_bus
-    }
-    
     public func setPc(pc: UInt16) {
         cpu.org(pc)
     }
     
     public func clearMemory() {
-        memory.clear()
+        for address in 0x4000...0xFFFF {
+            if (0x5800 <= address) && (address < 0x5B00) {
+                cpu.dataBus.write(UInt16(address), value: 0x38)
+            } else {
+                cpu.dataBus.write(UInt16(address), value: 0x00)
+            }
+            
+        }
+        
+        delegate?.Z80VMScreenRefresh?(ula.getScreen())
     }
     
     public func dumpMemoryFromAddress(fromAddress: Int, toAddress: Int) -> [UInt8] {
-        return memory.dumpFromAddress(fromAddress, toAddress: toAddress)
+        return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
     }
     
     func MemoryWriteAtAddress(address: Int, byte: UInt8) {
@@ -125,5 +138,9 @@ import Foundation
     
     func MemoryReadAtAddress(address: Int, byte: UInt8) {
         delegate?.Z80VMMemoryReadAtAddress?(address, byte: byte)
+    }
+    
+    func frameCompleted() {
+        delegate?.Z80VMScreenRefresh?(ula.getScreen())
     }
 }

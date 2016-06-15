@@ -8,72 +8,10 @@
 
 import Foundation
 
-class ControlUnit {
-    // MARK: Parameters
-    let pins : Pins
-    var regs : Registers!
-    
-    typealias OpcodeTable = [() -> Void]
-    
-    var opcode_tables : [OpcodeTable]!
-    
-    var id_opcode_table : Int
-    
-    var m_cycle : Int
-    var t_cycle : Int
-    
-    var machine_cycle : MachineCycle
-    
-    var control_reg : UInt8! // backup register to store parameters between t_cycles of execution
-    
-    var irq_kind : IrqKind?
-    
+extension Z80 {
     // MARK: Methods
     func isPrefixed() -> Bool {
-        return (id_opcode_table != prefix_NONE) ? true : false
-    }
-    
-    func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
-        return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
-    }
-    
-    func processOpcode(inout regs: Registers, _ t_cycle: Int, _ m_cycle: Int, inout _ machine_cycle: MachineCycle) {
-        self.m_cycle = m_cycle
-        self.t_cycle = t_cycle
-        self.regs = regs
-        self.machine_cycle = machine_cycle
-
-        switch machine_cycle {
-        case .NMIrq:
-            irq_kind = .NMI
-            self.regs.pc -= 1
-        case .SoftIrq:
-            irq_kind = .Soft
-        default:
-            break
-        }
-        
-        if let irq = irq_kind {
-            if irq == .Soft {
-                switch regs.int_mode {
-                case 0:
-                    opcode_tables[id_opcode_table][Int(self.regs.ir)]()
-                case 1:
-                    rst(0x0038)
-                case 2:
-                    mode2SoftIrq()
-                default:
-                    break
-                }
-            } else {
-                rst(0x0066)
-            }
-        } else {
-            opcode_tables[id_opcode_table][Int(self.regs.ir)]()
-        }
-        
-        machine_cycle = self.machine_cycle
-        regs = self.regs
+        return (id_opcode_table != table_NONE) ? true : false
     }
     
     func ulaCall16(operandA: UInt16, _ operandB: UInt16, ulaOp: UlaOp) -> UInt16 {
@@ -115,9 +53,14 @@ class ControlUnit {
             fallthrough
         case .Add:
             result = operandA &+ operandB &+ old_carry
+
+            if (UInt8(operandA.low &+ operandB.low &+ old_carry) & 0xF0 > 0) {
+                regs.f.setBit(H)
+            } else {
+                regs.f.resetBit(H)
+            }
             
-            if result.low < operandA.low {regs.f.setBit(H)} else {regs.f.resetBit(H)} // H (Half Carry)
-            regs.f.resetBit(N) // N (Add)
+            regs.f.resetBit(N)
             regs.f.bit(PV, newVal: checkOverflow(operandA, operandB, result: result, ulaOp: ulaOp))
             
             if !ignoreCarry {
@@ -132,9 +75,15 @@ class ControlUnit {
             old_carry = UInt8(regs.f.bit(C))
             fallthrough
         case .Sub:
-            result = operandA &- operandB &- old_carry
+            result = UInt8(operandA &- operandB &- old_carry)
             
-            if result.low > operandA.low {regs.f.setBit(H)} else {regs.f.resetBit(H)} // H (Half Carry)
+            // H (Half Carry)
+            if (UInt8(operandA.low &- operandB.low &- old_carry) & 0xF0 > 0) {
+                regs.f.setBit(H)
+            } else {
+                regs.f.resetBit(H)
+            }
+            
             regs.f.setBit(N) // N (Substract)
             regs.f.bit(PV, newVal: checkOverflow(operandA, operandB, result: result, ulaOp: ulaOp))
             
@@ -234,7 +183,18 @@ class ControlUnit {
             
         case .Bit:
             result = operandA
-            if operandA.bit(Int(operandB)) == 0 { regs.f.setBit(Z) } else { regs.f.resetBit(Z) }
+            if operandA.bit(Int(operandB)) == 0 {
+                regs.f.setBit(Z)
+                regs.f.setBit(PV)
+            } else {
+                regs.f.resetBit(Z)
+                regs.f.resetBit(PV)
+                if operandB == 7 {
+                    regs.f.setBit(S)
+                }
+            }
+            regs.f.setBit(H)
+            regs.f.resetBit(N)
             
         default:
             break
@@ -278,78 +238,15 @@ class ControlUnit {
     }
 
     func rst(address: UInt16) {
-        let last_t_cycle : Int
-        if irq_kind != nil && irq_kind! != .NMI {
-            last_t_cycle = 7
-        } else {
-            last_t_cycle = 5
-        }
-        switch m_cycle {
-        case 1:
-            machine_cycle = .TimeWait
-            if t_cycle == last_t_cycle {
-                regs.sp -= 1
-                pins.address_bus = self.regs.sp
-                pins.data_bus = self.regs.pc.high
-                machine_cycle = .MemoryWrite
-            }
-        case 2:
-            regs.sp -= 1
-            pins.address_bus = self.regs.sp
-            pins.data_bus = self.regs.pc.low
-        default:
-            regs.pc = address
-            machine_cycle = .OpcodeFetch
-            irq_kind = nil
-        }
+        t_cycle += 7
+        dataBus.write(regs.sp - 1, value: regs.pc.high)
+        dataBus.write(regs.sp - 2, value: regs.pc.low)
+        regs.sp = regs.sp &- 2
+        regs.pc = address
+        irq_kind = nil
     }
     
     func mode2SoftIrq() {
-        switch m_cycle {
-        case 1:
-            machine_cycle = .TimeWait
-            if t_cycle == 7 {
-                control_reg = pins.data_bus
-                control_reg.resetBit(0)
-                regs.sp -= 1
-                pins.address_bus = regs.sp
-                pins.data_bus = regs.pc.high
-                machine_cycle = .MemoryWrite
-            }
-        case 2:
-            regs.sp -= 1
-            pins.address_bus = self.regs.sp
-            pins.data_bus = self.regs.pc.low
-        case 3:
-            pins.address_bus = addressFromPair(regs.i, control_reg)
-            machine_cycle = .MemoryRead
-        case 4:
-            control_reg = pins.data_bus
-            pins.address_bus += 1
-        default:
-            regs.pc = addressFromPair(pins.data_bus, control_reg)
-            machine_cycle = .OpcodeFetch
-            irq_kind = nil
-        }
+        // FIX-ME: must implement mode2 irq
     }
-    
-    // MARK: Initialization
-    init(pins: Pins) {
-        m_cycle = 0
-        t_cycle = 0
-        machine_cycle = .OpcodeFetch
-        self.pins = pins
-        id_opcode_table = prefix_NONE
-        
-        opcode_tables = [OpcodeTable](count: 7, repeatedValue: OpcodeTable(count: 0x100, repeatedValue: {}))
-        
-        initOpcodeTableNONE(&opcode_tables[prefix_NONE])
-        initOpcodeTableDD(&opcode_tables[prefix_DD])
-        initOpcodeTableFD(&opcode_tables[prefix_FD])
-        initOpcodeTableCB(&opcode_tables[prefix_CB])
-        initOpcodeTableED(&opcode_tables[prefix_ED])
-        initOpcodeTableDDCB(&opcode_tables[prefix_DDCB])
-        initOpcodeTableFDCB(&opcode_tables[prefix_FDCB])
-    }
-    
 }

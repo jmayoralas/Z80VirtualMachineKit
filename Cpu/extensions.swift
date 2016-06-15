@@ -34,16 +34,7 @@ public extension UInt16 {
 
 public extension UInt8 {
     var parity: Int {
-        let bit_array = self.binArray
-        
-        var result = 0
-        if let ones_count = bit_array.freq()["1"] {
-            if ones_count % 2 != 0 {
-                result = 1
-            }
-        }
-        
-        return result
+        return Int(self & 1 + self >> 1 & 1 + self >> 2 & 1 + self >> 3 & 1 + self >> 4 & 1 + self >> 5 & 1 + self >> 6 & 1 + self >> 7 & 1) & 1
     }
 
     var comp2: Int {
@@ -64,14 +55,6 @@ public extension UInt8 {
         return result
     }
     
-    var binArray: Array<String> {
-        var res = [String]()
-        for caracter in self.binStr.characters {
-            res.append(String(caracter))
-        }
-        return res
-    }
-    
     mutating func bit(index: Int, newVal: Int) -> UInt8 {
         if newVal == 1 { self.setBit(index) } else { self.resetBit(index) }
         
@@ -79,27 +62,15 @@ public extension UInt8 {
     }
     
     func bit(index: Int) -> Int {
-        return Int(self.binArray[7 - index])!
+        return (Int(self) >> index) & 0x01
     }
     
     mutating func setBit(index: Int) {
-        var mask = String()
-        var i = 0
-        for char in "00000000".characters {
-            mask.append((i == 7 - index) ? "1" : char)
-            i += 1
-        }
-        self = self | UInt8(mask.binaryToDecimal)
+        self = self | UInt8(1 << index)
     }
     
     mutating func resetBit(index: Int) {
-        var mask = String()
-        var i = 0
-        for char in "11111111".characters {
-            mask.append((i == 7 - index) ? "0" : char)
-            i += 1
-        }
-        self = self & UInt8(mask.binaryToDecimal)
+        self = self & ~UInt8(1 << index)
     }
     
     var high: UInt8 {

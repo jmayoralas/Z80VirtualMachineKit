@@ -23,8 +23,6 @@ import Z80VirtualMachineKit
     
     @IBOutlet weak var instructionCounter: NSTextField!
     
-    @IBOutlet weak var DataBusTextField: ColorChangeTextField!
-    @IBOutlet weak var DataBusBinTextField: ColorChangeTextField!
     @IBOutlet weak var AddressBusTextField: ColorChangeTextField!
     
     @IBOutlet weak var CiclosTextField: ColorChangeTextField!
@@ -55,6 +53,7 @@ import Z80VirtualMachineKit
     @IBOutlet weak var IylTextField: ColorChangeTextField!
     @IBOutlet weak var IylBinTextField: ColorChangeTextField!
     @IBOutlet weak var memoryPeeker: NSTableView!
+    @IBOutlet weak var VMScreen: NSImageView!
     
     var dumpAddress: Int!
     var memoryDump: [UInt8]!
@@ -108,10 +107,18 @@ import Z80VirtualMachineKit
         self.refreshView()
     }
 
+    @IBAction func loadTestProgram(sender: AnyObject) {
+        let data : [UInt8] = [0x3E, 0xFE, 0x32, 0x30, 0x00, 0x21, 0x30, 0x00, 0x34, 0x76]
+        vm.loadRamAtAddress(Int(strtoul(AddressBusTextField.stringValue, nil, 16)), data: data)
+        _refreshMemoryDump()
+    }
+    
     @IBAction func runClick(sender: AnyObject) {
         vm.run()
-        refreshView()
-        _refreshMemoryDump()
+    }
+    
+    @IBAction func stopClick(sender: NSButton) {
+        vm.stop()
     }
     
     @IBAction func resetClick(sender: AnyObject) {
@@ -123,6 +130,7 @@ import Z80VirtualMachineKit
     @IBAction func clearMemoryClick(sender: AnyObject) {
         vm.clearMemory()
         _refreshMemoryDump()
+        
     }
     
     @IBAction func setPcClick(sender: AnyObject) {
@@ -144,19 +152,38 @@ import Z80VirtualMachineKit
             let data = NSData(contentsOfFile: path!)
             var buffer = [UInt8](count: data!.length, repeatedValue: 0)
             data!.getBytes(&buffer, length: data!.length)
-            vm.loadRamAtAddress(Int(AddressBusTextField.stringValue)!, data: buffer)
+            
+            let address = Int(strtoul(AddressBusTextField.stringValue, nil, 16))
+            if (sender as! NSButton).tag == 1 {
+                let alert = NSAlert()
+                alert.alertStyle = NSAlertStyle.CriticalAlertStyle
+                alert.addButtonWithTitle("OK")
+                
+                do {
+                    try vm.loadRomAtAddress(0x0000, data: buffer)
+                } catch RomErrors.BufferLimitReach {
+                    alert.messageText = "Memory full !!"
+                    alert.runModal()
+                } catch {
+                    alert.messageText = "Unknown error !!"
+                    alert.runModal()
+                }
+                
+            } else {
+                vm.loadRamAtAddress(address, data: buffer)
+            }
+            
             memoryPeeker.reloadData()
+            _refreshMemoryDump()
         }
     }
     
     func f5Pressed() {
-        vm.step()
-        
-        self.refreshView()
+        runClick(self)
     }
     
     func f6Pressed() {
-        vm.clk()
+        vm.step()
         
         self.refreshView()
     }
@@ -170,15 +197,10 @@ import Z80VirtualMachineKit
         ITextField!.stringValue = "\(regs.i.hexStr())"
         RTextField!.stringValue = "\(regs.r.hexStr())"
         
-        MTextField!.stringValue = "\(vm.getMCycle())"
         TTextField!.stringValue = "\(vm.getTCycle())"
         
         instructionCounter.stringValue = "\(vm.getInstructionsCount())"
-        DataBusTextField!.stringValue = "\(vm.getDataBus().hexStr())"
-        DataBusBinTextField!.stringValue = "\(vm.getDataBus().binStr)"
-        AddressBusTextField!.stringValue = "\(vm.getAddressBus().hexStr())"
-        
-        CiclosTextField!.stringValue = "\(vm.getTCount())"
+        AddressBusTextField!.stringValue = "\(UInt16(dumpAddress).hexStr())"
         
         ATextField!.stringValue = "\(regs.a.hexStr())"
         ABinTextField!.stringValue = regs.a.binStr
@@ -245,5 +267,13 @@ import Z80VirtualMachineKit
         }
         
         return cellView
+    }
+    
+    func Z80VMScreenRefresh(image: NSImage) {
+        VMScreen.image = image
+    }
+    
+    func Z80VMEmulationHalted() {
+        refreshView()
     }
 }

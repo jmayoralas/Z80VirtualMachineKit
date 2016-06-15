@@ -8,69 +8,120 @@
 
 import Foundation
 
-class Pins {
-    var address_bus: UInt16 = 0
-    var data_bus: UInt8 = 0
-    var busack: Bool = false
-    var busreq: Bool = false
-    var halt: Bool = false
-    var int: Bool = false
-    var iorq: Bool = false
-    var m1: Bool = false
-    var mreq: Bool = false
-    var nmi: Bool = false // positive edge triggered (false -> true)
-    var rd: Bool = false
-    var reset: Bool = false
-    var rfsh: Bool = false
-    var wait: Bool = false
-    var wr: Bool = false
-}
-
 public struct Registers {
     // Instruction Registers
-    public var ir: UInt8 = 0
-    public var ir_: UInt8 = 0
+    public var ir: UInt8 = 0xFF
+    public var ir_: UInt8 = 0xFF
     
     // Main Register Set
     // accumulator
-    public var a: UInt8 = 0
-    public var b: UInt8 = 0
-    public var d: UInt8 = 0
-    public var h: UInt8 = 0
+    public var a: UInt8 = 0xFF
+    public var b: UInt8 = 0xFF
+    public var d: UInt8 = 0xFF
+    public var h: UInt8 = 0xFF
     
     // flags
-    public var f: UInt8 = 0
-    public var c: UInt8 = 0
-    public var e: UInt8 = 0
-    public var l: UInt8 = 0
+    public var f: UInt8 = 0xFF
+    public var c: UInt8 = 0xFF
+    public var e: UInt8 = 0xFF
+    public var l: UInt8 = 0xFF
+    
+    // Interrupt Vector
+    public var i: UInt8 = 0xFF
+    
+    // Memory Refresh
+    public var r: UInt8 = 0xFF
+    
+    // Index Registers
+    public var ixh: UInt8 = 0xFF
+    public var ixl: UInt8 = 0xFF
+    public var iyh: UInt8 = 0xFF
+    public var iyl: UInt8 = 0xFF
+    public var xxh: UInt8 = 0xFF
+    public var xxl: UInt8 = 0xFF
+
+    // 16 bit registers
+    // primary
+    var af: UInt16 {
+        get {
+            return UInt16(Int(Int(self.a) * 0x100) + Int(self.f))
+        }
+        set(newValue) {
+            self.a = newValue.high
+            self.f = newValue.low
+        }
+    }
+
+    var bc: UInt16 {
+        get {
+            return UInt16(Int(Int(self.b) * 0x100) + Int(self.c))
+        }
+        set(newValue) {
+            self.b = newValue.high
+            self.c = newValue.low
+        }
+    }
+
+    var hl: UInt16 {
+        get {
+            return UInt16(Int(Int(self.h) * 0x100) + Int(self.l))
+        }
+        set(newValue) {
+            self.h = newValue.high
+            self.l = newValue.low
+        }
+    }
+
+    var de: UInt16 {
+        get {
+            return UInt16(Int(Int(self.d) * 0x100) + Int(self.e))
+        }
+        set(newValue) {
+            self.d = newValue.high
+            self.e = newValue.low
+        }
+    }
     
     // Alternate Register Set
     // accumulator
-    public var a_: UInt8 = 0
-    public var b_: UInt8 = 0
-    public var d_: UInt8 = 0
-    public var h_: UInt8 = 0
+    public var af_: UInt16 = 0xFFFF
+    public var bc_: UInt16 = 0xFFFF
+    public var de_: UInt16 = 0xFFFF
+    public var hl_: UInt16 = 0xFFFF
     
-    // flags
-    public var f_: UInt8 = 0
-    public var c_: UInt8 = 0
-    public var e_: UInt8 = 0
-    public var l_: UInt8 = 0
+    // index
+    var xx: UInt16 {
+        get {
+            return UInt16(Int(Int(self.xxh) * 0x100) + Int(self.xxl))
+        }
+        set(newValue) {
+            self.xxh = newValue.high
+            self.xxl = newValue.low
+        }
+    }
     
-    // Interrupt Vector
-    public var i: UInt8 = 0
+    var ix: UInt16 {
+        get {
+            return UInt16(Int(Int(self.ixh) * 0x100) + Int(self.ixl))
+        }
+        set(newValue) {
+            self.ixh = newValue.high
+            self.ixl = newValue.low
+        }
+    }
     
-    // Memory Refresh
-    public var r: UInt8 = 0
-    
-    // Index Registers
-    public var ixh: UInt8 = 0
-    public var ixl: UInt8 = 0
-    public var iyh: UInt8 = 0
-    public var iyl: UInt8 = 0
+    var iy: UInt16 {
+        get {
+            return UInt16(Int(Int(self.iyh) * 0x100) + Int(self.iyl))
+        }
+        set(newValue) {
+            self.iyh = newValue.high
+            self.iyl = newValue.low
+        }
+    }
     
     // Stack Pointer
-    public var sp: UInt16 = 0
+    public var sp: UInt16 = 0xFFFF
     
     // Program Counter
     public var pc: UInt16 = 0
@@ -80,10 +131,6 @@ public struct Registers {
     public var IFF2 : Bool = false
 
     public var int_mode : Int = 0
-}
-
-enum MachineCycle: Int {
-    case OpcodeFetch = 1, MemoryRead, MemoryWrite, IoRead, IoWrite, UlaOperation, TimeWait, SoftIrq, NMIrq
 }
 
 enum UlaOp {
@@ -106,10 +153,9 @@ let PV = 5
 let N = 6
 let C = 7
 
-let prefix_NONE = 0
-let prefix_DD = 1
-let prefix_FD = 2
-let prefix_CB = 3
-let prefix_DDCB = 4
-let prefix_FDCB = 5
-let prefix_ED = 6
+// id opcode table
+let table_NONE = 0
+let table_XX = 1
+let table_CB = 2
+let table_XXCB = 3
+let table_ED = 4
