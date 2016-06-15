@@ -75,7 +75,10 @@ import Z80VirtualMachineKit
                 self.f6Pressed()
                 return nil
             default:
-                break
+                if !theEvent.modifierFlags.contains(.command) {
+                    self.vm.keyPressed(theEvent: theEvent)
+                    return nil
+                }
             }
             
             return theEvent
