@@ -135,6 +135,10 @@ public enum RomErrors: ErrorProtocol {
         return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
     }
     
+    public func keyPressed(theEvent: NSEvent) {
+        NSLog("Key %d pressed", theEvent.keyCode)
+    }
+    
     // MARK: protocol MemoryChange
     func MemoryWriteAtAddress(_ address: Int, byte: UInt8) {
         delegate?.Z80VMMemoryWriteAtAddress?(address, byte: byte)
