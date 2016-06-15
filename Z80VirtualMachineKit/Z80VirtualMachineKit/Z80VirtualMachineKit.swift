@@ -79,7 +79,7 @@ public enum RomErrors: ErrorType {
         
         cpu.step()
 /*
-        if instructions == 610 {
+        if instructions == 877130 {
             cpu.halted = true
         }
 */
