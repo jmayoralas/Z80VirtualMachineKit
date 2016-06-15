@@ -21,6 +21,7 @@ public enum RomErrors: ErrorProtocol {
 
 @objc final public class Z80VirtualMachineKit: NSObject, MemoryChange, Z80Delegate
 {
+    // MARK: Properties
     public var delegate: Z80VirtualMachineStatus?
     
     private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
@@ -28,6 +29,7 @@ public enum RomErrors: ErrorProtocol {
     private var ula = Ula()
     private let rom = Rom(base_address: 0x0000, block_size: 0x4000)
     
+    // MARK: Constructor
     override public init() {
         super.init()
         
@@ -50,6 +52,7 @@ public enum RomErrors: ErrorProtocol {
         cpu.reset()
     }
     
+    // MARK: Methods
     public func reset() {
         cpu.reset()
         instructions = 0
@@ -132,6 +135,7 @@ public enum RomErrors: ErrorProtocol {
         return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
     }
     
+    // MARK: protocol MemoryChange
     func MemoryWriteAtAddress(_ address: Int, byte: UInt8) {
         delegate?.Z80VMMemoryWriteAtAddress?(address, byte: byte)
     }
@@ -140,6 +144,7 @@ public enum RomErrors: ErrorProtocol {
         delegate?.Z80VMMemoryReadAtAddress?(address, byte: byte)
     }
     
+    // MARK: protocol Z80Delegate
     func frameCompleted() {
         delegate?.Z80VMScreenRefresh?(ula.getScreen())
     }
