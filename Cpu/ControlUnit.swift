@@ -14,7 +14,7 @@ extension Z80 {
         return (id_opcode_table != table_NONE) ? true : false
     }
     
-    func ulaCall16(operandA: UInt16, _ operandB: UInt16, ulaOp: UlaOp) -> UInt16 {
+    func ulaCall16(_ operandA: UInt16, _ operandB: UInt16, ulaOp: UlaOp) -> UInt16 {
         let f_old = regs.f
         
         let result_l = ulaCall(operandA.low, operandB.low, ulaOp: ulaOp, ignoreCarry: false)
@@ -22,13 +22,13 @@ extension Z80 {
         var ulaOp_high = ulaOp
         
         switch ulaOp {
-        case .Add: ulaOp_high = .Adc
-        case .Sub: ulaOp_high = .Sbc
+        case .add: ulaOp_high = .adc
+        case .sub: ulaOp_high = .sbc
         default: break
         }
         
         let result_h = ulaCall(operandA.high, operandB.high, ulaOp: ulaOp_high, ignoreCarry: false)
-        if ulaOp == .Add {
+        if ulaOp == .add {
             // bits S, Z and PV are not affected so restore from F backup
             self.regs.f.bit(S, newVal: f_old.bit(S))
             self.regs.f.bit(Z, newVal: f_old.bit(Z))
@@ -38,7 +38,7 @@ extension Z80 {
         return addressFromPair(result_h, result_l)
     }
     
-    func ulaCall(operandA: UInt8, _ operandB: UInt8, ulaOp: UlaOp, ignoreCarry: Bool) -> UInt8 {
+    func ulaCall(_ operandA: UInt8, _ operandB: UInt8, ulaOp: UlaOp, ignoreCarry: Bool) -> UInt8 {
         /*
         Bit      0 1 2 3 4  5  6 7
         ￼￼Position S Z X H X P/V N C
@@ -48,10 +48,10 @@ extension Z80 {
         var old_carry: UInt8 = 0
         
         switch ulaOp {
-        case .Adc:
+        case .adc:
             old_carry = UInt8(regs.f.bit(C))
             fallthrough
-        case .Add:
+        case .add:
             result = operandA &+ operandB &+ old_carry
 
             if (UInt8(operandA.low &+ operandB.low &+ old_carry) & 0xF0 > 0) {
@@ -71,10 +71,10 @@ extension Z80 {
                 } 
             }
             
-        case .Sbc:
+        case .sbc:
             old_carry = UInt8(regs.f.bit(C))
             fallthrough
-        case .Sub:
+        case .sub:
             result = UInt8(operandA &- operandB &- old_carry)
             
             // H (Half Carry)
@@ -95,13 +95,13 @@ extension Z80 {
                 }
             }
             
-        case .Rl:
+        case .rl:
             old_carry = UInt8(regs.f.bit(C))
             fallthrough
-        case .Rlc:
+        case .rlc:
             regs.f.bit(C, newVal: operandA.bit(7)) // sign bit is copied to the carry flag
             result = operandA << 1
-            if ulaOp == .Rl {
+            if ulaOp == .rl {
                 result.bit(0, newVal: Int(old_carry)) // old carry is copied to the bit 0
             } else {
                 result.bit(0, newVal: regs.f.bit(C)) // new carry is copied to the bit 0
@@ -111,13 +111,13 @@ extension Z80 {
             regs.f.resetBit(N)
             regs.f.bit(PV, newVal: checkParity(result))
             
-        case .Rr:
+        case .rr:
             old_carry = UInt8(regs.f.bit(C))
             fallthrough
-        case .Rrc:
+        case .rrc:
             regs.f.bit(C, newVal: operandA.bit(0)) // least significant bit is copied to the carry flag
             result = operandA >> 1
-            if ulaOp == .Rr {
+            if ulaOp == .rr {
                 result.bit(7, newVal: Int(old_carry)) // old carry is copied to the bit 7
             } else {
                 result.bit(7, newVal: regs.f.bit(C)) // new carry is copied to the bit 7
@@ -127,12 +127,12 @@ extension Z80 {
             regs.f.resetBit(N)
             regs.f.bit(PV, newVal: checkParity(result))
         
-        case .Sls:
+        case .sls:
             fallthrough
-        case .Sla:
+        case .sla:
             regs.f.bit(C, newVal: operandA.bit(7)) // sign bit is copied to the carry flag
             result = operandA << 1
-            if ulaOp == .Sls {
+            if ulaOp == .sls {
                 result.bit(0, newVal: 1)
             }
             
@@ -140,7 +140,7 @@ extension Z80 {
             regs.f.resetBit(N)
             regs.f.bit(PV, newVal: checkParity(result))
             
-        case .Sra:
+        case .sra:
             regs.f.bit(C, newVal: operandA.bit(0)) // bit 0 is copied to the carry flag
             let sign_bit = operandA.bit(7)
             result = operandA >> 1
@@ -150,7 +150,7 @@ extension Z80 {
             regs.f.resetBit(N)
             regs.f.bit(PV, newVal: checkParity(result))
         
-        case .Srl:
+        case .srl:
             regs.f.bit(C, newVal: operandA.bit(0)) // bit 0 is copied to the carry flag
             result = operandA >> 1
             
@@ -158,19 +158,19 @@ extension Z80 {
             regs.f.resetBit(N)
             regs.f.bit(PV, newVal: checkParity(result))
             
-        case .And:
+        case .and:
             fallthrough
-        case .Or:
+        case .or:
             fallthrough
-        case .Xor:
+        case .xor:
             switch ulaOp {
-            case .And:
+            case .and:
                 result = operandA & operandB
                 regs.f.setBit(H)
-            case .Or:
+            case .or:
                 result = operandA | operandB
                 regs.f.resetBit(H)
-            case .Xor:
+            case .xor:
                 result = operandA ^ operandB
                 regs.f.resetBit(H)
             default:
@@ -181,7 +181,7 @@ extension Z80 {
             regs.f.resetBit(N)
             regs.f.resetBit(C)
             
-        case .Bit:
+        case .bit:
             result = operandA
             if operandA.bit(Int(operandB)) == 0 {
                 regs.f.setBit(Z)
@@ -200,7 +200,7 @@ extension Z80 {
             break
         }
         
-        if ulaOp != .Bit {
+        if ulaOp != .bit {
             regs.f.bit(S, newVal: result.bit(7))
             if result == 0 {regs.f.setBit(Z)} else {regs.f.resetBit(Z)} // Z (Zero)
         }
@@ -208,19 +208,19 @@ extension Z80 {
         return result
     }
     
-    func checkOverflow(opA: UInt8, _ opB: UInt8, result: UInt8, ulaOp: UlaOp) -> Int {
+    func checkOverflow(_ opA: UInt8, _ opB: UInt8, result: UInt8, ulaOp: UlaOp) -> Int {
         // will return true if an overflow has occurred, false if no overflow
         switch ulaOp {
-        case .Add:
+        case .add:
             fallthrough
-        case .Adc:
+        case .adc:
             if (opA.bit(7) == opB.bit(7)) && (result.bit(7) != opA.bit(7)) {
                 // same sign in both operands and different sign in result
                 return 1
             }
-        case .Sub:
+        case .sub:
             fallthrough
-        case .Sbc:
+        case .sbc:
             if (opA.bit(7) != opB.bit(7)) && (result.bit(7) == opB.bit(7)) {
                 // different sign in both operands and same sign in result
                 return 1
@@ -233,11 +233,11 @@ extension Z80 {
         return 0
     }
     
-    func checkParity(data: UInt8) -> Int {
+    func checkParity(_ data: UInt8) -> Int {
         return (data.parity == 0) ? 1 : 0 // 1 -> Even parity, 0 -> Odd parity
     }
 
-    func rst(address: UInt16) {
+    func rst(_ address: UInt16) {
         t_cycle += 7
         dataBus.write(regs.sp - 1, value: regs.pc.high)
         dataBus.write(regs.sp - 2, value: regs.pc.low)

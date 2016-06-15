@@ -11,11 +11,11 @@ import Foundation
 class BusBase : BusComponent {
     var bus_components = [BusComponentBase]()
     
-    func addBusComponent(bus_component: BusComponentBase) {
+    func addBusComponent(_ bus_component: BusComponentBase) {
         bus_components.append(bus_component)
     }
     
-    func deleteBusComponent(bus_component: BusComponentBase) {
+    func deleteBusComponent(_ bus_component: BusComponentBase) {
 
     }
 }
@@ -25,12 +25,12 @@ final class IoBus: BusBase {
     
     init() {
         let dummy_component = BusComponent(base_address: 0x0000, block_size: 0x0000)
-        io_components = Array(count: 0x100, repeatedValue: dummy_component)
+        io_components = Array(repeating: dummy_component, count: 0x100)
         
         super.init(base_address: 0x0000, block_size: 0x100)
     }
     
-    override func addBusComponent(bus_component: BusComponentBase) {
+    override func addBusComponent(_ bus_component: BusComponentBase) {
         // only asign non ula bus components to odd ports
         if bus_component.getBaseAddress() & 0x01 == 1 {
             io_components[Int(bus_component.getBaseAddress())] = bus_component
@@ -47,12 +47,12 @@ final class IoBus: BusBase {
         super.addBusComponent(bus_component)
     }
     
-    override func write(address: UInt16, value: UInt8) {
+    override func write(_ address: UInt16, value: UInt8) {
         // port addressed by low byte of address
         io_components[Int(address & 0x00FF)].write(address, value: value)
     }
     
-    override func read(address: UInt16) -> UInt8 {
+    override func read(_ address: UInt16) -> UInt8 {
         // port addressed by low byte of address
         return io_components[Int(address & 0x00FF)].read(address)
     }
@@ -63,12 +63,12 @@ final class Bus16 : BusBase {
     
     init() {
         let dummy_component = BusComponent(base_address: 0x0000, block_size: 0x0000)
-        paged_components = Array(count: 64, repeatedValue: dummy_component)
+        paged_components = Array(repeating: dummy_component, count: 64)
         
         super.init(base_address: 0x0000, block_size: 0x10000)
     }
     
-    override func addBusComponent(bus_component: BusComponentBase) {
+    override func addBusComponent(_ bus_component: BusComponentBase) {
         super.addBusComponent(bus_component)
 
         for component in self.bus_components {
@@ -81,18 +81,18 @@ final class Bus16 : BusBase {
         }
     }
     
-    override func write(address: UInt16, value: UInt8) {
+    override func write(_ address: UInt16, value: UInt8) {
         let index_component = Int(address) / 1024
         paged_components[index_component].write(address, value: value)
     }
     
-    override func read(address: UInt16) -> UInt8 {
+    override func read(_ address: UInt16) -> UInt8 {
         let index_component = (Int(address) & 0xFFFF) / 1024
         
         return paged_components[index_component].read(address)
     }
     
-    override func dumpFromAddress(fromAddress: Int, count: Int) -> [UInt8] {
+    override func dumpFromAddress(_ fromAddress: Int, count: Int) -> [UInt8] {
         var index_component = (fromAddress & 0xFFFF) / 1024
         var address = fromAddress
         var result = [UInt8]()

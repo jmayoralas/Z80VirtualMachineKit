@@ -9,7 +9,7 @@
 import Foundation
 
 final class GenericIODevice: BusComponent {
-    override func read(address: UInt16) -> UInt8 {
+    override func read(_ address: UInt16) -> UInt8 {
         return 0x01
     }
 }

@@ -20,7 +20,7 @@ class ColorChangeTextField : NSTextField {
                 if originalTextColor == nil {
                     originalTextColor = super.textColor
                 }
-                super.textColor = NSColor.redColor()
+                super.textColor = NSColor.red()
             } else {
                 super.textColor = originalTextColor
             }

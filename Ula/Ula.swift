@@ -22,9 +22,9 @@ private struct Attribute {
 }
 
 protocol UlaDelegate {
-    func memoryWrite(address: UInt16, value: UInt8)
-    func ioWrite(address: UInt16, value: UInt8)
-    func ioRead(address: UInt16) -> UInt8
+    func memoryWrite(_ address: UInt16, value: UInt8)
+    func ioWrite(_ address: UInt16, value: UInt8)
+    func ioRead(_ address: UInt16) -> UInt8
 }
 
 final class Ula: UlaDelegate {
@@ -32,8 +32,8 @@ final class Ula: UlaDelegate {
     var io: ULAIo!
     
     private let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
-    private let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedFirst.rawValue)
-    private var screen = [PixelData](count: 320 * 240, repeatedValue: PixelData(a: 255, r: 0xCD, g: 0xCD, b: 0xCD))
+    private let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
+    private var screen = [PixelData](repeating: PixelData(a: 255, r: 0xCD, g: 0xCD, b: 0xCD), count: 320 * 240)
     private let colorTable = [
         PixelData(a: 255, r: 0, g: 0, b: 0),
         PixelData(a: 255, r: 0, g: 0, b: 0xCD),
@@ -59,7 +59,7 @@ final class Ula: UlaDelegate {
         io = ULAIo(delegate: self)
     }
     
-    func memoryWrite(address: UInt16, value: UInt8) {
+    func memoryWrite(_ address: UInt16, value: UInt8) {
         let local_address = address & 0x3FFF
         if local_address > 0x1AFF {
             return
@@ -81,12 +81,12 @@ final class Ula: UlaDelegate {
         }
     }
     
-    func ioRead(address: UInt16) -> UInt8 {
+    func ioRead(_ address: UInt16) -> UInt8 {
         NSLog("Reading from ULAIo address: %@", address.hexStr())
         return 0xFF
     }
     
-    func ioWrite(address: UInt16, value: UInt8)  {
+    func ioWrite(_ address: UInt16, value: UInt8)  {
         NSLog("Writing to ULAIo address: %@, value: %@", address.hexStr(), value.hexStr())
     }
     
@@ -94,7 +94,7 @@ final class Ula: UlaDelegate {
         return imageFromARGB32Bitmap(screen, width: 320, height: 240)
     }
     
-    private func updateCharAtOffset(offset: Int, attribute: Attribute) {
+    private func updateCharAtOffset(_ offset: Int, attribute: Attribute) {
         let y = (offset / 32) * 8
         let x = offset % 32
         
@@ -110,41 +110,40 @@ final class Ula: UlaDelegate {
         let index = (y + 24) * 320 + x * 8 + 32
         var j = 0
         
-        for i in (0...7).reverse() {
+        for i in (0...7).reversed() {
             screen[index + j] = ((Int(value) & 1 << i) > 0) ? attribute.inkColor : attribute.paperColor
             j += 1
         }
     }
     
-    private func imageFromARGB32Bitmap(pixels:[PixelData], width:Int, height:Int) -> NSImage {
+    private func imageFromARGB32Bitmap(_ pixels:[PixelData], width:Int, height:Int) -> NSImage {
         let bitsPerComponent = 8
         let bitsPerPixel = 32
         
         assert(pixels.count == width * height)
         
-        var data = pixels // Copy to mutable []
-        let providerRef = CGDataProviderCreateWithCFData(
-            NSData(bytes: &data, length: data.count * sizeof(PixelData))
+        let providerRef = CGDataProvider(
+            data: Data(bytes: UnsafePointer<UInt8>(pixels), count: pixels.count * sizeof(PixelData))
         )
         
-        let cgim = CGImageCreate(
-            width,
-            height,
-            bitsPerComponent,
-            bitsPerPixel,
-            width * sizeof(PixelData),
-            rgbColorSpace,
-            bitmapInfo,
-            providerRef,
-            nil,
-            true,
-            CGColorRenderingIntent.RenderingIntentDefault
+        let cgim = CGImage(
+            width: width,
+            height: height,
+            bitsPerComponent: bitsPerComponent,
+            bitsPerPixel: bitsPerPixel,
+            bytesPerRow: width * sizeof(PixelData),
+            space: rgbColorSpace,
+            bitmapInfo: bitmapInfo,
+            provider: providerRef!,
+            decode: nil,
+            shouldInterpolate: true,
+            intent: CGColorRenderingIntent.defaultIntent
         )
         
-        return NSImage(CGImage: cgim!, size: NSZeroSize)
+        return NSImage(cgImage: cgim!, size: NSZeroSize)
     }
     
-    private func getAttribute(value: Int) -> Attribute {
+    private func getAttribute(_ value: Int) -> Attribute {
         return Attribute(
             flashing: (value & 0b10000000) > 0 ? true : false,
             paperColor: colorTable[(value >> 3) & 0b00001111],

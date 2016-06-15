@@ -8,15 +8,15 @@
 
 import Foundation
 
-public enum RomErrors: ErrorType {
-    case BufferLimitReach
+public enum RomErrors: ErrorProtocol {
+    case bufferLimitReach
 }
 
 @objc public protocol Z80VirtualMachineStatus {
-    optional func Z80VMMemoryWriteAtAddress(address: Int, byte: UInt8)
-    optional func Z80VMMemoryReadAtAddress(address: Int, byte: UInt8)
-    optional func Z80VMScreenRefresh(image: NSImage)
-    optional func Z80VMEmulationHalted()
+    @objc optional func Z80VMMemoryWriteAtAddress(_ address: Int, byte: UInt8)
+    @objc optional func Z80VMMemoryReadAtAddress(_ address: Int, byte: UInt8)
+    @objc optional func Z80VMScreenRefresh(_ image: NSImage)
+    @objc optional func Z80VMEmulationHalted()
 }
 
 @objc final public class Z80VirtualMachineKit: NSObject, MemoryChange, Z80Delegate
@@ -58,9 +58,9 @@ public enum RomErrors: ErrorType {
     public func run() {
         cpu.halted = false
         
-        let queue = dispatch_get_global_queue(Int(QOS_CLASS_USER_INITIATED.rawValue), 0)
+        let queue = DispatchQueue.global(attributes: DispatchQueue.GlobalAttributes(rawValue: UInt64(Int(DispatchQueueAttributes.qosUserInitiated.rawValue))))
         
-        dispatch_async(queue) {
+        queue.async {
             repeat {
                 self.step()
             } while !self.cpu.halted
@@ -89,17 +89,17 @@ public enum RomErrors: ErrorType {
         return instructions < 0 ? 0 : instructions
     }
     
-    public func addIoDevice(port: UInt8) {
+    public func addIoDevice(_ port: UInt8) {
         cpu.ioBus.addBusComponent(GenericIODevice(base_address: UInt16(port), block_size: 1))
     }
     
-    public func loadRamAtAddress(address: Int, data: [UInt8]) {
+    public func loadRamAtAddress(_ address: Int, data: [UInt8]) {
         for i in 0..<data.count {
             cpu.dataBus.write(UInt16(address + i), value: data[i])
         }
     }
     
-    public func loadRomAtAddress(address: Int, data: [UInt8]) throws {
+    public func loadRomAtAddress(_ address: Int, data: [UInt8]) throws {
         try rom.loadData(data, atAddress: address)
     }
     
@@ -111,7 +111,7 @@ public enum RomErrors: ErrorType {
         return cpu.getTCycle()
     }
     
-    public func setPc(pc: UInt16) {
+    public func setPc(_ pc: UInt16) {
         cpu.org(pc)
     }
     
@@ -128,15 +128,15 @@ public enum RomErrors: ErrorType {
         delegate?.Z80VMScreenRefresh?(ula.getScreen())
     }
     
-    public func dumpMemoryFromAddress(fromAddress: Int, toAddress: Int) -> [UInt8] {
+    public func dumpMemoryFromAddress(_ fromAddress: Int, toAddress: Int) -> [UInt8] {
         return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
     }
     
-    func MemoryWriteAtAddress(address: Int, byte: UInt8) {
+    func MemoryWriteAtAddress(_ address: Int, byte: UInt8) {
         delegate?.Z80VMMemoryWriteAtAddress?(address, byte: byte)
     }
     
-    func MemoryReadAtAddress(address: Int, byte: UInt8) {
+    func MemoryReadAtAddress(_ address: Int, byte: UInt8) {
         delegate?.Z80VMMemoryReadAtAddress?(address, byte: byte)
     }
     

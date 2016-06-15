@@ -42,7 +42,7 @@ class Z80 {
         
         id_opcode_table = table_NONE
         
-        opcode_tables = [OpcodeTable](count: 5, repeatedValue: OpcodeTable(count: 0x100, repeatedValue: {}))
+        opcode_tables = [OpcodeTable](repeating: OpcodeTable(repeating: {}, count: 0x100), count: 5)
         
         initOpcodeTableNONE(&opcode_tables[table_NONE])
         initOpcodeTableXX(&opcode_tables[table_XX])
@@ -81,7 +81,7 @@ class Z80 {
         t_cycle = 0
     }
     
-    func org(pc: UInt16) {
+    func org(_ pc: UInt16) {
         regs.pc = pc
     }
     
@@ -93,7 +93,7 @@ class Z80 {
         return t_cycle
     }
     
-    func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
+    func addressFromPair(_ val_h: UInt8, _ val_l: UInt8) -> UInt16 {
         return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
     }
     
