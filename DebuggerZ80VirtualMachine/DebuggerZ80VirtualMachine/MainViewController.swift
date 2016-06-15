@@ -18,15 +18,12 @@ import Z80VirtualMachineKit
     @IBOutlet weak var ITextField: ColorChangeTextField!
     @IBOutlet weak var RTextField: ColorChangeTextField!
     
-    @IBOutlet weak var MTextField: ColorChangeTextField!
     @IBOutlet weak var TTextField: ColorChangeTextField!
     
     @IBOutlet weak var instructionCounter: NSTextField!
     
     @IBOutlet weak var AddressBusTextField: ColorChangeTextField!
     
-    @IBOutlet weak var CiclosTextField: ColorChangeTextField!
-        
     @IBOutlet weak var ATextField: ColorChangeTextField!
     @IBOutlet weak var BTextField: ColorChangeTextField!
     @IBOutlet weak var IRTextField: ColorChangeTextField!
