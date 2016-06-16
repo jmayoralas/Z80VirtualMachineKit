@@ -8,13 +8,7 @@
 
 import Foundation
 
-protocol Z80Delegate {
-    func frameCompleted()
-}
-
 class Z80 {
-    private let TICS_PER_FRAME = 69888
-    
     typealias OpcodeTable = [() -> Void]
     
     var regs : Registers
@@ -32,8 +26,6 @@ class Z80 {
     
     let dataBus : Bus16
     let ioBus : IoBus
-    
-    var delegate: Z80Delegate?
     
     init(dataBus: Bus16, ioBus: IoBus) {
         self.regs = Registers()
@@ -89,27 +81,15 @@ class Z80 {
         return regs
     }
     
-    func getTCycle() -> Int {
-        return t_cycle
-    }
-    
     func addressFromPair(_ val_h: UInt8, _ val_l: UInt8) -> UInt16 {
         return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
     }
     
     // gets next opcode from PC and executes it
     func step() {
-        let old_t_cycle = t_cycle
-        
         repeat {
             processInstruction()
         } while id_opcode_table != table_NONE
-        
-        frameTics += t_cycle - old_t_cycle
-        if frameTics >= TICS_PER_FRAME {
-            delegate?.frameCompleted()
-            frameTics -= TICS_PER_FRAME
-        }
     }
     
     func processInstruction() {
@@ -134,5 +114,10 @@ class Z80 {
             // restore bit 7
             regs.r.bit(7, newVal: bit7)
         }
+    }
+    
+    func int() {
+        // Acknowledge an interrupt
+        NSLog("Screen Interrupt %d", t_cycle)
     }
 }

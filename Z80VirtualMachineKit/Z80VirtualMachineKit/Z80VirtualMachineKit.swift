@@ -19,7 +19,7 @@ public enum RomErrors: ErrorProtocol {
     @objc optional func Z80VMEmulationHalted()
 }
 
-@objc final public class Z80VirtualMachineKit: NSObject, MemoryChange, Z80Delegate
+@objc final public class Z80VirtualMachineKit: NSObject, MemoryChange, UlaDelegate
 {
     // MARK: Properties
     public var delegate: Z80VirtualMachineStatus?
@@ -39,7 +39,7 @@ public enum RomErrors: ErrorProtocol {
         
         // connect the ULA and his 16k of memory (this is a Spectrum 16k)
         ula.memory.delegate = self
-        cpu.delegate = self
+        ula.delegate = self
         
         cpu.dataBus.addBusComponent(ula.memory)
         cpu.ioBus.addBusComponent(ula.io)
@@ -80,7 +80,10 @@ public enum RomErrors: ErrorProtocol {
     public func step() {
         instructions += 1
         
+        cpu.t_cycle = 0
+        
         cpu.step()
+        ula.step(t_cycle: cpu.t_cycle)
 /*
         if instructions == 877130 {
             cpu.halted = true
@@ -111,7 +114,7 @@ public enum RomErrors: ErrorProtocol {
     }
     
     public func getTCycle() -> Int {
-        return cpu.getTCycle()
+        return cpu.t_cycle
     }
     
     public func setPc(_ pc: UInt16) {
@@ -149,7 +152,8 @@ public enum RomErrors: ErrorProtocol {
     }
     
     // MARK: protocol Z80Delegate
-    func frameCompleted() {
+    func onFrameCompleted() {
+        cpu.int()
         delegate?.Z80VMScreenRefresh?(ula.getScreen())
     }
 }

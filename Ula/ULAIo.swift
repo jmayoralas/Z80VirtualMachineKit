@@ -9,9 +9,9 @@
 import Foundation
 
 final class ULAIo : BusComponent {
-    let ulaDelegate: UlaDelegate
+    let ulaDelegate: InternalUlaOperationDelegate
     
-    init(delegate: UlaDelegate) {
+    init(delegate: InternalUlaOperationDelegate) {
         self.ulaDelegate = delegate
         super.init(base_address: 0xFE, block_size: 1)
     }

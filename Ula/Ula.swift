@@ -8,6 +8,10 @@
 
 import Foundation
 
+protocol UlaDelegate {
+    func onFrameCompleted()
+}
+
 private struct PixelData {
     var a:UInt8 = 255
     var r:UInt8
@@ -21,13 +25,17 @@ private struct Attribute {
     var inkColor: PixelData
 }
 
-protocol UlaDelegate {
+protocol InternalUlaOperationDelegate {
     func memoryWrite(_ address: UInt16, value: UInt8)
     func ioWrite(_ address: UInt16, value: UInt8)
     func ioRead(_ address: UInt16) -> UInt8
 }
 
-final class Ula: UlaDelegate {
+final class Ula: InternalUlaOperationDelegate {
+    var delegate: UlaDelegate?
+    
+    private let TICS_PER_FRAME = 69888
+    
     var memory: ULAMemory!
     var io: ULAIo!
     
@@ -54,9 +62,19 @@ final class Ula: UlaDelegate {
         PixelData(a: 255, r: 0xFF, g: 0xFF, b: 0xFF),
     ]
     
+    private var frameTics: Int = 0
+    
     init() {
         memory = ULAMemory(delegate: self)
         io = ULAIo(delegate: self)
+    }
+    
+    func step(t_cycle: Int) {
+        frameTics += t_cycle
+        if frameTics >= TICS_PER_FRAME {
+            delegate?.onFrameCompleted()
+            frameTics -= TICS_PER_FRAME
+        }
     }
     
     func memoryWrite(_ address: UInt16, value: UInt8) {
