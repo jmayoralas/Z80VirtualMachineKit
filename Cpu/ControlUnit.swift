@@ -250,6 +250,33 @@ extension Z80 {
         regs.pc = addressFromPair(dataBus.read(regs.sp &+ 1), dataBus.read(regs.sp))
         regs.sp = regs.sp &+ 2
     }
+    
+    func irq(kind: IrqKind) {
+        // Acknowledge an interrupt
+        // NSLog("Screen Interrupt %d", t_cycle)
+        switch kind {
+        case .nmi:
+            call(0x0066)
+            regs.IFF2 = regs.IFF1
+            regs.IFF1 = false
+            
+        case .soft:
+            if regs.IFF1 {
+                switch regs.int_mode {
+                case 1:
+                    call(0x0038)
+                case 2:
+                    mode2SoftIrq()
+                default:
+                    break
+                }
+                
+                regs.IFF1 = false
+                regs.IFF2 = false
+            }
+        }
+    }
+    
     func mode2SoftIrq() {
         // FIX-ME: must implement mode2 irq
     }
