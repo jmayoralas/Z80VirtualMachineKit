@@ -149,6 +149,24 @@ extension Z80 {
         opcodes[0x57] = { // LD A,I
             self.t_cycle += 1
             self.regs.a = self.regs.i
+            if self.regs.i.bit(7) > 0 {
+                self.regs.f.setBit(S)
+            } else {
+                self.regs.f.resetBit(S)
+            }
+            if self.regs.i == 0 {
+                self.regs.f.setBit(Z)
+            } else {
+                self.regs.f.resetBit(Z)
+            }
+            self.regs.f.resetBit(H)
+            if self.regs.IFF2 {
+                self.regs.f.setBit(PV)
+            } else {
+                self.regs.f.resetBit(PV)
+            }
+            self.regs.f.resetBit(N)
+            
         }
         opcodes[0x58] = { // IN E,(C)
             self.t_cycle += 4
@@ -195,6 +213,23 @@ extension Z80 {
         opcodes[0x5F] = { // LD A,R
             self.t_cycle += 1
             self.regs.a = self.regs.r
+            if self.regs.r.bit(7) > 0 {
+                self.regs.f.setBit(S)
+            } else {
+                self.regs.f.resetBit(S)
+            }
+            if self.regs.r == 0 {
+                self.regs.f.setBit(Z)
+            } else {
+                self.regs.f.resetBit(Z)
+            }
+            self.regs.f.resetBit(H)
+            if self.regs.IFF2 {
+                self.regs.f.setBit(PV)
+            } else {
+                self.regs.f.resetBit(PV)
+            }
+            self.regs.f.resetBit(N)
         }
         opcodes[0x60] = { // IN H,(C)
             self.t_cycle += 4
