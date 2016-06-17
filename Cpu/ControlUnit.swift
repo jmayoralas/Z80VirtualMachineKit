@@ -237,15 +237,19 @@ extension Z80 {
         return (data.parity == 0) ? 1 : 0 // 1 -> Even parity, 0 -> Odd parity
     }
 
-    func rst(_ address: UInt16) {
+    func call(_ address: UInt16) {
         t_cycle += 7
         dataBus.write(regs.sp - 1, value: regs.pc.high)
         dataBus.write(regs.sp - 2, value: regs.pc.low)
         regs.sp = regs.sp &- 2
         regs.pc = address
-        irq_kind = nil
     }
-    
+
+    func ret() {
+        t_cycle += 6
+        regs.pc = addressFromPair(dataBus.read(regs.sp &+ 1), dataBus.read(regs.sp))
+        regs.sp = regs.sp &+ 2
+    }
     func mode2SoftIrq() {
         // FIX-ME: must implement mode2 irq
     }

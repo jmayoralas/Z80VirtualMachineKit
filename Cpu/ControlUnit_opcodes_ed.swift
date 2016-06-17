@@ -48,9 +48,7 @@ extension Z80 {
             self.regs.a = self.ulaCall(0, self.regs.a, ulaOp: .sub, ignoreCarry: false)
         }
         opcodes[0x45] = { // RETN
-            self.t_cycle += 6
-            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
-            self.regs.sp = self.regs.sp &+ 2
+            self.ret()
             self.regs.IFF1 = self.regs.IFF2
         }
         opcodes[0x46] = { // IM 0
@@ -97,9 +95,7 @@ extension Z80 {
             self.opcode_tables[self.id_opcode_table][0x44]()
         }
         opcodes[0x4D] = { // RETI #TO-DO: signal an I/O device that the interrupt routine is completed
-            self.t_cycle += 6
-            self.regs.pc = self.addressFromPair(self.dataBus.read(self.regs.sp &+ 1), self.dataBus.read(self.regs.sp))
-            self.regs.sp = self.regs.sp &+ 2
+            self.ret()
         }
         opcodes[0x4E] = { // IM 0
             self.opcode_tables[self.id_opcode_table][0x46]()
