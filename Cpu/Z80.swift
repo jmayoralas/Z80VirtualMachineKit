@@ -115,9 +115,4 @@ class Z80 {
             regs.r.bit(7, newVal: bit7)
         }
     }
-    
-    func int() {
-        // Acknowledge an interrupt
-        NSLog("Screen Interrupt %d", t_cycle)
-    }
 }
