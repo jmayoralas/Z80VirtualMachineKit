@@ -13,10 +13,6 @@ private let SCREEN_LINES = 312 // 64 + 192 + 56
 private let TICS_PER_FRAME = TICS_PER_LINE * SCREEN_LINES
 private let WHITE_COLOR = PixelData(a: 255, r: 0xCD, g: 0xCD, b: 0xCD)
 
-protocol UlaDelegate {
-    func onFrameCompleted()
-}
-
 private struct PixelData {
     var a:UInt8 = 255
     var r:UInt8
@@ -42,8 +38,6 @@ protocol InternalUlaOperationDelegate {
 }
 
 final class Ula: InternalUlaOperationDelegate {
-    var delegate: UlaDelegate?
-    
     var memory: ULAMemory!
     var io: ULAIo!
     
@@ -77,19 +71,18 @@ final class Ula: InternalUlaOperationDelegate {
     private var screenLine: Int = 0
     private var flashState: Bool = false
     private var frames: Int = 0
-    private var screenDirty: Bool = false
     
     init() {
         memory = ULAMemory(delegate: self)
         io = ULAIo(delegate: self)
     }
     
-    func step(t_cycle: Int) {
+    func step(t_cycle: Int, _ IRQ: inout Bool) {
         lineTics += t_cycle
         frameTics += t_cycle
         
         if lineTics > TICS_PER_LINE {
-            screenLineCompleted()
+            screenLineCompleted(&IRQ)
         }
     }
     
@@ -160,8 +153,6 @@ final class Ula: InternalUlaOperationDelegate {
             screen[index + j] = ((Int(value) & 1 << i) > 0) ? inkColor : paperColor
             j += 1
         }
-        
-        screenDirty = true
     }
     
     private func imageFromARGB32Bitmap(_ pixels:[PixelData], width:Int, height:Int) -> NSImage {
@@ -199,7 +190,7 @@ final class Ula: InternalUlaOperationDelegate {
         )
     }
     
-    private func screenLineCompleted() {
+    private func screenLineCompleted(_ IRQ: inout Bool) {
         screenLine += 1
         lineTics -= TICS_PER_LINE
         
@@ -236,10 +227,10 @@ final class Ula: InternalUlaOperationDelegate {
                 frames = 0
             }
             
-            delegate?.onFrameCompleted()
-            
             frameTics -= TICS_PER_FRAME
             screenLine = 0
+            
+            IRQ = true
         }
     }
     
