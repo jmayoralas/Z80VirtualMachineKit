@@ -72,6 +72,8 @@ final class Ula: InternalUlaOperationDelegate {
     private var flashState: Bool = false
     private var frames: Int = 0
     
+    private var key_buffer = [UInt8](repeatElement(0xFF, count: 0xFF))
+    
     init() {
         memory = ULAMemory(delegate: self)
         io = ULAIo(delegate: self)
@@ -109,8 +111,10 @@ final class Ula: InternalUlaOperationDelegate {
     }
     
     func ioRead(_ address: UInt16) -> UInt8 {
-        NSLog("Reading from ULAIo address: %@", address.hexStr())
-        return 0xFF
+        let value = key_buffer[Int(address.high)]
+        key_buffer[Int(address.high)] = 0xFF
+        
+        return value
     }
     
     func ioWrite(_ address: UInt16, value: UInt8)  {
@@ -120,6 +124,10 @@ final class Ula: InternalUlaOperationDelegate {
     
     func getScreen() -> NSImage {
         return imageFromARGB32Bitmap(screen, width: 320, height: 240)
+    }
+    
+    func updateKeyboardBuffer(address: UInt8, value: UInt8) {
+        key_buffer[Int(address)] = value
     }
     
     private func updateCharAtOffset(_ offset: Int, attribute: Attribute) {
