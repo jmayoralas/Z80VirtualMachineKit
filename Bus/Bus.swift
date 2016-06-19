@@ -10,6 +10,7 @@ import Foundation
 
 class BusBase : BusComponent {
     var bus_components = [BusComponentBase]()
+    var last_data: UInt8 = 0xFF
     
     func addBusComponent(_ bus_component: BusComponentBase) {
         bus_components.append(bus_component)
@@ -54,7 +55,9 @@ final class IoBus: BusBase {
     
     override func read(_ address: UInt16) -> UInt8 {
         // port addressed by low byte of address
-        return io_components[Int(address & 0x00FF)].read(address)
+        last_data = io_components[Int(address & 0x00FF)].read(address)
+        
+        return last_data
     }
 }
 
