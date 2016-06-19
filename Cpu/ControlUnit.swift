@@ -266,7 +266,10 @@ extension Z80 {
                 case 1:
                     call(0x0038)
                 case 2:
-                    mode2SoftIrq()
+                    let vector_address = addressFromPair(regs.i, dataBus.last_data & 0xFE) // reset bit 0 of the byte in dataBus to make sure we get an even address
+                    let routine_address = addressFromPair(dataBus.read(vector_address + 1), dataBus.read(vector_address))
+                    
+                    call(routine_address)
                 default:
                     break
                 }
@@ -275,9 +278,5 @@ extension Z80 {
                 regs.IFF2 = false
             }
         }
-    }
-    
-    func mode2SoftIrq() {
-        // FIX-ME: must implement mode2 irq
     }
 }
