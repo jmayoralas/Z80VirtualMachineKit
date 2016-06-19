@@ -76,8 +76,10 @@ import Z80VirtualMachineKit
                 return nil
             default:
                 if !theEvent.modifierFlags.contains(.command) {
-                    self.vm.keyPressed(theEvent: theEvent)
-                    return nil
+                    if self.vm.isRunning() {
+                        self.vm.keyPressed(theEvent: theEvent)
+                        return nil
+                    }
                 }
             }
             
