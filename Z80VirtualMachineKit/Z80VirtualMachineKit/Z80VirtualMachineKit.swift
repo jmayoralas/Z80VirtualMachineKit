@@ -28,6 +28,9 @@ public enum RomErrors: ErrorProtocol {
     private var instructions = 0
     private var ula = Ula()
     private let rom = Rom(base_address: 0x0000, block_size: 0x4000)
+    private var t_cycles: Int = 0
+    
+    private var irq_enabled = true
     
     // MARK: Constructor
     override public init() {
@@ -55,6 +58,7 @@ public enum RomErrors: ErrorProtocol {
     public func reset() {
         cpu.reset()
         instructions = 0
+        t_cycles = 0
     }
     
     public func run() {
@@ -86,16 +90,28 @@ public enum RomErrors: ErrorProtocol {
         cpu.step()
         ula.step(t_cycle: cpu.t_cycle, &IRQ)
         
+        t_cycles += cpu.t_cycle
+/*
+        if instructions > 824000 && cpu.regs.pc == 0x0298 && cpu.regs.bc == 0xBFFE  && cpu.regs.sp == 0xFF3A {
+            cpu.regs.a = 0xFB
+            cpu.regs.f = 0b10010101
+            t_cycles = 7618271
+            instructions = 824514
+            irq_enabled = false
+        }
+*/        
+        if instructions == 824514 {
+            cpu.halted = true
+        }
+
         if IRQ {
-            cpu.irq(kind: .soft)
+            if irq_enabled {
+                cpu.irq(kind: .soft)
+            }
+            
             IRQ = false
             delegate?.Z80VMScreenRefresh?(ula.getScreen())
         }
-/*
-        if instructions == 877130 {
-            cpu.halted = true
-        }
-*/
     }
     
     public func getInstructionsCount() -> Int {
@@ -121,7 +137,7 @@ public enum RomErrors: ErrorProtocol {
     }
     
     public func getTCycle() -> Int {
-        return cpu.t_cycle
+        return t_cycles
     }
     
     public func setPc(_ pc: UInt16) {
@@ -146,9 +162,24 @@ public enum RomErrors: ErrorProtocol {
     }
     
     public func keyPressed(theEvent: NSEvent) {
-        NSLog("Key %d pressed", theEvent.keyCode)
+        let address: UInt8
+        let value: UInt8
+        
+        switch theEvent.keyCode {
+        case 36:
+            address = 0xBF
+            value = 0b11111110
+        default:
+            address = 0xBF
+            value = 0b11110111
+        }
+        
+        ula.updateKeyboardBuffer(address: address, value: value)
     }
     
+    public func isRunning() -> Bool {
+        return !cpu.halted
+    }
     // MARK: protocol MemoryChange
     func MemoryWriteAtAddress(_ address: Int, byte: UInt8) {
         delegate?.Z80VMMemoryWriteAtAddress?(address, byte: byte)
