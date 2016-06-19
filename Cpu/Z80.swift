@@ -14,7 +14,7 @@ class Z80 {
     var regs : Registers
     
     var t_cycle = 0
-    var halted: Bool = false;
+    var halted: Bool = true
     
     var irq_kind : IrqKind?
     
