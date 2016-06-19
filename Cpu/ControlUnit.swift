@@ -28,6 +28,13 @@ extension Z80 {
         }
         
         let result_h = ulaCall(operandA.high, operandB.high, ulaOp: ulaOp_high, ignoreCarry: false)
+        
+        if result_h == 0 && result_l == 0 {
+            self.regs.f.setBit(Z)
+        } else {
+            self.regs.f.resetBit(Z)
+        }
+        
         if ulaOp == .add {
             // bits S, Z and PV are not affected so restore from F backup
             self.regs.f.bit(S, newVal: f_old.bit(S))
