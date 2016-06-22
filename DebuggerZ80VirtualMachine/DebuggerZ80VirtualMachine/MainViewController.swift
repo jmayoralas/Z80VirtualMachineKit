@@ -66,25 +66,9 @@ import Z80VirtualMachineKit
         vm.delegate = self
         vm.addIoDevice(0x01)
         
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { (theEvent) -> NSEvent? in
-            switch theEvent.keyCode {
-            case 96:
-                self.f5Pressed()
-                return nil
-            case 97:
-                self.f6Pressed()
-                return nil
-            default:
-                if !theEvent.modifierFlags.contains(.command) {
-                    if self.vm.isRunning() {
-                        self.vm.keyPressed(theEvent: theEvent)
-                        return nil
-                    }
-                }
-            }
-            
-            return theEvent
-        }
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) {(theEvent: NSEvent) -> NSEvent? in return self.onKeyDown(theEvent: theEvent)}
+        NSEvent.addLocalMonitorForEvents(matching: .keyUp) {(theEvent: NSEvent) -> NSEvent? in return self.onKeyUp(theEvent: theEvent)}
+        NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) {(theEvent: NSEvent) -> NSEvent? in return self.onFlagsChanged(theEvent: theEvent)}
         
         for (index, column) in memoryPeeker.tableColumns.enumerated() {
             switch index {
@@ -233,6 +217,43 @@ import Z80VirtualMachineKit
     private func _refreshMemoryDump() {
         memoryDump = vm.dumpMemoryFromAddress(dumpAddress, toAddress: dumpAddress + 0xFF)
         memoryPeeker.reloadData()
+    }
+    
+    
+    private func onKeyDown(theEvent: NSEvent) -> NSEvent? {
+        switch theEvent.keyCode {
+        case 96:
+            self.f5Pressed()
+            return nil
+        case 97:
+            self.f6Pressed()
+            return nil
+        default:
+            if !theEvent.modifierFlags.contains(.command) {
+                if self.vm.isRunning() {
+                    self.vm.keyDown(char: KeyEventHandler.getChar(event: theEvent))
+                    return nil
+                }
+            }
+        }
+        
+        return theEvent
+    }
+    
+    private func onKeyUp(theEvent: NSEvent) -> NSEvent? {
+        if self.vm.isRunning() {
+            self.vm.keyUp(char: KeyEventHandler.getChar(event: theEvent))
+            return nil
+        }
+        return theEvent
+    }
+    
+    private func onFlagsChanged(theEvent: NSEvent) -> NSEvent? {
+        if self.vm.isRunning() {
+            self.vm.specialKeyUpdate(special_keys: KeyEventHandler.getSpecialKeys(event: theEvent))
+            return nil
+        }
+        return theEvent
     }
     
     // MARK: Z80VirtualMachineStatus delegate

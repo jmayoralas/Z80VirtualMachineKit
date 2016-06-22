@@ -12,6 +12,25 @@ public enum RomErrors: ErrorProtocol {
     case bufferLimitReach
 }
 
+public struct SpecialKeys: OptionSet {
+    public let rawValue: Int
+    
+    public init(rawValue: Int) { self.rawValue = rawValue }
+    
+    public static let capsShift = SpecialKeys(rawValue: 1)
+    public static let symbolShift = SpecialKeys(rawValue: 1 << 1)
+}
+
+private enum UlaKeyOperation {
+    case down
+    case up
+}
+
+private struct UlaUpdateData {
+    var address: UInt8?
+    var value: UInt8
+}
+
 @objc public protocol Z80VirtualMachineStatus {
     @objc optional func Z80VMMemoryWriteAtAddress(_ address: Int, byte: UInt8)
     @objc optional func Z80VMMemoryReadAtAddress(_ address: Int, byte: UInt8)
@@ -31,6 +50,22 @@ public enum RomErrors: ErrorProtocol {
     private var t_cycles: Int = 0
     
     private var irq_enabled = true
+    
+    private struct KeyboardRow {
+        let address: UInt8
+        let keys: [Character]
+    }
+    
+    private var keyboard = [
+        KeyboardRow(address: 0xFE, keys: ["-","z","x","c","v"]),
+        KeyboardRow(address: 0xFD, keys: ["a","s","d","f","g"]),
+        KeyboardRow(address: 0xFB, keys: ["q","w","e","r","t"]),
+        KeyboardRow(address: 0xF7, keys: ["1","2","3","4","5"]),
+        KeyboardRow(address: 0xEF, keys: ["0","9","8","7","6"]),
+        KeyboardRow(address: 0xDF, keys: ["p","o","i","u","y"]),
+        KeyboardRow(address: 0xBF, keys: ["*","l","k","j","h"]),
+        KeyboardRow(address: 0x7F, keys: [" ","-","m","n","b"]),
+    ]
     
     // MARK: Constructor
     override public init() {
@@ -99,11 +134,11 @@ public enum RomErrors: ErrorProtocol {
             instructions = 824514
             irq_enabled = false
         }
-*/        
+ 
         if instructions == 824514 {
             cpu.halted = true
         }
-
+*/
         if IRQ {
             if irq_enabled {
                 cpu.irq(kind: .soft)
@@ -157,29 +192,81 @@ public enum RomErrors: ErrorProtocol {
         delegate?.Z80VMScreenRefresh?(ula.getScreen())
     }
     
-    public func dumpMemoryFromAddress(_ fromAddress: Int, toAddress: Int) -> [UInt8] {
-        return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
-    }
-    
-    public func keyPressed(theEvent: NSEvent) {
-        let address: UInt8
-        let value: UInt8
-        
-        switch theEvent.keyCode {
-        case 36:
-            address = 0xBF
-            value = 0b11111110
-        default:
-            address = 0xBF
-            value = 0b11110111
-        }
-        
-        ula.updateKeyboardBuffer(address: address, value: value)
-    }
     
     public func isRunning() -> Bool {
         return !cpu.halted
     }
+    
+    public func dumpMemoryFromAddress(_ fromAddress: Int, toAddress: Int) -> [UInt8] {
+        return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
+    }
+    
+    // MARK: Keyboard management
+    public func keyDown(char: Character) {
+        updateUla(operation: .down, data: getKeyboardUlaUpdateData(char: char))
+    }
+    
+    public func keyUp(char: Character) {
+        updateUla(operation: .up, data: getKeyboardUlaUpdateData(char: char))
+    }
+    
+    public func specialKeyUpdate(special_keys: SpecialKeys) {
+        var op: UlaKeyOperation
+                
+        if special_keys.contains(SpecialKeys.capsShift) {
+            op = .down
+        } else {
+            op = .up
+        }
+        updateUla(operation: op, data: UlaUpdateData(address: 0xFE, value: 0b11111110))
+        
+        if special_keys.contains(SpecialKeys.symbolShift) {
+            op = .down
+        } else {
+            op = .up
+        }
+        updateUla(operation: op, data: UlaUpdateData(address: 0x7F, value: 0b11111101))
+    }
+    
+    
+    
+    private func updateUla(operation: UlaKeyOperation, data: UlaUpdateData) {
+        if let address = data.address {
+            switch operation {
+            case .down:
+                ula.keyDown(address: address, value: data.value)
+            case .up:
+                ula.keyUp(address: address, value: data.value)
+            }
+        }
+    }
+    
+    private func getKeyboardUlaUpdateData(char: Character) -> UlaUpdateData  {
+        var result = UlaUpdateData(address: nil, value: 0xFF)
+        
+        for row in keyboard {
+            if row.keys.contains(char) {
+                result.address = row.address
+                result.value = getValue(char: char, keys: row.keys)
+                break
+            }
+        }
+        
+        return result
+    }
+    
+    private func getValue(char: Character, keys: [Character]) -> UInt8 {
+        var value: UInt8 = 0xFF
+        
+        for (index,lchar) in keys.enumerated() {
+            if lchar == char {
+                value.resetBit(index)
+            }
+        }
+        
+        return value
+    }
+    
     // MARK: protocol MemoryChange
     func MemoryWriteAtAddress(_ address: Int, byte: UInt8) {
         delegate?.Z80VMMemoryWriteAtAddress?(address, byte: byte)

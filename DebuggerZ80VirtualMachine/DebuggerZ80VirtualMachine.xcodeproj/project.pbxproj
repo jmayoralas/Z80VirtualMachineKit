@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1D6C90C51C3705D1008ADF3A /* ColorChangeTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C90C41C3705D1008ADF3A /* ColorChangeTextField.swift */; };
+		1DD22E901D18436500010F20 /* KeyEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD22E8F1D18436500010F20 /* KeyEventHandler.swift */; };
 		1DD723301C3589BB00178421 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7232F1C3589BB00178421 /* AppDelegate.swift */; };
 		1DD723321C3589BB00178421 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DD723311C3589BB00178421 /* Assets.xcassets */; };
 		1DD723351C3589BB00178421 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DD723331C3589BB00178421 /* MainMenu.xib */; };
@@ -50,6 +51,7 @@
 
 /* Begin PBXFileReference section */
 		1D6C90C41C3705D1008ADF3A /* ColorChangeTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorChangeTextField.swift; sourceTree = "<group>"; };
+		1DD22E8F1D18436500010F20 /* KeyEventHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyEventHandler.swift; sourceTree = "<group>"; };
 		1DD7232C1C3589BB00178421 /* DebuggerZ80VirtualMachine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DebuggerZ80VirtualMachine.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD7232F1C3589BB00178421 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1DD723311C3589BB00178421 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 				1DD723441C35902900178421 /* MainViewController.swift */,
 				1DD723451C35902900178421 /* MainViewController.xib */,
 				1D6C90C41C3705D1008ADF3A /* ColorChangeTextField.swift */,
+				1DD22E8F1D18436500010F20 /* KeyEventHandler.swift */,
 			);
 			path = DebuggerZ80VirtualMachine;
 			sourceTree = "<group>";
@@ -202,6 +205,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D6C90C51C3705D1008ADF3A /* ColorChangeTextField.swift in Sources */,
+				1DD22E901D18436500010F20 /* KeyEventHandler.swift in Sources */,
 				1DD723301C3589BB00178421 /* AppDelegate.swift in Sources */,
 				1DD723461C35902900178421 /* MainViewController.swift in Sources */,
 			);
