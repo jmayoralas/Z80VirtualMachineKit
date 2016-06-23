@@ -566,10 +566,12 @@ extension Z80 {
             self.regs.bc = self.ulaCall16(self.regs.bc, 1, ulaOp: .sub)
             self.regs.f = f_backup
             self.regs.f.resetBit(PV)
-            if self.regs.bc != 0 && self.regs.f.bit(Z) == 0 {
-                self.t_cycle += 5
-                self.regs.pc = self.regs.pc &- 2
+            if self.regs.bc != 0 {
                 self.regs.f.setBit(PV)
+                if self.regs.f.bit(Z) == 0 {
+                    self.t_cycle += 5
+                    self.regs.pc = self.regs.pc &- 2
+                }
             }
         }
         opcodes[0xB2] = { // INIR
@@ -623,10 +625,12 @@ extension Z80 {
             self.regs.bc = self.ulaCall16(self.regs.bc, 1, ulaOp: .sub)
             self.regs.f = f_backup
             self.regs.f.resetBit(PV)
-            if self.regs.bc != 0 && self.regs.f.bit(Z) == 0 {
-                self.t_cycle += 5
-                self.regs.pc = self.regs.pc &- 2
+            if self.regs.bc != 0 {
                 self.regs.f.setBit(PV)
+                if self.regs.f.bit(Z) == 0 {
+                    self.t_cycle += 5
+                    self.regs.pc = self.regs.pc &- 2
+                }
             }
         }
         opcodes[0xBA] = { // INDR
