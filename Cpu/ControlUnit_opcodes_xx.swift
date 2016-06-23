@@ -399,5 +399,10 @@ extension Z80 {
         opcodes[0xE9] = { // JP (xx)
             self.regs.pc = self.regs.xx
         }
+        opcodes[0xF9] = { // LD SP,xx
+            self.t_cycle += 2
+            self.regs.sp = self.regs.xx
+        }
+        
     }
 }
