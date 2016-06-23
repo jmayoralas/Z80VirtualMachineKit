@@ -592,7 +592,7 @@ extension Z80 {
             self.regs.a = self.ulaCall(self.regs.a, self.regs.d, ulaOp: .add, ignoreCarry: false)
         }
         opcodes[0x83] = { // ADD A,E
-            self.regs.a = self.ulaCall(self.regs.a, self.regs.d, ulaOp: .add, ignoreCarry: false)
+            self.regs.a = self.ulaCall(self.regs.a, self.regs.e, ulaOp: .add, ignoreCarry: false)
         }
         opcodes[0x84] = { // ADD A,H
             self.regs.a = self.ulaCall(self.regs.a, self.regs.h, ulaOp: .add, ignoreCarry: false)
@@ -617,7 +617,7 @@ extension Z80 {
             self.regs.a = self.ulaCall(self.regs.a, self.regs.d, ulaOp: .adc, ignoreCarry: false)
         }
         opcodes[0x8B] = { // ADC A,E
-            self.regs.a = self.ulaCall(self.regs.a, self.regs.d, ulaOp: .adc, ignoreCarry: false)
+            self.regs.a = self.ulaCall(self.regs.a, self.regs.e, ulaOp: .adc, ignoreCarry: false)
         }
         opcodes[0x8C] = { // ADC A,H
             self.regs.a = self.ulaCall(self.regs.a, self.regs.h, ulaOp: .adc, ignoreCarry: false)
@@ -642,7 +642,7 @@ extension Z80 {
             self.regs.a = self.ulaCall(self.regs.a, self.regs.d, ulaOp: .sub, ignoreCarry: false)
         }
         opcodes[0x93] = { // SUB A,E
-            self.regs.a = self.ulaCall(self.regs.a, self.regs.d, ulaOp: .sub, ignoreCarry: false)
+            self.regs.a = self.ulaCall(self.regs.a, self.regs.e, ulaOp: .sub, ignoreCarry: false)
         }
         opcodes[0x94] = { // SUB A,H
             self.regs.a = self.ulaCall(self.regs.a, self.regs.h, ulaOp: .sub, ignoreCarry: false)
