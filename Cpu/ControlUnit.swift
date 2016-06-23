@@ -190,6 +190,9 @@ extension Z80 {
             
         case .bit:
             result = operandA
+            
+            regs.f.resetBit(S)
+            
             if operandA.bit(Int(operandB)) == 0 {
                 regs.f.setBit(Z)
                 regs.f.setBit(PV)
