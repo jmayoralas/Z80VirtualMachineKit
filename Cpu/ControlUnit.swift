@@ -263,12 +263,16 @@ extension Z80 {
         // NSLog("Screen Interrupt %d", t_cycle)
         switch kind {
         case .nmi:
+            halted = false
+            
             call(0x0066)
             regs.IFF2 = regs.IFF1
             regs.IFF1 = false
             
         case .soft:
             if regs.IFF1 {
+                halted = false
+                
                 switch regs.int_mode {
                 case 1:
                     call(0x0038)
