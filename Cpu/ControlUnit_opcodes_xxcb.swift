@@ -227,7 +227,7 @@ extension Z80 {
             let displ = self.dataBus.read(self.regs.pc &- 2)
             let address = UInt16(Int(self.regs.xx) &+ Int(displ.comp2))
             let data = self.dataBus.read(address)
-            self.regs.d = self.ulaCall(data, 1, ulaOp: .rr, ignoreCarry: false)
+            self.regs.e = self.ulaCall(data, 1, ulaOp: .rr, ignoreCarry: false)
             self.dataBus.write(address, value: self.regs.e)
         }
         opcodes[0x1C] = { // rr (xx+0) -> h
