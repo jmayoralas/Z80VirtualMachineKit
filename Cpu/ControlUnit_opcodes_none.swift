@@ -310,7 +310,7 @@ extension Z80 {
         }
         opcodes[0x33] = { // INC SP
             self.t_cycle += 2
-            self.regs.hl = self.regs.hl &+ 1
+            self.regs.sp = self.regs.sp &+ 1
         }
         opcodes[0x34] = { // INC (HL)
             self.t_cycle += 7
