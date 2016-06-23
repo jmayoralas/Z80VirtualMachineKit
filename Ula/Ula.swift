@@ -72,7 +72,7 @@ final class Ula: InternalUlaOperationDelegate {
     private var flashState: Bool = false
     private var frames: Int = 0
     
-    private var key_buffer = [UInt8](repeatElement(0xFF, count: 0xFF))
+    private var key_buffer = [UInt8](repeatElement(0xFF, count: 0x100))
     
     init() {
         memory = ULAMemory(delegate: self)
