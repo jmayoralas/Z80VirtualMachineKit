@@ -217,39 +217,25 @@ extension Z80 {
             - the others flags are altered by definition.
             */
             let a = self.regs.a
+            var add: UInt8 = 0
+            var carry = self.regs.f.bit(C)
             
             if a.low > 9 || self.regs.f.bit(H) == 1 {
-                if self.regs.f.bit(N) == 0 {
-                    self.regs.a = UInt8(self.regs.a &+ UInt8(0x06))
-                } else {
-                    self.regs.a = UInt8(self.regs.a &- UInt8(0x06))
-                }
-                
-                self.regs.f.setBit(H)
-            } else {
-                self.regs.f.resetBit(H)
+                add = 0x06
             }
             
-            if a.high > 9 || self.regs.f.bit(C) == 1 {
-                if self.regs.f.bit(N) == 0 {
-                    self.regs.a = UInt8(self.regs.a &+ UInt8(0x60))
-                } else {
-                    self.regs.a = UInt8(self.regs.a &- UInt8(0x60))
-                }
-                
-                self.regs.f.setBit(C)
-            } else {
-                self.regs.f.resetBit(C)
+            if a > 0x99 || self.regs.f.bit(C) == 1 {
+                add |= 0x60
+                carry = 1
             }
             
-            self.regs.f.bit(S, newVal: self.regs.a.bit(7))
-            
-            if self.regs.a == 0 {
-                self.regs.f.setBit(Z)
+            if self.regs.f.bit(N) == 1 {
+                self.regs.a = self.ulaCall(self.regs.a, add, ulaOp: .sub, ignoreCarry: true)
             } else {
-                self.regs.f.resetBit(Z)
+                self.regs.a = self.ulaCall(self.regs.a, add, ulaOp: .add, ignoreCarry: true)
             }
             
+            self.regs.f.bit(C, newVal: carry)
             if self.regs.a.parity == 0 {
                 self.regs.f.setBit(PV) // even parity
             } else {
