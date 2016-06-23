@@ -216,20 +216,27 @@ extension Z80 {
             - P/V is parity
             - the others flags are altered by definition.
             */
-            let sign: Int!
+            let a = self.regs.a
             
-            if self.regs.f.bit(N) == 1 {
-                sign = -1
+            if a.low > 9 || self.regs.f.bit(H) == 1 {
+                if self.regs.f.bit(N) == 0 {
+                    self.regs.a = UInt8(self.regs.a &+ UInt8(0x06))
+                } else {
+                    self.regs.a = UInt8(self.regs.a &- UInt8(0x06))
+                }
+                
+                self.regs.f.setBit(H)
             } else {
-                sign = 1
+                self.regs.f.resetBit(H)
             }
             
-            if self.regs.a.low > 9 || self.regs.f.bit(H) == 1 {
-                self.regs.a = UInt8(Int(self.regs.a) + sign * 0x06)
-            }
-            
-            if self.regs.a.high > 9 || self.regs.f.bit(C) == 1 {
-                self.regs.a = UInt8(Int(self.regs.a) + sign * 0x60)
+            if a.high > 9 || self.regs.f.bit(C) == 1 {
+                if self.regs.f.bit(N) == 0 {
+                    self.regs.a = UInt8(self.regs.a &+ UInt8(0x60))
+                } else {
+                    self.regs.a = UInt8(self.regs.a &- UInt8(0x60))
+                }
+                
                 self.regs.f.setBit(C)
             } else {
                 self.regs.f.resetBit(C)
