@@ -97,14 +97,14 @@ private struct UlaUpdateData {
     }
     
     public func run() {
-        cpu.halted = false
+        cpu.stopped = false
         
         let queue = DispatchQueue.global(attributes: DispatchQueue.GlobalAttributes(rawValue: UInt64(Int(DispatchQueueAttributes.qosUserInitiated.rawValue))))
         
         queue.async {
             repeat {
                 self.step()
-            } while !self.cpu.halted
+            } while !self.cpu.stopped
             
             self.delegate?.Z80VMScreenRefresh?(self.ula.getScreen())
             self.delegate?.Z80VMEmulationHalted?()
@@ -112,7 +112,7 @@ private struct UlaUpdateData {
     }
     
     public func stop() {
-        cpu.halted = true;
+        cpu.stopped = true;
     }
     
     public func step() {
@@ -125,7 +125,7 @@ private struct UlaUpdateData {
         cpu.step()
         ula.step(t_cycle: cpu.t_cycle, &IRQ)
         
-        t_cycles += cpu.t_cycle
+        t_cycles = cpu.t_cycle
 /*
         if instructions > 824000 && cpu.regs.pc == 0x0298 && cpu.regs.bc == 0xBFFE  && cpu.regs.sp == 0xFF3A {
             cpu.regs.a = 0xFB
@@ -134,9 +134,9 @@ private struct UlaUpdateData {
             instructions = 824514
             irq_enabled = false
         }
- 
-        if instructions == 824514 {
-            cpu.halted = true
+
+        if cpu.regs.pc == 0x82BA && cpu.regs.sp == 0x8800 && cpu.addressFromPair(cpu.dataBus.read(cpu.regs.sp + 1), cpu.dataBus.read(cpu.regs.sp)) == 0x86c1 && cpu.regs.r == 0x8D {
+            cpu.stopped = true
         }
 */
         if IRQ {
@@ -194,7 +194,7 @@ private struct UlaUpdateData {
     
     
     public func isRunning() -> Bool {
-        return !cpu.halted
+        return !cpu.stopped
     }
     
     public func dumpMemoryFromAddress(_ fromAddress: Int, toAddress: Int) -> [UInt8] {

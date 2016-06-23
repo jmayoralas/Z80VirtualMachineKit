@@ -27,6 +27,8 @@ class Z80 {
     let dataBus : Bus16
     let ioBus : IoBus
     
+    var stopped = true
+    
     init(dataBus: Bus16, ioBus: IoBus) {
         self.regs = Registers()
         self.dataBus = dataBus
@@ -71,6 +73,8 @@ class Z80 {
         regs.hl_ = 0xFFFF
         
         t_cycle = 0
+        
+        halted = false
     }
     
     func org(_ pc: UInt16) {
@@ -100,9 +104,14 @@ class Z80 {
     func getNextOpcode() {
         t_cycle += 4
         
-        // get opcode at PC into IR register
-        regs.ir = dataBus.read(regs.pc)
-        regs.pc = regs.pc &+ 1
+        if halted {
+            // cpu halted, always execute NOP
+            regs.ir = 0x00
+        } else {
+            // get opcode at PC into IR register
+            regs.ir = dataBus.read(regs.pc)
+            regs.pc = regs.pc &+ 1
+        }
         
         if regs.ir != 0xCB || id_opcode_table == table_NONE {
             // save bit 7 of R to restore after increment
