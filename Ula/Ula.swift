@@ -41,7 +41,7 @@ final class Ula: InternalUlaOperationDelegate {
     var memory: ULAMemory!
     var io: ULAIo!
     
-    private var screen: [PixelData]
+    private var screen: VmScreen
     private let colorTable = [
         PixelData(a: 255, r: 0, g: 0, b: 0),
         PixelData(a: 255, r: 0, g: 0, b: 0xCD),
@@ -72,15 +72,11 @@ final class Ula: InternalUlaOperationDelegate {
     
     private var key_buffer = [UInt8](repeatElement(0xFF, count: 0x100))
     
-    init(screen: inout [PixelData]) {
+    init(screen: VmScreen) {
         self.screen = screen
         
         memory = ULAMemory(delegate: self)
         io = ULAIo(delegate: self)
-    }
-    
-    static func initScreen(_ screen: inout [PixelData]) {
-        screen = [PixelData](repeating: WHITE_COLOR, count: 320 * 240)
     }
     
     func step(t_cycle: Int, _ IRQ: inout Bool) {
@@ -159,7 +155,7 @@ final class Ula: InternalUlaOperationDelegate {
         var j = 0
         
         for i in (0...7).reversed() {
-            screen[index + j] = ((Int(value) & 1 << i) > 0) ? inkColor : paperColor
+            screen.buffer[index + j] = ((Int(value) & 1 << i) > 0) ? inkColor : paperColor
             j += 1
         }
     }
@@ -184,19 +180,19 @@ final class Ula: InternalUlaOperationDelegate {
             let index = bitmapLine * 320
             
             // the bitmapLine background color has changed ?
-            if screen[index] != borderColor {
+            if screen.buffer[index] != borderColor {
                 if 24 <= bitmapLine && bitmapLine < 24 + 192 {
                     // bitmap border
                     for i in 0..<32 {
-                        screen[index + i] = borderColor
+                        screen.buffer[index + i] = borderColor
                     }
                     for i in 256 + 32..<320 {
-                        screen[index + i] = borderColor
+                        screen.buffer[index + i] = borderColor
                     }
                 } else {
                     // above and below bitmap area border
                     for i in 0..<320 {
-                        screen[index + i] = borderColor
+                        screen.buffer[index + i] = borderColor
                     }
                 }
             }

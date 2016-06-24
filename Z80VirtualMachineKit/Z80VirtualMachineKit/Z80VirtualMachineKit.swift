@@ -8,8 +8,14 @@
 
 import Foundation
 
+private let WHITE_COLOR = PixelData(a: 255, r: 0xCD, g: 0xCD, b: 0xCD)
+
 public enum RomErrors: ErrorProtocol {
     case bufferLimitReach
+}
+
+@objc final public class VmScreen: NSObject {
+    public var buffer = [PixelData](repeating: WHITE_COLOR, count: 320 * 240)
 }
 
 public struct SpecialKeys: OptionSet {
@@ -68,8 +74,8 @@ private struct UlaUpdateData {
     ]
     
     // MARK: Constructor
-    public init(_ screen: inout [PixelData]) {
-        ula = Ula(screen: &screen)
+    public init(_ screen: VmScreen) {
+        ula = Ula(screen: screen)
         
         super.init()
         
@@ -201,10 +207,6 @@ private struct UlaUpdateData {
     
     public func dumpMemoryFromAddress(_ fromAddress: Int, toAddress: Int) -> [UInt8] {
         return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
-    }
-    // MARK: Screen management
-    public static func initScreen(_ screen: inout [PixelData]) {
-        Ula.initScreen(&screen)
     }
     
     // MARK: Keyboard management

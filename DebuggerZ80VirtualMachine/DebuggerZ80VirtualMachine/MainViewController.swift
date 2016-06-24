@@ -52,7 +52,7 @@ import Z80VirtualMachineKit
     @IBOutlet weak var memoryPeeker: NSTableView!
     @IBOutlet weak var VMScreen: NSImageView!
     
-    var screen = [PixelData]()
+    var screen = VmScreen()
     
     var dumpAddress: Int!
     var memoryDump: [UInt8]!
@@ -65,8 +65,7 @@ import Z80VirtualMachineKit
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        Z80VirtualMachineKit.initScreen(&screen)
-        vm = Z80VirtualMachineKit.init(&screen)
+        vm = Z80VirtualMachineKit.init(screen)
         vm.delegate = self
         vm.addIoDevice(0x01)
         
@@ -297,7 +296,7 @@ import Z80VirtualMachineKit
     }
     
     func Z80VMScreenRefresh() {
-        VMScreen.image = imageFromARGB32Bitmap(screen, width: 320, height: 240)
+        VMScreen.image = imageFromARGB32Bitmap(screen.buffer, width: 320, height: 240)
     }
     
     func Z80VMEmulationHalted() {
