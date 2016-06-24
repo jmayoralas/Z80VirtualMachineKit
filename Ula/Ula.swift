@@ -13,7 +13,7 @@ private let SCREEN_LINES = 312 // 64 + 192 + 56
 private let TICS_PER_FRAME = TICS_PER_LINE * SCREEN_LINES
 private let WHITE_COLOR = PixelData(a: 255, r: 0xCD, g: 0xCD, b: 0xCD)
 
-private struct PixelData {
+public struct PixelData {
     var a:UInt8 = 255
     var r:UInt8
     var g:UInt8
@@ -21,7 +21,7 @@ private struct PixelData {
 }
 
 extension PixelData: Equatable {}
-    private func ==(lhs: PixelData, rhs: PixelData) -> Bool {
+    public func ==(lhs: PixelData, rhs: PixelData) -> Bool {
         return lhs.a == rhs.a && lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b
     }
 
@@ -41,9 +41,7 @@ final class Ula: InternalUlaOperationDelegate {
     var memory: ULAMemory!
     var io: ULAIo!
     
-    private let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
-    private let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
-    private var screen = [PixelData](repeating: WHITE_COLOR, count: 320 * 240)
+    private var screen: [PixelData]
     private let colorTable = [
         PixelData(a: 255, r: 0, g: 0, b: 0),
         PixelData(a: 255, r: 0, g: 0, b: 0xCD),
@@ -74,9 +72,15 @@ final class Ula: InternalUlaOperationDelegate {
     
     private var key_buffer = [UInt8](repeatElement(0xFF, count: 0x100))
     
-    init() {
+    init(screen: inout [PixelData]) {
+        self.screen = screen
+        
         memory = ULAMemory(delegate: self)
         io = ULAIo(delegate: self)
+    }
+    
+    static func initScreen(_ screen: inout [PixelData]) {
+        screen = [PixelData](repeating: WHITE_COLOR, count: 320 * 240)
     }
     
     func step(t_cycle: Int, _ IRQ: inout Bool) {
@@ -119,10 +123,6 @@ final class Ula: InternalUlaOperationDelegate {
         borderColor = colorTable[Int(value) & 0x07]
     }
     
-    func getScreen() -> NSImage {
-        return imageFromARGB32Bitmap(screen, width: 320, height: 240)
-    }
-    
     func keyDown(address: UInt8, value: UInt8) {
         key_buffer[Int(address)] = key_buffer[Int(address)] & value
     }
@@ -163,33 +163,7 @@ final class Ula: InternalUlaOperationDelegate {
             j += 1
         }
     }
-    
-    private func imageFromARGB32Bitmap(_ pixels:[PixelData], width:Int, height:Int) -> NSImage {
-        let bitsPerComponent = 8
-        let bitsPerPixel = 32
-        
-        assert(pixels.count == width * height)
-        
-        let providerRef = CGDataProvider(
-            data: Data(bytes: UnsafePointer<UInt8>(pixels), count: pixels.count * sizeof(PixelData))
-        )
-        
-        let cgim = CGImage(
-            width: width,
-            height: height,
-            bitsPerComponent: bitsPerComponent,
-            bitsPerPixel: bitsPerPixel,
-            bytesPerRow: width * sizeof(PixelData),
-            space: rgbColorSpace,
-            bitmapInfo: bitmapInfo,
-            provider: providerRef!,
-            decode: nil,
-            shouldInterpolate: true,
-            intent: CGColorRenderingIntent.defaultIntent
-        )
-        
-        return NSImage(cgImage: cgim!, size: NSZeroSize)
-    }
+
     
     private func getAttribute(_ value: Int) -> Attribute {
         return Attribute(

@@ -52,17 +52,21 @@ import Z80VirtualMachineKit
     @IBOutlet weak var memoryPeeker: NSTableView!
     @IBOutlet weak var VMScreen: NSImageView!
     
+    var screen = [PixelData]()
+    
     var dumpAddress: Int!
     var memoryDump: [UInt8]!
     var insCounter: Int!
 
-    var vm = Z80VirtualMachineKit()
+    var vm: Z80VirtualMachineKit!
     
     var matrix: NSMatrix!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        Z80VirtualMachineKit.initScreen(&screen)
+        vm = Z80VirtualMachineKit.init(&screen)
         vm.delegate = self
         vm.addIoDevice(0x01)
         
@@ -292,11 +296,40 @@ import Z80VirtualMachineKit
         return cellView
     }
     
-    func Z80VMScreenRefresh(_ image: NSImage) {
-        VMScreen.image = image
+    func Z80VMScreenRefresh() {
+        VMScreen.image = imageFromARGB32Bitmap(screen, width: 320, height: 240)
     }
     
     func Z80VMEmulationHalted() {
         refreshView()
+    }
+    
+    func imageFromARGB32Bitmap(_ pixels:[PixelData], width:Int, height:Int) -> NSImage {
+        let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
+        let bitsPerComponent = 8
+        let bitsPerPixel = 32
+        
+        assert(pixels.count == width * height)
+        
+        let providerRef = CGDataProvider(
+            data: Data(bytes: UnsafePointer<UInt8>(pixels), count: pixels.count * sizeof(PixelData))
+        )
+        
+        let cgim = CGImage(
+            width: width,
+            height: height,
+            bitsPerComponent: bitsPerComponent,
+            bitsPerPixel: bitsPerPixel,
+            bytesPerRow: width * sizeof(PixelData),
+            space: rgbColorSpace,
+            bitmapInfo: bitmapInfo,
+            provider: providerRef!,
+            decode: nil,
+            shouldInterpolate: true,
+            intent: CGColorRenderingIntent.defaultIntent
+        )
+        
+        return NSImage(cgImage: cgim!, size: NSZeroSize)
     }
 }

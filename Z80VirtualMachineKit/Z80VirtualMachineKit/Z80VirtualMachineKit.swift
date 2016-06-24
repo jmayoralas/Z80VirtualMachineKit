@@ -34,7 +34,7 @@ private struct UlaUpdateData {
 @objc public protocol Z80VirtualMachineStatus {
     @objc optional func Z80VMMemoryWriteAtAddress(_ address: Int, byte: UInt8)
     @objc optional func Z80VMMemoryReadAtAddress(_ address: Int, byte: UInt8)
-    @objc optional func Z80VMScreenRefresh(_ image: NSImage)
+    @objc optional func Z80VMScreenRefresh()
     @objc optional func Z80VMEmulationHalted()
 }
 
@@ -45,7 +45,7 @@ private struct UlaUpdateData {
     
     private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
     private var instructions = 0
-    private var ula = Ula()
+    private var ula: Ula
     private let rom = Rom(base_address: 0x0000, block_size: 0x4000)
     private var t_cycles: Int = 0
     
@@ -68,7 +68,9 @@ private struct UlaUpdateData {
     ]
     
     // MARK: Constructor
-    override public init() {
+    public init(_ screen: inout [PixelData]) {
+        ula = Ula(screen: &screen)
+        
         super.init()
         
         // connect the 16k ROM
@@ -106,7 +108,7 @@ private struct UlaUpdateData {
                 self.step()
             } while !self.cpu.stopped
             
-            self.delegate?.Z80VMScreenRefresh?(self.ula.getScreen())
+            self.delegate?.Z80VMScreenRefresh?()
             self.delegate?.Z80VMEmulationHalted?()
         }
     }
@@ -145,7 +147,7 @@ private struct UlaUpdateData {
             }
             
             IRQ = false
-            delegate?.Z80VMScreenRefresh?(ula.getScreen())
+            delegate?.Z80VMScreenRefresh?()
         }
     }
     
@@ -189,7 +191,7 @@ private struct UlaUpdateData {
             
         }
         
-        delegate?.Z80VMScreenRefresh?(ula.getScreen())
+        delegate?.Z80VMScreenRefresh?()
     }
     
     
@@ -199,6 +201,10 @@ private struct UlaUpdateData {
     
     public func dumpMemoryFromAddress(_ fromAddress: Int, toAddress: Int) -> [UInt8] {
         return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
+    }
+    // MARK: Screen management
+    public static func initScreen(_ screen: inout [PixelData]) {
+        Ula.initScreen(&screen)
     }
     
     // MARK: Keyboard management
