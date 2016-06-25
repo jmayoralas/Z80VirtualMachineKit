@@ -296,7 +296,9 @@ import Z80VirtualMachineKit
     }
     
     func Z80VMScreenRefresh() {
-        VMScreen.image = imageFromARGB32Bitmap(screen.buffer, width: 320, height: 240)
+        DispatchQueue.main.async { [unowned self] in
+            self.VMScreen.image = self.imageFromARGB32Bitmap(self.screen.buffer, width: 320, height: 240)
+        }
     }
     
     func Z80VMEmulationHalted() {
