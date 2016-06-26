@@ -14,10 +14,10 @@ extension Z80 {
         return (id_opcode_table != table_NONE) ? true : false
     }
     
-    func ulaCall16(_ operandA: UInt16, _ operandB: UInt16, ulaOp: UlaOp) -> UInt16 {
+    func aluCall16(_ operandA: UInt16, _ operandB: UInt16, ulaOp: UlaOp) -> UInt16 {
         let f_old = regs.f
         
-        let result_l = ulaCall(operandA.low, operandB.low, ulaOp: ulaOp, ignoreCarry: false)
+        let result_l = aluCall(operandA.low, operandB.low, ulaOp: ulaOp, ignoreCarry: false)
         
         var ulaOp_high = ulaOp
         
@@ -27,7 +27,7 @@ extension Z80 {
         default: break
         }
         
-        let result_h = ulaCall(operandA.high, operandB.high, ulaOp: ulaOp_high, ignoreCarry: false)
+        let result_h = aluCall(operandA.high, operandB.high, ulaOp: ulaOp_high, ignoreCarry: false)
         
         if result_h == 0 && result_l == 0 {
             self.regs.f.setBit(Z)
@@ -45,7 +45,7 @@ extension Z80 {
         return addressFromPair(result_h, result_l)
     }
     
-    func ulaCall(_ operandA: UInt8, _ operandB: UInt8, ulaOp: UlaOp, ignoreCarry: Bool) -> UInt8 {
+    func aluCall(_ operandA: UInt8, _ operandB: UInt8, ulaOp: UlaOp, ignoreCarry: Bool) -> UInt8 {
         /*
         Bit      0 1 2 3 4  5  6 7
         ￼￼Position S Z X H X P/V N C
