@@ -36,7 +36,13 @@ class Z80 {
         
         id_opcode_table = table_NONE
         
-        opcode_tables = [OpcodeTable](repeating: OpcodeTable(repeating: {}, count: 0x100), count: 5)
+        opcode_tables = [OpcodeTable](repeating: OpcodeTable(repeating: {
+            // by default, every undocumented and unimplemented opcode prefixed by DD or FD, will execute his equivalent in the un-prefixed opcode table
+            // and NOP in the rest of cases
+            if self.id_opcode_table == table_XX {
+                self.opcode_tables[table_NONE][Int(self.regs.ir)]()
+            }
+        }, count: 0x100), count: 5)
         
         initOpcodeTableNONE(&opcode_tables[table_NONE])
         initOpcodeTableXX(&opcode_tables[table_XX])
