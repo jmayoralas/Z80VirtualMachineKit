@@ -64,11 +64,13 @@ final class Ula: InternalUlaOperationDelegate {
     
     private var borderColor: PixelData = WHITE_COLOR
     
+    private var newFrame = true
     private var frameTics: Int = 0
     private var lineTics: Int = 0
     private var screenLine: Int = 0
     private var flashState: Bool = false
     private var frames: Int = 0
+    private var frameStartTime: Date!
     
     private var key_buffer = [UInt8](repeatElement(0xFF, count: 0x100))
     
@@ -80,6 +82,11 @@ final class Ula: InternalUlaOperationDelegate {
     }
     
     func step(t_cycle: Int, _ IRQ: inout Bool) {
+        if newFrame {
+            frameStartTime = Date()
+            newFrame = false
+        }
+        
         lineTics += t_cycle
         frameTics += t_cycle
         
@@ -206,6 +213,9 @@ final class Ula: InternalUlaOperationDelegate {
                 frames = 0
             }
             
+            while Date().timeIntervalSince(frameStartTime) <= 0.02 {}
+            
+            newFrame = true
             frameTics -= TICS_PER_FRAME
             screenLine = 0
             
