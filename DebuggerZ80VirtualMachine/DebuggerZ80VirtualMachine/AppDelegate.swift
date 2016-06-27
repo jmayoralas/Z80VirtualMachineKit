@@ -16,14 +16,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var mainViewController: MainViewController!
 
 
-    func applicationDidFinishLaunching(aNotification: NSNotification) {
+    func applicationDidFinishLaunching(_ aNotification: Notification) {
         mainViewController = MainViewController(nibName: "MainViewController", bundle: nil)
         
         window.contentView!.addSubview(mainViewController.view)
         mainViewController.view.frame = (window.contentView! as NSView).bounds
     }
 
-    func applicationWillTerminate(aNotification: NSNotification) {
+    func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
     }
 

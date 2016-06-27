@@ -18,15 +18,12 @@ import Z80VirtualMachineKit
     @IBOutlet weak var ITextField: ColorChangeTextField!
     @IBOutlet weak var RTextField: ColorChangeTextField!
     
-    @IBOutlet weak var MTextField: ColorChangeTextField!
     @IBOutlet weak var TTextField: ColorChangeTextField!
     
     @IBOutlet weak var instructionCounter: NSTextField!
     
     @IBOutlet weak var AddressBusTextField: ColorChangeTextField!
     
-    @IBOutlet weak var CiclosTextField: ColorChangeTextField!
-        
     @IBOutlet weak var ATextField: ColorChangeTextField!
     @IBOutlet weak var BTextField: ColorChangeTextField!
     @IBOutlet weak var IRTextField: ColorChangeTextField!
@@ -55,36 +52,28 @@ import Z80VirtualMachineKit
     @IBOutlet weak var memoryPeeker: NSTableView!
     @IBOutlet weak var VMScreen: NSImageView!
     
+    var screen = VmScreen()
+    
     var dumpAddress: Int!
     var memoryDump: [UInt8]!
     var insCounter: Int!
 
-    var vm = Z80VirtualMachineKit()
+    var vm: Z80VirtualMachineKit!
     
     var matrix: NSMatrix!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        vm = Z80VirtualMachineKit.init(screen)
         vm.delegate = self
         vm.addIoDevice(0x01)
         
-        NSEvent.addLocalMonitorForEventsMatchingMask(.KeyDownMask) { (theEvent) -> NSEvent? in
-            switch theEvent.keyCode {
-            case 96:
-                self.f5Pressed()
-                return nil
-            case 97:
-                self.f6Pressed()
-                return nil
-            default:
-                break
-            }
-            
-            return theEvent
-        }
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) {(theEvent: NSEvent) -> NSEvent? in return self.onKeyDown(theEvent: theEvent)}
+        NSEvent.addLocalMonitorForEvents(matching: .keyUp) {(theEvent: NSEvent) -> NSEvent? in return self.onKeyUp(theEvent: theEvent)}
+        NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) {(theEvent: NSEvent) -> NSEvent? in return self.onFlagsChanged(theEvent: theEvent)}
         
-        for (index, column) in memoryPeeker.tableColumns.enumerate() {
+        for (index, column) in memoryPeeker.tableColumns.enumerated() {
             switch index {
             case 0:
                 column.headerCell.stringValue = "Addr"
@@ -92,7 +81,7 @@ import Z80VirtualMachineKit
             case 1...16:
                 column.headerCell.stringValue = "\(UInt8(index-1).hexStr())"
                 column.width = 25
-                column.headerCell.alignment = .Center
+                column.headerCell.alignment = .center
             case 17:
                 column.headerCell.stringValue = "ASCII"
                 column.width = 150
@@ -107,61 +96,61 @@ import Z80VirtualMachineKit
         self.refreshView()
     }
 
-    @IBAction func loadTestProgram(sender: AnyObject) {
+    @IBAction func loadTestProgram(_ sender: AnyObject) {
         let data : [UInt8] = [0x3E, 0xFE, 0x32, 0x30, 0x00, 0x21, 0x30, 0x00, 0x34, 0x76]
         vm.loadRamAtAddress(Int(strtoul(AddressBusTextField.stringValue, nil, 16)), data: data)
         _refreshMemoryDump()
     }
     
-    @IBAction func runClick(sender: AnyObject) {
+    @IBAction func runClick(_ sender: AnyObject) {
         vm.run()
     }
     
-    @IBAction func stopClick(sender: NSButton) {
+    @IBAction func stopClick(_ sender: NSButton) {
         vm.stop()
     }
     
-    @IBAction func resetClick(sender: AnyObject) {
+    @IBAction func resetClick(_ sender: AnyObject) {
         vm.reset()
         refreshView()
         _refreshMemoryDump()
     }
     
-    @IBAction func clearMemoryClick(sender: AnyObject) {
+    @IBAction func clearMemoryClick(_ sender: AnyObject) {
         vm.clearMemory()
         _refreshMemoryDump()
         
     }
     
-    @IBAction func setPcClick(sender: AnyObject) {
+    @IBAction func setPcClick(_ sender: AnyObject) {
         vm.setPc(UInt16(strtoul(PcTextField.stringValue, nil, 16)))
     }
     
-    @IBAction func gotoClick(sender: AnyObject) {
+    @IBAction func gotoClick(_ sender: AnyObject) {
         // get memory dump at address specified by AddressBus text field
         dumpAddress = Int(strtoul(AddressBusTextField.stringValue, nil, 16))
         _refreshMemoryDump()
     }
     
-    @IBAction func loadProgramClick(sender: AnyObject) {
+    @IBAction func loadProgramClick(_ sender: AnyObject) {
         let openPanel = NSOpenPanel()
         openPanel.runModal()
         
-        let path = openPanel.URL?.path
+        let path = openPanel.url?.path
         if path != nil {
-            let data = NSData(contentsOfFile: path!)
-            var buffer = [UInt8](count: data!.length, repeatedValue: 0)
-            data!.getBytes(&buffer, length: data!.length)
+            let data = try? Data(contentsOf: URL(fileURLWithPath: path!))
+            var buffer = [UInt8](repeating: 0, count: data!.count)
+            (data! as NSData).getBytes(&buffer, length: data!.count)
             
             let address = Int(strtoul(AddressBusTextField.stringValue, nil, 16))
             if (sender as! NSButton).tag == 1 {
                 let alert = NSAlert()
-                alert.alertStyle = NSAlertStyle.CriticalAlertStyle
-                alert.addButtonWithTitle("OK")
+                alert.alertStyle = NSAlertStyle.critical
+                alert.addButton(withTitle: "OK")
                 
                 do {
                     try vm.loadRomAtAddress(0x0000, data: buffer)
-                } catch RomErrors.BufferLimitReach {
+                } catch RomErrors.bufferLimitReach {
                     alert.messageText = "Memory full !!"
                     alert.runModal()
                 } catch {
@@ -233,8 +222,45 @@ import Z80VirtualMachineKit
         memoryPeeker.reloadData()
     }
     
+    
+    private func onKeyDown(theEvent: NSEvent) -> NSEvent? {
+        switch theEvent.keyCode {
+        case 96:
+            self.f5Pressed()
+            return nil
+        case 97:
+            self.f6Pressed()
+            return nil
+        default:
+            if !theEvent.modifierFlags.contains(.command) {
+                if self.vm.isRunning() {
+                    self.vm.keyDown(char: KeyEventHandler.getChar(event: theEvent))
+                    return nil
+                }
+            }
+        }
+        
+        return theEvent
+    }
+    
+    private func onKeyUp(theEvent: NSEvent) -> NSEvent? {
+        if self.vm.isRunning() {
+            self.vm.keyUp(char: KeyEventHandler.getChar(event: theEvent))
+            return nil
+        }
+        return theEvent
+    }
+    
+    private func onFlagsChanged(theEvent: NSEvent) -> NSEvent? {
+        if self.vm.isRunning() {
+            self.vm.specialKeyUpdate(special_keys: KeyEventHandler.getSpecialKeys(event: theEvent))
+            return nil
+        }
+        return theEvent
+    }
+    
     // MARK: Z80VirtualMachineStatus delegate
-    func Z80VMMemoryWriteAtAddress(address: Int, byte: UInt8) {
+    func Z80VMMemoryWriteAtAddress(_ address: Int, byte: UInt8) {
         if dumpAddress <= address && address < dumpAddress + 0x100 {
             memoryDump[address - dumpAddress] = byte
             memoryPeeker.reloadData()
@@ -242,13 +268,13 @@ import Z80VirtualMachineKit
     }
     
     // MARK: NSTableViewDataSource
-    func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+    func numberOfRows(in tableView: NSTableView) -> Int {
         return 0x10
     }
     
-    func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         
-        let cellView = tableView.makeViewWithIdentifier(tableColumn!.identifier, owner: self) as! NSTableCellView
+        let cellView = tableView.make(withIdentifier: tableColumn!.identifier, owner: self) as! NSTableCellView
         cellView.textField!.font = NSFont.init(name: "Courier", size: 12)
         
         switch tableColumn!.identifier {
@@ -263,17 +289,48 @@ import Z80VirtualMachineKit
         default:
             let address = Int(tableColumn!.identifier)! + row * 0x10
             cellView.textField!.stringValue = "\(memoryDump[address].hexStr())"
-            cellView.textField!.alignment = .Center
+            cellView.textField!.alignment = .center
         }
         
         return cellView
     }
     
-    func Z80VMScreenRefresh(image: NSImage) {
-        VMScreen.image = image
+    func Z80VMScreenRefresh() {
+        DispatchQueue.main.async { [unowned self] in
+            self.VMScreen.image = self.imageFromARGB32Bitmap(self.screen.buffer, width: 320, height: 240)
+        }
     }
     
     func Z80VMEmulationHalted() {
         refreshView()
+    }
+    
+    func imageFromARGB32Bitmap(_ pixels:[PixelData], width:Int, height:Int) -> NSImage {
+        let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
+        let bitsPerComponent = 8
+        let bitsPerPixel = 32
+        
+        assert(pixels.count == width * height)
+        
+        let providerRef = CGDataProvider(
+            data: Data(bytes: UnsafePointer<UInt8>(pixels), count: pixels.count * sizeof(PixelData))
+        )
+        
+        let cgim = CGImage(
+            width: width,
+            height: height,
+            bitsPerComponent: bitsPerComponent,
+            bitsPerPixel: bitsPerPixel,
+            bytesPerRow: width * sizeof(PixelData),
+            space: rgbColorSpace,
+            bitmapInfo: bitmapInfo,
+            provider: providerRef!,
+            decode: nil,
+            shouldInterpolate: true,
+            intent: CGColorRenderingIntent.defaultIntent
+        )
+        
+        return NSImage(cgImage: cgim!, size: NSZeroSize)
     }
 }

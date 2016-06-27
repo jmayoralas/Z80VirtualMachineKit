@@ -8,19 +8,13 @@
 
 import Foundation
 
-protocol Z80Delegate {
-    func frameCompleted()
-}
-
 class Z80 {
-    private let TICS_PER_FRAME = 69888
-    
     typealias OpcodeTable = [() -> Void]
     
     var regs : Registers
     
     var t_cycle = 0
-    var halted: Bool = false;
+    var halted: Bool = true
     
     var irq_kind : IrqKind?
     
@@ -33,7 +27,7 @@ class Z80 {
     let dataBus : Bus16
     let ioBus : IoBus
     
-    var delegate: Z80Delegate?
+    var stopped = true
     
     init(dataBus: Bus16, ioBus: IoBus) {
         self.regs = Registers()
@@ -42,7 +36,13 @@ class Z80 {
         
         id_opcode_table = table_NONE
         
-        opcode_tables = [OpcodeTable](count: 5, repeatedValue: OpcodeTable(count: 0x100, repeatedValue: {}))
+        opcode_tables = [OpcodeTable](repeating: OpcodeTable(repeating: {
+            // by default, every undocumented and unimplemented opcode prefixed by DD or FD, will execute his equivalent in the un-prefixed opcode table
+            // and NOP in the rest of cases
+            if self.id_opcode_table == table_XX {
+                self.opcode_tables[table_NONE][Int(self.regs.ir)]()
+            }
+        }, count: 0x100), count: 5)
         
         initOpcodeTableNONE(&opcode_tables[table_NONE])
         initOpcodeTableXX(&opcode_tables[table_XX])
@@ -79,9 +79,11 @@ class Z80 {
         regs.hl_ = 0xFFFF
         
         t_cycle = 0
+        
+        halted = false
     }
     
-    func org(pc: UInt16) {
+    func org(_ pc: UInt16) {
         regs.pc = pc
     }
     
@@ -89,27 +91,15 @@ class Z80 {
         return regs
     }
     
-    func getTCycle() -> Int {
-        return t_cycle
-    }
-    
-    func addressFromPair(val_h: UInt8, _ val_l: UInt8) -> UInt16 {
+    func addressFromPair(_ val_h: UInt8, _ val_l: UInt8) -> UInt16 {
         return UInt16(Int(Int(val_h) * 0x100) + Int(val_l))
     }
     
     // gets next opcode from PC and executes it
     func step() {
-        let old_t_cycle = t_cycle
-        
         repeat {
             processInstruction()
         } while id_opcode_table != table_NONE
-        
-        frameTics += t_cycle - old_t_cycle
-        if frameTics >= TICS_PER_FRAME {
-            delegate?.frameCompleted()
-            frameTics -= TICS_PER_FRAME
-        }
     }
     
     func processInstruction() {
@@ -120,9 +110,14 @@ class Z80 {
     func getNextOpcode() {
         t_cycle += 4
         
-        // get opcode at PC into IR register
-        regs.ir = dataBus.read(regs.pc)
-        regs.pc = regs.pc &+ 1
+        if halted {
+            // cpu halted, always execute NOP
+            regs.ir = 0x00
+        } else {
+            // get opcode at PC into IR register
+            regs.ir = dataBus.read(regs.pc)
+            regs.pc = regs.pc &+ 1
+        }
         
         if regs.ir != 0xCB || id_opcode_table == table_NONE {
             // save bit 7 of R to restore after increment

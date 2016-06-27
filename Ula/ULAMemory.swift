@@ -9,14 +9,14 @@
 import Foundation
 
 final class ULAMemory : Ram {
-    let ulaDelegate: UlaDelegate
+    let ulaDelegate: InternalUlaOperationDelegate
     
-    init(delegate: UlaDelegate) {
+    init(delegate: InternalUlaOperationDelegate) {
         self.ulaDelegate = delegate
         super.init(base_address: 0x4000, block_size: 0x4000)
     }
     
-    override func write(address: UInt16, value: UInt8) {
+    override func write(_ address: UInt16, value: UInt8) {
         super.write(address, value: value)
         ulaDelegate.memoryWrite(address, value: value)
     }

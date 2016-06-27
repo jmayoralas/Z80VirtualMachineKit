@@ -17,9 +17,9 @@ protocol BusComponentBase: class {
     
     func getBaseAddress() -> UInt16
     func getBlockSize() -> Int
-    func read(address: UInt16) -> UInt8
-    func write(address: UInt16, value: UInt8)
-    func dumpFromAddress(fromAddress: Int, count: Int) -> [UInt8]
+    func read(_ address: UInt16) -> UInt8
+    func write(_ address: UInt16, value: UInt8)
+    func dumpFromAddress(_ fromAddress: Int, count: Int) -> [UInt8]
 }
 
 extension BusComponentBase {

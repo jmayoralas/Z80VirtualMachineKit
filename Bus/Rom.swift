@@ -9,14 +9,14 @@
 import Foundation
 
 final class Rom: Ram {
-    override func write(address: UInt16, value: UInt8) {
+    override func write(_ address: UInt16, value: UInt8) {
         // do nothing
     }
     
-    func loadData(data: [UInt8], atAddress address: Int) throws
+    func loadData(_ data: [UInt8], atAddress address: Int) throws
     {
         guard data.count <= self.block_size else {
-            throw RomErrors.BufferLimitReach
+            throw RomErrors.bufferLimitReach
         }
         
         for i in 0..<data.count {

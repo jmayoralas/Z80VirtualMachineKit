@@ -134,24 +134,24 @@ public struct Registers {
 }
 
 enum UlaOp {
-    case Add, Adc, Sub, Sbc, And, Or, Xor, Rlc, Rrc, Rl, Rr, Sla, Sra, Sll, Srl, Sls, Bit
+    case add, adc, sub, sbc, and, or, xor, rlc, rrc, rl, rr, sla, sra, sll, srl, sls, bit
 }
 
-public enum Z80Error : ErrorType {
-    case ZeroBytesReadFromMemory
-    case ZeroBytesWriteToMemory
+public enum Z80Error : ErrorProtocol {
+    case zeroBytesReadFromMemory
+    case zeroBytesWriteToMemory
 }
 
 enum IrqKind {
-    case NMI, Soft
+    case nmi, soft
 }
 
-let S = 0
-let Z = 1
-let H = 3
-let PV = 5
-let N = 6
-let C = 7
+let S = 7
+let Z = 6
+let H = 4
+let PV = 2
+let N = 1
+let C = 0
 
 // id opcode table
 let table_NONE = 0
