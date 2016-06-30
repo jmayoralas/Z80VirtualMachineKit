@@ -32,6 +32,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
 
     // MARK: Initialization
     func setup() {
+        screenView.imageScaling = .scaleProportionallyUpOrDown
         screen = VmScreen()
         vm = Z80VirtualMachineKit(screen)
         vm.delegate = self
