@@ -19,9 +19,12 @@ class KeyEventHandler {
         if let index = number_key_codes.index(of: event.keyCode) {
             char = Character(String(index))
         } else {
-            if event.keyCode == 36 {
+            switch event.keyCode {
+            case 36:
                 char = "*" // enter key
-            } else {
+            case 51:
+                char = "@" // backspace key
+            default:
                 char = Character(event.charactersIgnoringModifiers!.lowercased())
             }
         }
