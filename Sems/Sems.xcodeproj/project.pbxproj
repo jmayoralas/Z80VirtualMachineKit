@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D143DF81D292C7800991AD5 /* AudioKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D143DF71D292C7800991AD5 /* AudioKit.framework */; };
+		1D143DF91D292C7800991AD5 /* AudioKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1D143DF71D292C7800991AD5 /* AudioKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1D429D481D22E6A6003DA7FC /* KeyEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D429D471D22E6A6003DA7FC /* KeyEventHandler.swift */; };
 		1DF397EA1D21929F00045D06 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF397E91D21929F00045D06 /* AppDelegate.swift */; };
 		1DF397EC1D21929F00045D06 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF397EB1D21929F00045D06 /* ViewController.swift */; };
@@ -23,6 +25,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				1D143DF91D292C7800991AD5 /* AudioKit.framework in Embed Frameworks */,
 				1DF397FA1D2192CE00045D06 /* Z80VirtualMachineKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -31,6 +34,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1D143DF71D292C7800991AD5 /* AudioKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioKit.framework; path = "../../../../../../../../../../Volumes/Datos Mini/Documentos/Desarrollo/z80emu/Sems/AudioKit.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D429D471D22E6A6003DA7FC /* KeyEventHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyEventHandler.swift; sourceTree = "<group>"; };
 		1DF397E61D21929F00045D06 /* Sems.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sems.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF397E91D21929F00045D06 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -46,6 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1D143DF81D292C7800991AD5 /* AudioKit.framework in Frameworks */,
 				1DF397F91D2192CE00045D06 /* Z80VirtualMachineKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -56,6 +61,7 @@
 		1DF397DD1D21929E00045D06 = {
 			isa = PBXGroup;
 			children = (
+				1D143DF71D292C7800991AD5 /* AudioKit.framework */,
 				1DF397F81D2192CE00045D06 /* Z80VirtualMachineKit.framework */,
 				1DF397E81D21929F00045D06 /* Sems */,
 				1DF397E71D21929F00045D06 /* Products */,
@@ -266,6 +272,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = Sems/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = lomocorp.Sems;
@@ -279,6 +289,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = Sems/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = lomocorp.Sems;
