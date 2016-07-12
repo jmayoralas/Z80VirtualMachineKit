@@ -74,8 +74,11 @@ final class Ula: InternalUlaOperationDelegate {
     
     private var key_buffer = [UInt8](repeatElement(0xFF, count: 0x100))
     
+    private var audioStreamer: AudioStreamer
+    
     init(screen: VmScreen) {
         self.screen = screen
+        audioStreamer = AudioStreamer()
         
         memory = ULAMemory(delegate: self)
         io = ULAIo(delegate: self)
