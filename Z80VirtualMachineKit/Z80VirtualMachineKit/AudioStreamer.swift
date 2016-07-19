@@ -13,22 +13,24 @@ typealias AudioDataElement = Float
 typealias AudioData = [AudioDataElement]
 
 let kSampleRate = 48000.0
+let kSamplesPerFrame = Int(kSampleRate) / 50
 let kNumberBuffers = 3
-let kNumberBufferElements = Int(kSampleRate) / 50
 
-extension Int {
-    var degreesToRadian: Double {
-        return Double(self) * .pi / 180
-    }
+
+protocol AudioStreamerDelegate {
+    func requestAudioData(sender: AudioStreamer) -> AudioData
 }
 
 class AudioStreamer {
+    var audioData: AudioData?
+    
+    var delegate: AudioStreamerDelegate
     var outputQueue: AudioQueueRef?
     
     var buffers = [AudioQueueBufferRef?](repeatElement(nil, count: kNumberBuffers))
-    let bufferByteSize = UInt32(kNumberBufferElements * sizeof(AudioDataElement)) // 20 mili sec of audio
+    let bufferByteSize = UInt32(kSamplesPerFrame * sizeof(AudioDataElement)) // 20 mili sec of audio
     
-    var allocatedBuffers = 0
+    var nextAvailableBuffer = 0
     
     var streamBasicDescription = AudioStreamBasicDescription(
         mSampleRate: 48000.0,
@@ -42,7 +44,9 @@ class AudioStreamer {
         mReserved: 0
     )
     
-    init() {
+    init(delegate: AudioStreamerDelegate) {
+        self.delegate = delegate
+        
         // create new output audio queue
         AudioQueueNewOutput(
             &self.streamBasicDescription,
@@ -53,42 +57,41 @@ class AudioStreamer {
             0,
             &self.outputQueue
         )
-    }
+        
+        // allocate audio buffers
+        for i in 0 ..< kNumberBuffers {
+            AudioQueueAllocateBuffer(
+                self.outputQueue!,
+                self.bufferByteSize,
+                &self.buffers[i]
+            )
+            
+            if let bufferRef = self.buffers[i] {
+                // configure audio buffer
+                let selfPointer = unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self)
     
-    var audioData: AudioData? {
-        get {
-            return self.audioData
+                bufferRef.pointee.mUserData = selfPointer
+                bufferRef.pointee.mAudioDataByteSize = self.bufferByteSize
+                
+                AudioStreamerOuputCallback(userData: selfPointer, queueRef: self.outputQueue!, buffer: bufferRef)
+            }
         }
         
-        set {
-            self.audioData = newValue
+        AudioQueueStart(self.outputQueue!, nil)
+    }
+    
+    func enqueueAudioData(_ audioData: AudioData) {
+        // wait for a free audioData buffer
+        self.audioData = audioData
+        NSLog("new audioData")
+        
+        if self.nextAvailableBuffer < kNumberBuffers {
+            let selfPointer = unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self)
+            AudioStreamerOuputCallback(userData: selfPointer, queueRef: self.outputQueue!, buffer: self.buffers[nextAvailableBuffer]!)
+            self.nextAvailableBuffer += 1
             
-            if let _ = self.audioData {
-                // if there are still free buffers, allocate buffer and prime this audioData to outputQueue
-                if self.allocatedBuffers < kNumberBufferElements {
-                    AudioQueueAllocateBuffer(
-                        self.outputQueue!,
-                        self.bufferByteSize,
-                        &self.buffers[self.allocatedBuffers]
-                    )
-                    
-                    if let bufferRef = self.buffers[self.allocatedBuffers] {
-                        // configure audio buffer
-                        let selfPointer = unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self)
-                        
-                        bufferRef.pointee.mUserData = selfPointer
-                        bufferRef.pointee.mAudioDataByteSize = self.bufferByteSize
-                        
-                        self.allocatedBuffers += 1
-                        
-                        AudioStreamerOuputCallback(userData: selfPointer, queueRef: self.outputQueue!, buffer: self.buffers[self.allocatedBuffers]!)
-                        
-                        if self.allocatedBuffers == kNumberBufferElements {
-                            // all buffers completed, outputQueue can be started now
-                            AudioQueueStart(self.outputQueue!, nil)
-                        }
-                    }
-                }
+            if self.nextAvailableBuffer == kNumberBuffers {
+                AudioQueueStart(self.outputQueue!, nil)
             }
         }
     }
@@ -98,12 +101,9 @@ func AudioStreamerOuputCallback(userData: Optional<UnsafeMutablePointer<Void>>, 
     // recover AudioStreamer instance from void * userData
     let this = Unmanaged<AudioStreamer>.fromOpaque(OpaquePointer(userData!)).takeUnretainedValue()
     
-    if let audioData = this.audioData {
-        memcpy(buffer.pointee.mAudioData, unsafeBitCast(audioData, to: UnsafeMutablePointer<Void>.self), Int(this.bufferByteSize))
-        
-        AudioQueueEnqueueBuffer(queueRef, buffer, 0, nil)
-        this.audioData = nil
-    } else {
-        AudioQueueStop(queueRef, false)
-    }
+    let audioData = this.delegate.requestAudioData(sender: this)
+    memcpy(buffer.pointee.mAudioData, unsafeBitCast(audioData, to: UnsafeMutablePointer<Void>.self), Int(this.bufferByteSize))
+    
+    AudioQueueEnqueueBuffer(queueRef, buffer, 0, nil)
+    this.audioData = nil
 }
