@@ -78,6 +78,7 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     
     private var audioData = AudioData(repeating: 0.0, count: kSamplesPerFrame)
     private var audioWave: AudioDataElement = 0
+    private var dcAverage: AudioDataElement = 0
     
     private var ioData: UInt8 = 0x00
     private let semaphore = DispatchSemaphore(value: 0)
@@ -100,18 +101,20 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         frameTics += t_cycle
         
         // sample ioData to compute new audio data
-/*
-        var sample: AudioDataElement = (ioData & 0b00010000) > 0 ? 16384 : -16384
-        sample += (ioData & 0b00001000) > 0 ? 8192 : -8192
 
+        var sample: AudioDataElement = (ioData & 0b00010000) > 0 ? 1 : -1
+        sample += (ioData & 0b00001000) > 0 ? 0.5 : -0.5
+
+        dcAverage = (dcAverage + sample) / 2
+        
         audioWave -= audioWave / 8
         audioWave += sample / 8
         
         let offset: Int = (frameTics * kSamplesPerFrame) / TICS_PER_FRAME;
         if offset < kSamplesPerFrame {
-            audioData[offset] = audioWave
+            audioData[offset] = audioWave - dcAverage
         }
-*/
+
         if lineTics > TICS_PER_LINE {
             screenLineCompleted(&IRQ)
         }
