@@ -73,6 +73,9 @@ private struct UlaUpdateData {
         KeyboardRow(address: 0x7F, keys: [" ","-","m","n","b"]),
     ]
     
+    private let capsShiftUlaUpdateData = UlaUpdateData(address: 0xFE, value: 0b11111110)
+    private let symbolShiftUlaUpdateData = UlaUpdateData(address: 0x7F, value: 0b11111101)
+    
     // MARK: Constructor
     public init(_ screen: VmScreen) {
         ula = Ula(screen: screen)
@@ -211,11 +214,23 @@ private struct UlaUpdateData {
     
     // MARK: Keyboard management
     public func keyDown(char: Character) {
-        updateUla(operation: .down, data: getKeyboardUlaUpdateData(char: char))
+        let lchar = char == "@" ? "0" : char
+        
+        // treat special combinatio for backspace
+        if char == "@" {
+            updateUla(operation: .down, data: capsShiftUlaUpdateData)
+        }
+        updateUla(operation: .down, data: getKeyboardUlaUpdateData(char: lchar))
     }
     
     public func keyUp(char: Character) {
-        updateUla(operation: .up, data: getKeyboardUlaUpdateData(char: char))
+        let lchar = char == "@" ? "0" : char
+        
+        // treat special combinatio for backspace
+        if char == "@" {
+            updateUla(operation: .up, data: capsShiftUlaUpdateData)
+        }
+        updateUla(operation: .up, data: getKeyboardUlaUpdateData(char: lchar))
     }
     
     public func specialKeyUpdate(special_keys: SpecialKeys) {
@@ -226,14 +241,14 @@ private struct UlaUpdateData {
         } else {
             op = .up
         }
-        updateUla(operation: op, data: UlaUpdateData(address: 0xFE, value: 0b11111110))
+        updateUla(operation: op, data: capsShiftUlaUpdateData)
         
         if special_keys.contains(SpecialKeys.symbolShift) {
             op = .down
         } else {
             op = .up
         }
-        updateUla(operation: op, data: UlaUpdateData(address: 0x7F, value: 0b11111101))
+        updateUla(operation: op, data: symbolShiftUlaUpdateData)
     }
     
     
