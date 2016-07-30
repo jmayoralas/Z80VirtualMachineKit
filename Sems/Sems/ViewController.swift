@@ -108,7 +108,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         assert(pixels.count == width * height)
         
         let providerRef = CGDataProvider(
-            data: Data(bytes: UnsafePointer<UInt8>(pixels), count: pixels.count * sizeof(PixelData))
+            data: Data(bytes: UnsafePointer<UInt8>(pixels), count: pixels.count * sizeof(PixelData.self))
         )
         
         let cgim = CGImage(
@@ -116,7 +116,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
             height: height,
             bitsPerComponent: bitsPerComponent,
             bitsPerPixel: bitsPerPixel,
-            bytesPerRow: width * sizeof(PixelData),
+            bytesPerRow: width * sizeof(PixelData.self),
             space: rgbColorSpace,
             bitmapInfo: bitmapInfo,
             provider: providerRef!,

@@ -99,7 +99,7 @@ class AudioStreamer {
 
 func AudioStreamerOuputCallback(userData: Optional<UnsafeMutablePointer<Void>>, queueRef: AudioQueueRef, buffer: AudioQueueBufferRef) {
     // recover AudioStreamer instance from void * userData
-    let this = Unmanaged<AudioStreamer>.fromOpaque(OpaquePointer(userData!)).takeUnretainedValue()
+    let this = Unmanaged<AudioStreamer>.fromOpaque(userData!).takeUnretainedValue()
     
     let audioData = this.delegate.requestAudioData(sender: this)
     memcpy(buffer.pointee.mAudioData, unsafeBitCast(audioData, to: UnsafeMutablePointer<Void>.self), Int(this.bufferByteSize))
