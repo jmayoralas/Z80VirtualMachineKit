@@ -94,38 +94,14 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     
     // MARK: Screen handling
     func Z80VMScreenRefresh() {
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapContext = CGContext(data: &self.screen.buffer, width: 320, height: 240, bitsPerComponent: 8, bytesPerRow: 4 * 320, space: colorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue)
+        
+        let cgImage = bitmapContext!.makeImage()
+        
         DispatchQueue.main.async { [unowned self] in
-            self.screenView.image = self.imageFromARGB32Bitmap(self.screen.buffer, width: 320, height: 240)
+            self.screenView.image = NSImage(cgImage: cgImage!, size: NSZeroSize)
         }
-    }
-    
-    func imageFromARGB32Bitmap(_ pixels:[PixelData], width:Int, height:Int) -> NSImage {
-        let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
-        let bitsPerComponent = 8
-        let bitsPerPixel = 32
-        
-        assert(pixels.count == width * height)
-        
-        let providerRef = CGDataProvider(
-            data: Data(bytes: UnsafePointer<UInt8>(pixels), count: pixels.count * sizeof(PixelData.self))
-        )
-        
-        let cgim = CGImage(
-            width: width,
-            height: height,
-            bitsPerComponent: bitsPerComponent,
-            bitsPerPixel: bitsPerPixel,
-            bytesPerRow: width * sizeof(PixelData.self),
-            space: rgbColorSpace,
-            bitmapInfo: bitmapInfo,
-            provider: providerRef!,
-            decode: nil,
-            shouldInterpolate: true,
-            intent: CGColorRenderingIntent.defaultIntent
-        )
-        
-        return NSImage(cgImage: cgim!, size: NSZeroSize)
     }
 }
 
