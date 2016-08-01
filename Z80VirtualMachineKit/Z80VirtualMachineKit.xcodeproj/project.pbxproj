@@ -7,12 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D0AA7531D43E846007612CE /* AudioUnitStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0AA7521D43E846007612CE /* AudioUnitStreamer.swift */; };
+		1D1BEFED1D4A661B00A8641A /* sfifo.c in Sources */ = {isa = PBXBuildFile; fileRef = 1D1BEFEB1D4A661B00A8641A /* sfifo.c */; };
+		1D1BEFEE1D4A661B00A8641A /* sfifo.h in Headers */ = {isa = PBXBuildFile; fileRef = 1D1BEFEC1D4A661B00A8641A /* sfifo.h */; };
+		1D1E33F41D46702A00F3D07D /* SoundWave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1E33F31D46702A00F3D07D /* SoundWave.swift */; };
 		1D24EACF1D3553D7003BA41E /* AudioStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */; };
 		1D2D381B1CD5102D00DA69B6 /* BusComponentBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2D381A1CD5102D00DA69B6 /* BusComponentBase.swift */; };
 		1D2D381D1CD655C200DA69B6 /* Ram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2D381C1CD655C200DA69B6 /* Ram.swift */; };
 		1D2D381F1CD6570E00DA69B6 /* BusComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2D381E1CD6570E00DA69B6 /* BusComponent.swift */; };
 		1D53EEDD1CE502A400AF9A16 /* Bus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D53EEDC1CE502A400AF9A16 /* Bus.swift */; };
 		1D74EEC91CF35998004B5748 /* GenericIODevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D74EEC81CF35998004B5748 /* GenericIODevice.swift */; };
+		1DB040E91D44D07300D9B03E /* blipbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 1DB040E71D44D07300D9B03E /* blipbuffer.c */; };
+		1DB040EA1D44D07300D9B03E /* blipbuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DB040E81D44D07300D9B03E /* blipbuffer.h */; };
 		1DBABA921D09BE2500E631D5 /* Ula.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBABA911D09BE2500E631D5 /* Ula.swift */; };
 		1DBABA941D09BE8700E631D5 /* ULAMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBABA931D09BE8700E631D5 /* ULAMemory.swift */; };
 		1DBABA961D09BE9F00E631D5 /* ULAIo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBABA951D09BE9F00E631D5 /* ULAIo.swift */; };
@@ -31,12 +37,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1D0AA7521D43E846007612CE /* AudioUnitStreamer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioUnitStreamer.swift; sourceTree = "<group>"; };
+		1D1BEFEB1D4A661B00A8641A /* sfifo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sfifo.c; sourceTree = "<group>"; };
+		1D1BEFEC1D4A661B00A8641A /* sfifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sfifo.h; sourceTree = "<group>"; };
+		1D1E33F31D46702A00F3D07D /* SoundWave.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundWave.swift; sourceTree = "<group>"; };
 		1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioStreamer.swift; sourceTree = "<group>"; };
 		1D2D381A1CD5102D00DA69B6 /* BusComponentBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BusComponentBase.swift; path = ../../Bus/BusComponentBase.swift; sourceTree = "<group>"; };
 		1D2D381C1CD655C200DA69B6 /* Ram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Ram.swift; path = ../../Bus/Ram.swift; sourceTree = "<group>"; };
 		1D2D381E1CD6570E00DA69B6 /* BusComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BusComponent.swift; path = ../../Bus/BusComponent.swift; sourceTree = "<group>"; };
 		1D53EEDC1CE502A400AF9A16 /* Bus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Bus.swift; path = ../../Bus/Bus.swift; sourceTree = "<group>"; };
 		1D74EEC81CF35998004B5748 /* GenericIODevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GenericIODevice.swift; path = ../../Bus/GenericIODevice.swift; sourceTree = "<group>"; };
+		1DB040E71D44D07300D9B03E /* blipbuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = blipbuffer.c; sourceTree = "<group>"; };
+		1DB040E81D44D07300D9B03E /* blipbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = blipbuffer.h; sourceTree = "<group>"; };
+		1DB040ED1D44D32500D9B03E /* module.map */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.map; sourceTree = "<group>"; };
 		1DBABA911D09BE2500E631D5 /* Ula.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Ula.swift; path = ../../Ula/Ula.swift; sourceTree = "<group>"; };
 		1DBABA931D09BE8700E631D5 /* ULAMemory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ULAMemory.swift; path = ../../Ula/ULAMemory.swift; sourceTree = "<group>"; };
 		1DBABA951D09BE9F00E631D5 /* ULAIo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ULAIo.swift; path = ../../Ula/ULAIo.swift; sourceTree = "<group>"; };
@@ -109,13 +122,20 @@
 		1DD722D81C35857B00178421 /* Z80VirtualMachineKit */ = {
 			isa = PBXGroup;
 			children = (
+				1D1BEFEB1D4A661B00A8641A /* sfifo.c */,
+				1D1BEFEC1D4A661B00A8641A /* sfifo.h */,
+				1DB040E71D44D07300D9B03E /* blipbuffer.c */,
+				1DB040E81D44D07300D9B03E /* blipbuffer.h */,
 				1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */,
+				1D0AA7521D43E846007612CE /* AudioUnitStreamer.swift */,
 				1DBABA901D09BDBF00E631D5 /* Ula */,
 				1D2D38191CD50A8500DA69B6 /* Bus */,
 				1DD723061C35871800178421 /* Cpu */,
 				1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */,
 				1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */,
 				1DD722DB1C35857B00178421 /* Info.plist */,
+				1DB040ED1D44D32500D9B03E /* module.map */,
+				1D1E33F31D46702A00F3D07D /* SoundWave.swift */,
 			);
 			path = Z80VirtualMachineKit;
 			sourceTree = "<group>";
@@ -144,7 +164,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1D1BEFEE1D4A661B00A8641A /* sfifo.h in Headers */,
 				1DD722DA1C35857B00178421 /* Z80VirtualMachineKit.h in Headers */,
+				1DB040EA1D44D07300D9B03E /* blipbuffer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,6 +240,7 @@
 			files = (
 				1DD722E21C3585A800178421 /* Z80VirtualMachineKit.swift in Sources */,
 				1DBABA941D09BE8700E631D5 /* ULAMemory.swift in Sources */,
+				1DB040E91D44D07300D9B03E /* blipbuffer.c in Sources */,
 				1D74EEC91CF35998004B5748 /* GenericIODevice.swift in Sources */,
 				1DBABA961D09BE9F00E631D5 /* ULAIo.swift in Sources */,
 				1D53EEDD1CE502A400AF9A16 /* Bus.swift in Sources */,
@@ -226,12 +249,15 @@
 				1D24EACF1D3553D7003BA41E /* AudioStreamer.swift in Sources */,
 				1DD7231A1C35871800178421 /* ControlUnit_opcodes_none.swift in Sources */,
 				1DD723131C35871800178421 /* ControlUnit.swift in Sources */,
+				1D1E33F41D46702A00F3D07D /* SoundWave.swift in Sources */,
 				1DD723141C35871800178421 /* ControlUnit_opcodes_cb.swift in Sources */,
 				1DD723171C35871800178421 /* ControlUnit_opcodes_ed.swift in Sources */,
 				1D2D381B1CD5102D00DA69B6 /* BusComponentBase.swift in Sources */,
+				1D1BEFED1D4A661B00A8641A /* sfifo.c in Sources */,
 				1DD7231E1C35871800178421 /* Z80.swift in Sources */,
 				1DD723161C35871800178421 /* ControlUnit_opcodes_xxcb.swift in Sources */,
 				1DD7231B1C35871800178421 /* extensions.swift in Sources */,
+				1D0AA7531D43E846007612CE /* AudioUnitStreamer.swift in Sources */,
 				1D2D381F1CD6570E00DA69B6 /* BusComponent.swift in Sources */,
 				1D2D381D1CD655C200DA69B6 /* Ram.swift in Sources */,
 				1DD7231D1C35871800178421 /* types.swift in Sources */,
@@ -283,6 +309,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Z80VirtualMachineKit";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -323,6 +350,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Z80VirtualMachineKit";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};

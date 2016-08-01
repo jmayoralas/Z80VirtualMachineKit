@@ -37,7 +37,7 @@ protocol InternalUlaOperationDelegate {
     func ioRead(_ address: UInt16) -> UInt8
 }
 
-final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
+final class Ula: InternalUlaOperationDelegate, SoundWaveDelegate {
     var memory: ULAMemory!
     var io: ULAIo!
     
@@ -74,21 +74,24 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     
     private var key_buffer = [UInt8](repeatElement(0xFF, count: 0x100))
     
-    private var audioStreamer: AudioStreamer!
+    // private var audioStreamer: AudioStreamer!
     
     private var audioData = AudioData(repeating: 0.0, count: kSamplesPerFrame)
     private var audioWave: AudioDataElement = 0
     private var dcAverage: AudioDataElement = 0
     
     private var ioData: UInt8 = 0x00
-    private let semaphore = DispatchSemaphore(value: 0)
+    
+    private var sw: SoundWave!
     
     init(screen: VmScreen) {
         self.screen = screen
-        audioStreamer = AudioStreamer(delegate: self)
+        // audioStreamer = AudioStreamer(delegate: self)
         
         memory = ULAMemory(delegate: self)
         io = ULAIo(delegate: self)
+        
+        sw = SoundWave(delegate: self)
     }
     
     func step(t_cycle: Int, _ IRQ: inout Bool) {
@@ -100,21 +103,6 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         lineTics += t_cycle
         frameTics += t_cycle
         
-        // sample ioData to compute new audio data
-
-        var sample: AudioDataElement = (ioData & 0b00010000) > 0 ? 1 : -1
-        sample += (ioData & 0b00001000) > 0 ? 0.5 : -0.5
-
-        dcAverage = (dcAverage + sample) / 2
-        
-        audioWave -= audioWave / 8
-        audioWave += sample / 8
-        
-        let offset: Int = (frameTics * kSamplesPerFrame) / TICS_PER_FRAME;
-        if offset < kSamplesPerFrame {
-            audioData[offset] = audioWave - dcAverage
-        }
-
         if lineTics > TICS_PER_LINE {
             screenLineCompleted(&IRQ)
         }
@@ -202,7 +190,7 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         }
         
         if screenLine >= SCREEN_LINES {
-            semaphore.wait()
+            sw.soundFrame()
             
             frames += 1
             if frames > 16 {
@@ -254,15 +242,14 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     
     func ioWrite(_ address: UInt16, value: UInt8)  {
         self.ioData = value
+        var on = ( (value & 0x10) > 0 ? 2 : 0 ) + ( (value & 0x08) > 0 ? 0 : 1 )
+        sw.soundBeeper(t_cycle: frameTics, value: Int(on))
         
         // get the border color from value
         borderColor = colorTable[Int(value) & 0x07]
     }
     
-    // MARK: AudioStreamer delegate
-    func requestAudioData(sender: AudioStreamer) -> AudioData {
-        semaphore.signal()
-        
-        return self.audioData
+    func audioDataRequested() {
+        // semaphore.signal()
     }
 }
