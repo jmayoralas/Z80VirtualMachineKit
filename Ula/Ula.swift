@@ -11,25 +11,6 @@ import Foundation
 private let TICS_PER_LINE = 224
 private let SCREEN_LINES = 312 // 64 + 192 + 56
 private let TICS_PER_FRAME = TICS_PER_LINE * SCREEN_LINES
-private let WHITE_COLOR = PixelData(a: 255, r: 0xCD, g: 0xCD, b: 0xCD)
-
-public struct PixelData {
-    var a:UInt8 = 255
-    var r:UInt8
-    var g:UInt8
-    var b:UInt8
-}
-
-extension PixelData: Equatable {}
-    public func ==(lhs: PixelData, rhs: PixelData) -> Bool {
-        return lhs.a == rhs.a && lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b
-    }
-
-private struct Attribute {
-    var flashing: Bool
-    var paperColor: PixelData
-    var inkColor: PixelData
-}
 
 protocol InternalUlaOperationDelegate {
     func memoryWrite(_ address: UInt16, value: UInt8)

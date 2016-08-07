@@ -8,14 +8,8 @@
 
 import Foundation
 
-private let WHITE_COLOR = PixelData(a: 255, r: 0xCD, g: 0xCD, b: 0xCD)
-
 public enum RomErrors: ErrorProtocol {
     case bufferLimitReach
-}
-
-@objc final public class VmScreen: NSObject {
-    public var buffer = [PixelData](repeating: WHITE_COLOR, count: 320 * 240)
 }
 
 public struct SpecialKeys: OptionSet {

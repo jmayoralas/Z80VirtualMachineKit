@@ -9,6 +9,8 @@
 import Cocoa
 import Z80VirtualMachineKit
 
+let kColorSpace = CGColorSpaceCreateDeviceRGB()
+
 class ViewController: NSViewController, Z80VirtualMachineStatus {
     @IBOutlet weak var screenView: NSImageView!
     
@@ -105,8 +107,9 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     
     // MARK: Screen handling
     func Z80VMScreenRefresh() {
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapContext = CGContext(data: &self.screen.buffer, width: 320, height: 240, bitsPerComponent: 8, bytesPerRow: 4 * 320, space: colorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue)
+        var screen_buffer = screen.getBuffer(width: 320)
+        
+        let bitmapContext = CGContext(data: &screen_buffer, width: 320, height: 240, bitsPerComponent: 8, bytesPerRow: 4 * 320, space: kColorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue)
         
         let cgImage = bitmapContext!.makeImage()
         
