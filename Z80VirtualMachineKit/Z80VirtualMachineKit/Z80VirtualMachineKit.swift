@@ -82,6 +82,8 @@ private struct UlaUpdateData {
     private let symbolShiftUlaUpdateData = UlaUpdateData(address: 0x7F, value: 0b11111101)
     private var previousSpecialKeys = SpecialKeys()
     
+    public var tapeAvailable = false
+    
     // MARK: Constructor
     public init(_ screen: VmScreen) {
         ula = Ula(screen: screen)
@@ -139,7 +141,7 @@ private struct UlaUpdateData {
         
         cpu.t_cycle = 0
         
-        if cpu.regs.pc == 0x056B {
+        if cpu.regs.pc == 0x056B && tapeAvailable {
             do {
                 try tapeLoaderHandler()
                 
