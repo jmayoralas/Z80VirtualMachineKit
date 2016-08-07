@@ -27,6 +27,10 @@ public struct SpecialKeys: OptionSet {
     public static let symbolShift = SpecialKeys(rawValue: 1 << 1)
 }
 
+private enum TapeLoaderError: ErrorProtocol {
+    case OutOfData
+}
+
 private enum UlaKeyOperation {
     case down
     case up
@@ -42,6 +46,7 @@ private struct UlaUpdateData {
     @objc optional func Z80VMMemoryReadAtAddress(_ address: Int, byte: UInt8)
     @objc optional func Z80VMScreenRefresh()
     @objc optional func Z80VMEmulationHalted()
+    @objc func tapeBlockRequested() -> UnsafeMutablePointer<UInt8>?
 }
 
 @objc final public class Z80VirtualMachineKit: NSObject, MemoryChange
@@ -134,23 +139,25 @@ private struct UlaUpdateData {
         
         cpu.t_cycle = 0
         
+        if cpu.regs.pc == 0x056B {
+            do {
+                try tapeLoaderHandler()
+                
+                cpu.regs.bc = 0xB001
+                cpu.regs.af_ = 0x0145
+                cpu.regs.f.setBit(C)
+            } catch {
+                cpu.regs.f.resetBit(C)
+            }
+            
+            cpu.regs.pc = 0x05E2
+        }
+        
         cpu.step()
         ula.step(t_cycle: cpu.t_cycle, &IRQ)
         
         t_cycles = cpu.t_cycle
-/*
-        if instructions > 824000 && cpu.regs.pc == 0x0298 && cpu.regs.bc == 0xBFFE  && cpu.regs.sp == 0xFF3A {
-            cpu.regs.a = 0xFB
-            cpu.regs.f = 0b10010101
-            t_cycles = 7618271
-            instructions = 824514
-            irq_enabled = false
-        }
-
-        if cpu.regs.pc == 0x82BA && cpu.regs.sp == 0x8800 && cpu.addressFromPair(cpu.dataBus.read(cpu.regs.sp + 1), cpu.dataBus.read(cpu.regs.sp)) == 0x86c1 && cpu.regs.r == 0x8D {
-            cpu.stopped = true
-        }
-*/
+        
         if IRQ {
             if irq_enabled {
                 cpu.irq(kind: .soft)
@@ -211,6 +218,22 @@ private struct UlaUpdateData {
     
     public func dumpMemoryFromAddress(_ fromAddress: Int, toAddress: Int) -> [UInt8] {
         return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
+    }
+    
+    private func tapeLoaderHandler() throws {
+        if let bufferRef = delegate!.tapeBlockRequested() {
+            let buffer = Array(UnsafeBufferPointer(start: bufferRef, count: Int(cpu.regs.de + 1)))
+            
+            for (index, data) in buffer.enumerated() {
+                if 0 < index {
+                    cpu.dataBus.write(cpu.regs.ix, value: data)
+                    cpu.regs.ix = cpu.regs.ix &+ 1
+                    cpu.regs.de -= 1
+                }
+            }
+        } else {
+            throw TapeLoaderError.OutOfData
+        }
     }
     
     // MARK: Keyboard management

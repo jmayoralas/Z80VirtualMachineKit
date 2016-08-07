@@ -15,6 +15,8 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     var screen: VmScreen!
     var vm: Z80VirtualMachineKit!
     
+    var tapeLoader = TapeLoader()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -102,6 +104,27 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         DispatchQueue.main.async { [unowned self] in
             self.screenView.image = NSImage(cgImage: cgImage!, size: NSZeroSize)
         }
+    }
+    
+    // MARK: Tape loader
+    func tapeBlockRequested() -> UnsafeMutablePointer<UInt8>? {
+        var tapeBlock: TapeBlock?
+        
+        do {
+            tapeBlock = try tapeLoader.readBlock()
+        } catch TapeLoaderErrors.OutOfData {
+            NSLog("Out of data")
+        } catch {
+            NSLog("error")
+        }
+        
+        var data: UnsafeMutablePointer<UInt8>? = nil
+        
+        if let block = tapeBlock {
+            data = UnsafeMutablePointer(block.data)
+        }
+        
+        return data
     }
 }
 
