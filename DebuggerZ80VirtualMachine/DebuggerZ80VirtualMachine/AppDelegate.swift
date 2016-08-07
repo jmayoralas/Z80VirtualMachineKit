@@ -15,7 +15,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     var mainViewController: MainViewController!
 
-
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         mainViewController = MainViewController(nibName: "MainViewController", bundle: nil)
         

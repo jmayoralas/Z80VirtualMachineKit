@@ -27,6 +27,10 @@ public struct SpecialKeys: OptionSet {
     public static let symbolShift = SpecialKeys(rawValue: 1 << 1)
 }
 
+private enum TapeLoaderError: ErrorProtocol {
+    case OutOfData
+}
+
 private enum UlaKeyOperation {
     case down
     case up
@@ -42,6 +46,7 @@ private struct UlaUpdateData {
     @objc optional func Z80VMMemoryReadAtAddress(_ address: Int, byte: UInt8)
     @objc optional func Z80VMScreenRefresh()
     @objc optional func Z80VMEmulationHalted()
+    @objc func tapeBlockRequested() -> UnsafeMutablePointer<UInt8>?
 }
 
 @objc final public class Z80VirtualMachineKit: NSObject, MemoryChange
@@ -72,6 +77,12 @@ private struct UlaUpdateData {
         KeyboardRow(address: 0xBF, keys: ["*","l","k","j","h"]),
         KeyboardRow(address: 0x7F, keys: [" ","-","m","n","b"]),
     ]
+    
+    private let capsShiftUlaUpdateData = UlaUpdateData(address: 0xFE, value: 0b11111110)
+    private let symbolShiftUlaUpdateData = UlaUpdateData(address: 0x7F, value: 0b11111101)
+    private var previousSpecialKeys = SpecialKeys()
+    
+    public var tapeAvailable = false
     
     // MARK: Constructor
     public init(_ screen: VmScreen) {
@@ -130,23 +141,25 @@ private struct UlaUpdateData {
         
         cpu.t_cycle = 0
         
+        if cpu.regs.pc == 0x056B && tapeAvailable {
+            do {
+                try tapeLoaderHandler()
+                
+                cpu.regs.bc = 0xB001
+                cpu.regs.af_ = 0x0145
+                cpu.regs.f.setBit(C)
+            } catch {
+                cpu.regs.f.resetBit(C)
+            }
+            
+            cpu.regs.pc = 0x05E2
+        }
+        
         cpu.step()
         ula.step(t_cycle: cpu.t_cycle, &IRQ)
         
         t_cycles = cpu.t_cycle
-/*
-        if instructions > 824000 && cpu.regs.pc == 0x0298 && cpu.regs.bc == 0xBFFE  && cpu.regs.sp == 0xFF3A {
-            cpu.regs.a = 0xFB
-            cpu.regs.f = 0b10010101
-            t_cycles = 7618271
-            instructions = 824514
-            irq_enabled = false
-        }
-
-        if cpu.regs.pc == 0x82BA && cpu.regs.sp == 0x8800 && cpu.addressFromPair(cpu.dataBus.read(cpu.regs.sp + 1), cpu.dataBus.read(cpu.regs.sp)) == 0x86c1 && cpu.regs.r == 0x8D {
-            cpu.stopped = true
-        }
-*/
+        
         if IRQ {
             if irq_enabled {
                 cpu.irq(kind: .soft)
@@ -209,34 +222,97 @@ private struct UlaUpdateData {
         return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
     }
     
+    private func tapeLoaderHandler() throws {
+        if let bufferRef = delegate!.tapeBlockRequested() {
+            let buffer = Array(UnsafeBufferPointer(start: bufferRef, count: Int(cpu.regs.de + 1)))
+            
+            for (index, data) in buffer.enumerated() {
+                if 0 < index {
+                    cpu.dataBus.write(cpu.regs.ix, value: data)
+                    cpu.regs.ix = cpu.regs.ix &+ 1
+                    cpu.regs.de -= 1
+                }
+            }
+        } else {
+            throw TapeLoaderError.OutOfData
+        }
+    }
+    
     // MARK: Keyboard management
     public func keyDown(char: Character) {
-        updateUla(operation: .down, data: getKeyboardUlaUpdateData(char: char))
+        let (lchar, ulaUpdateData) = getEfectiveKeyData(char: char)
+        
+        if let data = ulaUpdateData {
+            updateUla(operation: .up, data: capsShiftUlaUpdateData)
+            updateUla(operation: .down, data: data)
+        }
+        
+        updateUla(operation: .down, data: getKeyboardUlaUpdateData(char: lchar))
     }
     
     public func keyUp(char: Character) {
-        updateUla(operation: .up, data: getKeyboardUlaUpdateData(char: char))
+        let (lchar, ulaUpdateData) = getEfectiveKeyData(char: char)
+        
+        if let data = ulaUpdateData {
+            updateUla(operation: .up, data: data)
+        }
+        
+        updateUla(operation: .up, data: getKeyboardUlaUpdateData(char: lchar))
     }
     
     public func specialKeyUpdate(special_keys: SpecialKeys) {
-        var op: UlaKeyOperation
-                
-        if special_keys.contains(SpecialKeys.capsShift) {
-            op = .down
-        } else {
-            op = .up
+        var op: UlaKeyOperation = special_keys.contains(SpecialKeys.capsShift) ? .down : .up
+        if (!previousSpecialKeys.contains(SpecialKeys.capsShift) && op == .down) || (previousSpecialKeys.contains(SpecialKeys.capsShift) && op == .up) {
+            updateUla(operation: op, data: capsShiftUlaUpdateData)
         }
-        updateUla(operation: op, data: UlaUpdateData(address: 0xFE, value: 0b11111110))
         
-        if special_keys.contains(SpecialKeys.symbolShift) {
-            op = .down
-        } else {
-            op = .up
+        op = special_keys.contains(SpecialKeys.symbolShift) ? .down : .up
+        if (!previousSpecialKeys.contains(SpecialKeys.symbolShift) && op == .down) || (previousSpecialKeys.contains(SpecialKeys.symbolShift) && op == .up) {
+            updateUla(operation: op, data: symbolShiftUlaUpdateData)
         }
-        updateUla(operation: op, data: UlaUpdateData(address: 0x7F, value: 0b11111101))
+        
+        previousSpecialKeys = special_keys
     }
     
-    
+    private func getEfectiveKeyData(char: Character) -> (Character, UlaUpdateData?) {
+        // treat special combination for backspace
+        var lchar: Character = char
+        var ulaUpdateData: UlaUpdateData? = nil
+        
+        switch char {
+        case "@":
+            lchar = "0"
+            ulaUpdateData = capsShiftUlaUpdateData
+        case ",":
+            lchar = "n"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case ";":
+            lchar = "o"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case ":":
+            lchar = "z"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case ".":
+            lchar = "m"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case "-":
+            lchar = "j"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case "+":
+            lchar = "k"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case "<":
+            lchar = "r"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case ">":
+            lchar = "t"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        default:
+            break
+        }
+        
+        return (lchar, ulaUpdateData)
+    }
     
     private func updateUla(operation: UlaKeyOperation, data: UlaUpdateData) {
         if let address = data.address {
