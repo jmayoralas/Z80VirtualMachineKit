@@ -75,6 +75,7 @@ private struct UlaUpdateData {
     
     private let capsShiftUlaUpdateData = UlaUpdateData(address: 0xFE, value: 0b11111110)
     private let symbolShiftUlaUpdateData = UlaUpdateData(address: 0x7F, value: 0b11111101)
+    private var previousSpecialKeys = SpecialKeys()
     
     // MARK: Constructor
     public init(_ screen: VmScreen) {
@@ -216,7 +217,7 @@ private struct UlaUpdateData {
     public func keyDown(char: Character) {
         let lchar = char == "@" ? "0" : char
         
-        // treat special combinatio for backspace
+        // treat special combination for backspace
         if char == "@" {
             updateUla(operation: .down, data: capsShiftUlaUpdateData)
         }
@@ -226,7 +227,7 @@ private struct UlaUpdateData {
     public func keyUp(char: Character) {
         let lchar = char == "@" ? "0" : char
         
-        // treat special combinatio for backspace
+        // treat special combination for backspace
         if char == "@" {
             updateUla(operation: .up, data: capsShiftUlaUpdateData)
         }
@@ -234,21 +235,17 @@ private struct UlaUpdateData {
     }
     
     public func specialKeyUpdate(special_keys: SpecialKeys) {
-        var op: UlaKeyOperation
-                
-        if special_keys.contains(SpecialKeys.capsShift) {
-            op = .down
-        } else {
-            op = .up
+        var op: UlaKeyOperation = special_keys.contains(SpecialKeys.capsShift) ? .down : .up
+        if (!previousSpecialKeys.contains(SpecialKeys.capsShift) && op == .down) || (previousSpecialKeys.contains(SpecialKeys.capsShift) && op == .up) {
+            updateUla(operation: op, data: capsShiftUlaUpdateData)
         }
-        updateUla(operation: op, data: capsShiftUlaUpdateData)
         
-        if special_keys.contains(SpecialKeys.symbolShift) {
-            op = .down
-        } else {
-            op = .up
+        op = special_keys.contains(SpecialKeys.symbolShift) ? .down : .up
+        if (!previousSpecialKeys.contains(SpecialKeys.symbolShift) && op == .down) || (previousSpecialKeys.contains(SpecialKeys.symbolShift) && op == .up) {
+            updateUla(operation: op, data: symbolShiftUlaUpdateData)
         }
-        updateUla(operation: op, data: symbolShiftUlaUpdateData)
+        
+        previousSpecialKeys = special_keys
     }
     
     

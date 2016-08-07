@@ -122,11 +122,19 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     
     // MARK: Keyboard management
     func keyDown(address: UInt8, value: UInt8) {
-        key_buffer[Int(address)] = key_buffer[Int(address)] & value
+        for i in 0 ..< 8 {
+            if (Int(address) >> i) & 0x01 == 0 {
+                key_buffer[i] = key_buffer[i] & value
+            }
+        }
     }
     
     func keyUp(address: UInt8, value: UInt8) {
-        key_buffer[Int(address)] = key_buffer[Int(address)] | ~value
+        for i in 0 ..< 8 {
+            if (Int(address) >> i) & 0x01 == 0 {
+                key_buffer[i] = key_buffer[i] | ~value
+            }
+        }
     }
     
     // MARK: Screen management
@@ -249,7 +257,14 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     }
     
     func ioRead(_ address: UInt16) -> UInt8 {
-        return key_buffer[Int(address.high)]
+        var key_scanned: UInt8 = 0b10111111
+        
+        for i in 0 ..< 8 {
+            if (Int(address.high) >> i) & 0x01 == 0 {
+                key_scanned = key_scanned & key_buffer[i]
+            }
+        }
+        return key_scanned
     }
     
     func ioWrite(_ address: UInt16, value: UInt8)  {
