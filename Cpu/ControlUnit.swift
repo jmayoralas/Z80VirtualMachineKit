@@ -249,8 +249,10 @@ extension Z80 {
 
     func call(_ address: UInt16) {
         t_cycle += 7
-        dataBus.write(regs.sp - 1, value: regs.pc.high)
-        dataBus.write(regs.sp - 2, value: regs.pc.low)
+        var sp = regs.sp &- 1
+        dataBus.write(sp, value: regs.pc.high)
+        sp = regs.sp &- 2
+        dataBus.write(sp, value: regs.pc.low)
         regs.sp = regs.sp &- 2
         regs.pc = address
     }
