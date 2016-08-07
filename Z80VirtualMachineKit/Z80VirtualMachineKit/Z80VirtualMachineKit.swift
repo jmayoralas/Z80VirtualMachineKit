@@ -238,22 +238,25 @@ private struct UlaUpdateData {
     
     // MARK: Keyboard management
     public func keyDown(char: Character) {
-        let lchar = char == "@" ? "0" : char
+        let (lchar, ulaUpdateData) = getEfectiveKeyData(char: char)
         
-        // treat special combination for backspace
-        if char == "@" {
-            updateUla(operation: .down, data: capsShiftUlaUpdateData)
+        print("char: \(lchar)")
+        
+        if let data = ulaUpdateData {
+            updateUla(operation: .up, data: capsShiftUlaUpdateData)
+            updateUla(operation: .down, data: data)
         }
+        
         updateUla(operation: .down, data: getKeyboardUlaUpdateData(char: lchar))
     }
     
     public func keyUp(char: Character) {
-        let lchar = char == "@" ? "0" : char
+        let (lchar, ulaUpdateData) = getEfectiveKeyData(char: char)
         
-        // treat special combination for backspace
-        if char == "@" {
-            updateUla(operation: .up, data: capsShiftUlaUpdateData)
+        if let data = ulaUpdateData {
+            updateUla(operation: .up, data: data)
         }
+        
         updateUla(operation: .up, data: getKeyboardUlaUpdateData(char: lchar))
     }
     
@@ -271,7 +274,45 @@ private struct UlaUpdateData {
         previousSpecialKeys = special_keys
     }
     
-    
+    private func getEfectiveKeyData(char: Character) -> (Character, UlaUpdateData?) {
+        // treat special combination for backspace
+        var lchar: Character = char
+        var ulaUpdateData: UlaUpdateData? = nil
+        
+        switch char {
+        case "@":
+            lchar = "0"
+            ulaUpdateData = capsShiftUlaUpdateData
+        case ",":
+            lchar = "n"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case ";":
+            lchar = "o"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case ":":
+            lchar = "z"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case ".":
+            lchar = "m"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case "-":
+            lchar = "j"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case "+":
+            lchar = "k"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case "<":
+            lchar = "r"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        case ">":
+            lchar = "t"
+            ulaUpdateData = symbolShiftUlaUpdateData
+        default:
+            break
+        }
+        
+        return (lchar, ulaUpdateData)
+    }
     
     private func updateUla(operation: UlaKeyOperation, data: UlaUpdateData) {
         if let address = data.address {
