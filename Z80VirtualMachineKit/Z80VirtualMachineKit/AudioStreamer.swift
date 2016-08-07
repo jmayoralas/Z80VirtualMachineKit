@@ -76,7 +76,9 @@ class AudioStreamer {
                 AudioStreamerOuputCallback(userData: selfPointer, queueRef: self.outputQueue!, buffer: bufferRef)
             }
         }
-        
+    }
+    
+    func start() {
         AudioQueueStart(self.outputQueue!, nil)
     }
     

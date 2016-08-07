@@ -37,6 +37,8 @@ protocol InternalUlaOperationDelegate {
     func ioRead(_ address: UInt16) -> UInt8
 }
 
+private let kEmulateAudio = true
+
 final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     var memory: ULAMemory!
     var io: ULAIo!
@@ -72,7 +74,7 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     private var frames: Int = 0
     private var frameStartTime: Date!
     
-    private var key_buffer = [UInt8](repeatElement(0xFF, count: 0x100))
+    private var key_buffer = [UInt8](repeatElement(0xFF, count: 8))
     
     private var audioStreamer: AudioStreamer!
     
@@ -89,6 +91,10 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         
         memory = ULAMemory(delegate: self)
         io = ULAIo(delegate: self)
+        
+        if kEmulateAudio {
+            audioStreamer.start()
+        }
     }
     
     func step(t_cycle: Int, _ IRQ: inout Bool) {
@@ -100,19 +106,21 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         lineTics += t_cycle
         frameTics += t_cycle
         
-        // sample ioData to compute new audio data
-
-        var sample: AudioDataElement = (ioData & 0b00010000) > 0 ? 1 : -1
-        sample += (ioData & 0b00001000) > 0 ? 0.5 : -0.5
-
-        dcAverage = (dcAverage + sample) / 2
-        
-        audioWave -= audioWave / 8
-        audioWave += sample / 8
-        
-        let offset: Int = (frameTics * kSamplesPerFrame) / TICS_PER_FRAME;
-        if offset < kSamplesPerFrame {
-            audioData[offset] = audioWave - dcAverage
+        if kEmulateAudio {
+            // sample ioData to compute new audio data
+            
+            var sample: AudioDataElement = (ioData & 0b00010000) > 0 ? 1 : -1
+            sample += (ioData & 0b00001000) > 0 ? 0.5 : -0.5
+            
+            dcAverage = (dcAverage + sample) / 2
+            
+            audioWave -= audioWave / 8
+            audioWave += sample / 8
+            
+            let offset: Int = (frameTics * kSamplesPerFrame) / TICS_PER_FRAME;
+            if offset < kSamplesPerFrame {
+                audioData[offset] = audioWave - dcAverage
+            }
         }
 
         if lineTics > TICS_PER_LINE {
@@ -210,8 +218,10 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         }
         
         if screenLine >= SCREEN_LINES {
-            semaphore.wait()
-            
+            if kEmulateAudio {
+                semaphore.wait()
+            }
+
             frames += 1
             if frames > 16 {
                 flashState = !flashState
