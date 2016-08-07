@@ -240,8 +240,6 @@ private struct UlaUpdateData {
     public func keyDown(char: Character) {
         let (lchar, ulaUpdateData) = getEfectiveKeyData(char: char)
         
-        print("char: \(lchar)")
-        
         if let data = ulaUpdateData {
             updateUla(operation: .up, data: capsShiftUlaUpdateData)
             updateUla(operation: .down, data: data)
