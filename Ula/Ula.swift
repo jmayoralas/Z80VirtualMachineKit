@@ -109,8 +109,8 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         if kEmulateAudio {
             // sample ioData to compute new audio data
             
-            var sample: AudioDataElement = (ioData & 0b00010000) > 0 ? 1 : -1
-            sample += (ioData & 0b00001000) > 0 ? 0.5 : -0.5
+            var sample: AudioDataElement = (ioData & 0b00010000) > 0 ? 0.25 : -0.25
+            sample += (ioData & 0b00001000) > 0 ? 0.1 : -0.1
             
             dcAverage = (dcAverage + sample) / 2
             
