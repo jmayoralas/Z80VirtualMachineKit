@@ -25,6 +25,15 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         
         vm.run()
     }
+    
+    override func viewDidAppear() {
+        let appVersionString = String(
+            format: "Sems v%@.%@",
+            Bundle.main.objectForInfoDictionaryKey("CFBundleShortVersionString") as! String,
+            Bundle.main.objectForInfoDictionaryKey("CFBundleVersion") as! String
+        )
+        self.view.window!.title = appVersionString
+    }
 
     override var representedObject: AnyObject? {
         didSet {
