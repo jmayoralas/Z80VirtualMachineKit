@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="11129.15" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="11173.2" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11129.15"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11173.2"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <scenes>
@@ -60,7 +60,11 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="File" id="bib-Uj-vzu">
                                     <items>
-                                        <menuItem title="Load program..." keyEquivalent="o" id="scO-kW-lM3"/>
+                                        <menuItem title="Open tape..." keyEquivalent="o" id="scO-kW-lM3">
+                                            <connections>
+                                                <action selector="openTape:" target="Ady-hI-5gd" id="xEm-C3-B6x"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -68,7 +72,12 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Emulation" id="q6o-A0-tjN">
                                     <items>
-                                        <menuItem title="Pause" keyEquivalent="p" id="Gpv-Id-wVW"/>
+                                        <menuItem title="Reset" keyEquivalent="r" id="Gpv-Id-wVW">
+                                            <connections>
+                                                <action selector="resetMachine:" target="Ady-hI-5gd" id="ke1-Rm-wxA"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Pause" keyEquivalent="p" id="RYq-1x-85q"/>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -81,7 +90,7 @@
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Sems" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="0.0"/>
+            <point key="canvasLocation" x="64" y="-142"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">

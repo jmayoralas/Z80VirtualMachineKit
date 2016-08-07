@@ -45,7 +45,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         NSEvent.addLocalMonitorForEvents(matching: .keyUp) {(theEvent: NSEvent) -> NSEvent? in return self.onKeyUp(theEvent: theEvent)}
         NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) {(theEvent: NSEvent) -> NSEvent? in return self.onFlagsChanged(theEvent: theEvent)}
     }
-
+    
     func loadRom() {
         let data = NSDataAsset(name: "Rom48k")!.data
         var buffer = [UInt8](repeating: 0, count: data.count)
@@ -125,6 +125,45 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         }
         
         return data
+    }
+    
+    // MARK: Menu selectors
+    @IBAction func openTape(_ sender: AnyObject) {
+        if vm.tapeAvailable {
+            tapeLoader.close()
+            vm.tapeAvailable = false
+        }
+        
+        let dialog = NSOpenPanel()
+        
+        dialog.title = "Choose a file"
+        dialog.showsResizeIndicator = true
+        dialog.showsHiddenFiles = false
+        dialog.canChooseDirectories = true
+        dialog.canCreateDirectories = true
+        dialog.allowsMultipleSelection = false
+        dialog.allowedFileTypes = ["tap"]
+        
+        if dialog.runModal() == NSModalResponseOK {
+            if let result = dialog.url {
+                let path = result.path!
+                
+                do {
+                    try tapeLoader.open(path: path)
+                    vm.tapeAvailable = true
+                } catch TapeLoaderErrors.FileNotFound {
+                    NSLog("File not found")
+                } catch {
+                    NSLog("Weird error")
+                }
+            }
+        }
+    }
+    
+    @IBAction func resetMachine(_ sender: AnyObject) {
+        tapeLoader.close()
+        vm.tapeAvailable = false
+        vm.reset()
     }
 }
 
