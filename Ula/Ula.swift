@@ -11,25 +11,6 @@ import Foundation
 private let TICS_PER_LINE = 224
 private let SCREEN_LINES = 312 // 64 + 192 + 56
 private let TICS_PER_FRAME = TICS_PER_LINE * SCREEN_LINES
-private let WHITE_COLOR = PixelData(a: 255, r: 0xCD, g: 0xCD, b: 0xCD)
-
-public struct PixelData {
-    var a:UInt8 = 255
-    var r:UInt8
-    var g:UInt8
-    var b:UInt8
-}
-
-extension PixelData: Equatable {}
-    public func ==(lhs: PixelData, rhs: PixelData) -> Bool {
-        return lhs.a == rhs.a && lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b
-    }
-
-private struct Attribute {
-    var flashing: Bool
-    var paperColor: PixelData
-    var inkColor: PixelData
-}
 
 protocol InternalUlaOperationDelegate {
     func memoryWrite(_ address: UInt16, value: UInt8)
@@ -44,25 +25,6 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     var io: ULAIo!
     
     private var screen: VmScreen
-    private let colorTable = [
-        PixelData(a: 255, r: 0, g: 0, b: 0),
-        PixelData(a: 255, r: 0, g: 0, b: 0xCD),
-        PixelData(a: 255, r: 0xCD, g: 0, b: 0),
-        PixelData(a: 255, r: 0xCD, g: 0, b: 0xCD),
-        PixelData(a: 255, r: 0, g: 0xCD, b: 0),
-        PixelData(a: 255, r: 0, g: 0xCD, b: 0xCD),
-        PixelData(a: 255, r: 0xCD, g: 0xCD, b: 0),
-        PixelData(a: 255, r: 0xCD, g: 0xCD, b: 0xCD),
-        
-        PixelData(a: 255, r: 0, g: 0, b: 0),
-        PixelData(a: 255, r: 0, g: 0, b: 0xFF),
-        PixelData(a: 255, r: 0xFF, g: 0, b: 0),
-        PixelData(a: 255, r: 0xFF, g: 0, b: 0xFF),
-        PixelData(a: 255, r: 0, g: 0xFF, b: 0),
-        PixelData(a: 255, r: 0, g: 0xFF, b: 0xFF),
-        PixelData(a: 255, r: 0xFF, g: 0xFF, b: 0),
-        PixelData(a: 255, r: 0xFF, g: 0xFF, b: 0xFF),
-    ]
     
     private var borderColor: PixelData = WHITE_COLOR
     
@@ -70,7 +32,7 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     private var frameTics: Int = 0
     private var lineTics: Int = 0
     private var screenLine: Int = 0
-    private var flashState: Bool = false
+    
     private var frames: Int = 0
     private var frameStartTime: Date!
     
@@ -91,6 +53,8 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         
         memory = ULAMemory(delegate: self)
         io = ULAIo(delegate: self)
+        
+        screen.memory = memory
         
         if kEmulateAudio {
             audioStreamer.start()
@@ -146,76 +110,11 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     }
     
     // MARK: Screen management
-    private func updateCharAtOffset(_ offset: Int, attribute: Attribute) {
-        let y = (offset / 32) * 8
-        let x = offset % 32
-        
-        let line_address = UInt16(0x4000 + y * 32 + x)
-        let line_address_corrected = (line_address & 0xF800) | ((line_address & 0x700) >> 3) | ((line_address & 0xE0) << 3) | (line_address & 0x1F)
-        
-        for i in 0...7 {
-            fillScreenEightBitLineAt(char: x, line: y + i, value: memory.read(line_address_corrected + UInt16(i * 0x100)), attribute: attribute)
-        }
-    }
-    
-    private func fillScreenEightBitLineAt(char x: Int, line y: Int, value: UInt8, attribute: Attribute) {
-        
-        let inkColor: PixelData!
-        let paperColor: PixelData!
-        
-        if flashState && attribute.flashing {
-            inkColor = attribute.paperColor
-            paperColor = attribute.inkColor
-        } else {
-            inkColor = attribute.inkColor
-            paperColor = attribute.paperColor
-        }
-        let index = (y + 24) * 320 + x * 8 + 32
-        var j = 0
-        
-        for i in (0...7).reversed() {
-            screen.buffer[index + j] = ((Int(value) & 1 << i) > 0) ? inkColor : paperColor
-            j += 1
-        }
-    }
-
-    
-    private func getAttribute(_ value: Int) -> Attribute {
-        return Attribute(
-            flashing: (value & 0b10000000) > 0 ? true : false,
-            paperColor: colorTable[(value >> 3) & 0b00001111],
-            inkColor: colorTable[((value >> 3) & 0b00001000) | (value & 0b00000111)]
-        )
-    }
-    
     private func screenLineCompleted(_ IRQ: inout Bool) {
         screenLine += 1
         lineTics -= TICS_PER_LINE
         
-        if 36 <= screenLine && screenLine <= 239 + 36 {
-            // the line is on the visible area of the screen
-            // update border color if we have to
-            let bitmapLine = screenLine - 36
-            let index = bitmapLine * 320
-            
-            // the bitmapLine background color has changed ?
-            if screen.buffer[index] != borderColor {
-                if 24 <= bitmapLine && bitmapLine < 24 + 192 {
-                    // bitmap border
-                    for i in 0..<32 {
-                        screen.buffer[index + i] = borderColor
-                    }
-                    for i in 256 + 32..<320 {
-                        screen.buffer[index + i] = borderColor
-                    }
-                } else {
-                    // above and below bitmap area border
-                    for i in 0..<320 {
-                        screen.buffer[index + i] = borderColor
-                    }
-                }
-            }
-        }
+        screen.updateBorder(line: screenLine, color: borderColor)
         
         if screenLine >= SCREEN_LINES {
             if kEmulateAudio {
@@ -224,8 +123,8 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
 
             frames += 1
             if frames > 16 {
-                flashState = !flashState
-                updateScreenFlashing()
+                screen.flashState = !screen.flashState
+                screen.updateFlashing()
                 frames = 0
             }
             
@@ -234,12 +133,6 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
             screenLine = 0
             
             IRQ = true
-        }
-    }
-    
-    private func updateScreenFlashing() {
-        for i in 0..<0x300 {
-            updateCharAtOffset(i, attribute: getAttribute(Int(memory.read(0x5800 + UInt16(i)))))
         }
     }
     
@@ -256,13 +149,10 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
             let y = Int(((local_address.high & 0b00011000) << 3) | ((local_address.low & 0b11100000) >> 2) | (local_address.high & 0b00000111))
             
             let attribute_address = 0x5800 + x + (y / 8) * 32
-            let attribute = getAttribute(Int(memory.read(UInt16(attribute_address))))
-            
-            fillScreenEightBitLineAt(char: x, line: y, value: value, attribute: attribute)
+            screen.fillEightBitLineAt(char: x, line: y, value: value, attribute: VmScreen.getAttribute(Int(memory.read(UInt16(attribute_address)))))
         } else {
             // attr area
-            let attribute = getAttribute(Int(value))
-            updateCharAtOffset(Int(local_address) & 0x7FF, attribute: attribute)
+            screen.updateCharAtOffset(Int(local_address) & 0x7FF, attribute: VmScreen.getAttribute(Int(value)))
         }
     }
     
