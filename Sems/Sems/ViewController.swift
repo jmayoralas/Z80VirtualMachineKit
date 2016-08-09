@@ -46,7 +46,9 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     // MARK: Initialization
     func setup() {
         screenView.imageScaling = .scaleProportionallyUpOrDown
-        screen = VmScreen()
+        
+        screen = VmScreen(zoomFactor: 2)
+        
         vm = Z80VirtualMachineKit(screen)
         vm.delegate = self
         
@@ -107,9 +109,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     
     // MARK: Screen handling
     func Z80VMScreenRefresh() {
-        var screen_buffer = screen.getBuffer(width: 320)
-        
-        let bitmapContext = CGContext(data: &screen_buffer, width: 320, height: 240, bitsPerComponent: 8, bytesPerRow: 4 * 320, space: kColorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue)
+        let bitmapContext = CGContext(data: &screen.buffer, width: screen.width, height: screen.height, bitsPerComponent: 8, bytesPerRow: 4 * screen.width, space: kColorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue)
         
         let cgImage = bitmapContext!.makeImage()
         
