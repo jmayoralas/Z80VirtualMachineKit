@@ -154,7 +154,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         dialog.canChooseDirectories = true
         dialog.canCreateDirectories = true
         dialog.allowsMultipleSelection = false
-        dialog.allowedFileTypes = ["tap", "tzx"]
+        dialog.allowedFileTypes = ["tap"]
         
         if dialog.runModal() == NSModalResponseOK {
             if let result = dialog.url {
