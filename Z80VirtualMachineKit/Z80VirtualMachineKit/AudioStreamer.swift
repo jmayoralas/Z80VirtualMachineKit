@@ -28,7 +28,7 @@ class AudioStreamer {
     var outputQueue: AudioQueueRef?
     
     var buffers = [AudioQueueBufferRef?](repeatElement(nil, count: kNumberBuffers))
-    let bufferByteSize = UInt32(kSamplesPerFrame * sizeof(AudioDataElement)) // 20 mili sec of audio
+    let bufferByteSize = UInt32(kSamplesPerFrame * MemoryLayout<AudioDataElement>.size) // 20 mili sec of audio
     
     var nextAvailableBuffer = 0
     
@@ -36,11 +36,11 @@ class AudioStreamer {
         mSampleRate: 48000.0,
         mFormatID: kAudioFormatLinearPCM,
         mFormatFlags: kAudioFormatFlagsNativeFloatPacked,
-        mBytesPerPacket: UInt32(sizeof(AudioDataElement)),
+        mBytesPerPacket: UInt32(MemoryLayout<AudioDataElement>.size),
         mFramesPerPacket: 1,
-        mBytesPerFrame: UInt32(sizeof(AudioDataElement)),
+        mBytesPerFrame: UInt32(MemoryLayout<AudioDataElement>.size),
         mChannelsPerFrame: 1,
-        mBitsPerChannel: UInt32(8 * sizeof(AudioDataElement)),
+        mBitsPerChannel: UInt32(8 * MemoryLayout<AudioDataElement>.size),
         mReserved: 0
     )
     
@@ -68,7 +68,7 @@ class AudioStreamer {
             
             if let bufferRef = self.buffers[i] {
                 // configure audio buffer
-                let selfPointer = unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self)
+                let selfPointer = unsafeBitCast(self, to: UnsafeMutableRawPointer.self)
     
                 bufferRef.pointee.mUserData = selfPointer
                 bufferRef.pointee.mAudioDataByteSize = self.bufferByteSize
@@ -99,7 +99,7 @@ class AudioStreamer {
     }
 }
 
-func AudioStreamerOuputCallback(userData: Optional<UnsafeMutablePointer<Void>>, queueRef: AudioQueueRef, buffer: AudioQueueBufferRef) {
+func AudioStreamerOuputCallback(userData: Optional<UnsafeMutableRawPointer>, queueRef: AudioQueueRef, buffer: AudioQueueBufferRef) {
     // recover AudioStreamer instance from void * userData
     let this = Unmanaged<AudioStreamer>.fromOpaque(userData!).takeUnretainedValue()
     

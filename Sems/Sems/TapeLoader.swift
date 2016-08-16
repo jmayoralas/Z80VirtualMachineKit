@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum TapeLoaderErrors: ErrorProtocol {
+enum TapeLoaderErrors: Error {
     case FileNotFound
     case OutOfData
 }
@@ -17,7 +17,7 @@ struct TapeBlock {
     var size : Int {
         get {
             // a tape block has a UInt16 header with the data buffer size, and the data buffer
-            return sizeof(UInt16.self) + data.count
+            return MemoryLayout<UInt16>.size + data.count
         }
     }
     
@@ -27,10 +27,10 @@ struct TapeBlock {
 private extension NSData {
     func getTapeBlock(atLocation location: Int) -> TapeBlock {
         var size: UInt16 = 0
-        var range = NSRange(location: location, length: sizeof(UInt16.self))
+        var range = NSRange(location: location, length: MemoryLayout<UInt16>.size)
         self.getBytes(&size, range: range)
         
-        range = NSRange(location: location + sizeof(UInt16.self), length: Int(size))
+        range = NSRange(location: location + MemoryLayout<UInt16>.size, length: Int(size))
         var tapeBlock = TapeBlock(data: [UInt8](repeating: 0, count: Int(size)))
         self.getBytes(&tapeBlock.data, range: range)
         

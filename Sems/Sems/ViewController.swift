@@ -31,16 +31,10 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     override func viewDidAppear() {
         let appVersionString = String(
             format: "Sems v%@.%@",
-            Bundle.main.objectForInfoDictionaryKey("CFBundleShortVersionString") as! String,
-            Bundle.main.objectForInfoDictionaryKey("CFBundleVersion") as! String
+            Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String,
+            Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
         )
         self.view.window!.title = appVersionString
-    }
-
-    override var representedObject: AnyObject? {
-        didSet {
-        // Update the view, if already loaded.
-        }
     }
 
     // MARK: Initialization
@@ -133,7 +127,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         var data: UnsafeMutablePointer<UInt8>? = nil
         
         if let block = tapeBlock {
-            data = UnsafeMutablePointer(block.data)
+            data = UnsafeMutablePointer(mutating:block.data)
         }
         
         return data
@@ -158,7 +152,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         
         if dialog.runModal() == NSModalResponseOK {
             if let result = dialog.url {
-                let path = result.path!
+                let path = result.path
                 
                 do {
                     try tapeLoader.open(path: path)
