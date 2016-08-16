@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum RomErrors: ErrorProtocol {
+public enum RomErrors: Error {
     case bufferLimitReach
 }
 
@@ -21,7 +21,7 @@ public struct SpecialKeys: OptionSet {
     public static let symbolShift = SpecialKeys(rawValue: 1 << 1)
 }
 
-private enum TapeLoaderError: ErrorProtocol {
+private enum TapeLoaderError: Error {
     case OutOfData
 }
 
@@ -112,7 +112,7 @@ private struct UlaUpdateData {
     public func run() {
         cpu.stopped = false
         
-        let queue = DispatchQueue.global(attributes: DispatchQueue.GlobalAttributes(rawValue: UInt64(Int(DispatchQueueAttributes.qosUserInitiated.rawValue))))
+        let queue = DispatchQueue.global()
         
         queue.async {
             repeat {

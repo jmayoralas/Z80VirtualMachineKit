@@ -137,7 +137,7 @@ enum UlaOp {
     case add, adc, sub, sbc, and, or, xor, rlc, rrc, rl, rr, sla, sra, sll, srl, sls, bit
 }
 
-public enum Z80Error : ErrorProtocol {
+public enum Z80Error : Error {
     case zeroBytesReadFromMemory
     case zeroBytesWriteToMemory
 }
