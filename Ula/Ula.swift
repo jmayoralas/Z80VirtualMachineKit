@@ -24,7 +24,7 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     var memory: ULAMemory!
     var io: ULAIo!
     
-    private var screen: VmScreen
+    var screen: VmScreen
     
     private var borderColor: PixelData = WHITE_COLOR
     
@@ -65,6 +65,7 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         if newFrame {
             frameStartTime = Date()
             newFrame = false
+            screen.changed = false
         }
         
         lineTics += t_cycle
