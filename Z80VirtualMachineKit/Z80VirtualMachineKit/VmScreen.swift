@@ -82,6 +82,10 @@ let kBaseWidth = 320
         }
     }
     
+    func beginFrame() {
+        self.changed = false
+    }
+    
     func fillEightBitLineAt(char x: Int, line y: Int, value: UInt8, attribute: Attribute) {
         
         let inkColor: PixelData!

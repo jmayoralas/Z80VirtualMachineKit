@@ -65,7 +65,7 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         if newFrame {
             frameStartTime = Date()
             newFrame = false
-            screen.changed = false
+            screen.beginFrame()
         }
         
         lineTics += t_cycle
