@@ -1,7 +1,7 @@
 /*
-------------------------------------------------------------
+ ------------------------------------------------------------
 	SFIFO 1.3
-------------------------------------------------------------
+ ------------------------------------------------------------
  * Simple portable lock-free FIFO
  * (c) 2000-2002, David Olofson
  * Released under the GNU LESSER GENERAL PUBLIC LICENSE Version 2.1
@@ -38,59 +38,59 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+    
 #include <errno.h>
-
-/*------------------------------------------------
-	"Private" stuff
-------------------------------------------------*/
-/*
- * Porting note:
- *	Reads and writes of a variable of this type in memory
- *	must be *atomic*! 'int' is *not* atomic on all platforms.
- *	A safe type should be used, and  sfifo should limit the
- *	maximum buffer size accordingly.
- */
-typedef int sfifo_atomic_t;
+    
+    /*------------------------------------------------
+     "Private" stuff
+     ------------------------------------------------*/
+    /*
+     * Porting note:
+     *	Reads and writes of a variable of this type in memory
+     *	must be *atomic*! 'int' is *not* atomic on all platforms.
+     *	A safe type should be used, and  sfifo should limit the
+     *	maximum buffer size accordingly.
+     */
+    typedef int sfifo_atomic_t;
 #ifdef __TURBOC__
 #	define	SFIFO_MAX_BUFFER_SIZE	0x7fff
 #else /* Kludge: Assume 32 bit platform */
 #	define	SFIFO_MAX_BUFFER_SIZE	0x7fffffff
 #endif
-
-typedef struct sfifo_t
-{
-	char *buffer;
-	int size;			/* Number of bytes */
-	sfifo_atomic_t readpos;		/* Read position */
-	sfifo_atomic_t writepos;	/* Write position */
-} sfifo_t;
-
+    
+    typedef struct sfifo_t
+    {
+        char *buffer;
+        int size;			/* Number of bytes */
+        sfifo_atomic_t readpos;		/* Read position */
+        sfifo_atomic_t writepos;	/* Write position */
+    } sfifo_t;
+    
 #define SFIFO_SIZEMASK(x)	((x)->size - 1)
-
-
-/*------------------------------------------------
-	API
-------------------------------------------------*/
-int sfifo_init(sfifo_t *f, int size);
-void sfifo_close(sfifo_t *f);
-void sfifo_flush(sfifo_t *f);
-int sfifo_write(sfifo_t *f, const void *buf, int len);
-int sfifo_read(sfifo_t *f, void *buf, int len);
-int sfifo_used(sfifo_t *f);
-int sfifo_space(sfifo_t *f);
-
-/*------------------------------------------------
-	Linux kernel space interface
-------------------------------------------------*/
+    
+    
+    /*------------------------------------------------
+     API
+     ------------------------------------------------*/
+    int sfifo_init(sfifo_t *f, int size);
+    void sfifo_close(sfifo_t *f);
+    void sfifo_flush(sfifo_t *f);
+    int sfifo_write(sfifo_t *f, const void *buf, int len);
+    int sfifo_read(sfifo_t *f, void *buf, int len);
+    int sfifo_used(sfifo_t *f);
+    int sfifo_space(sfifo_t *f);
+    
+    /*------------------------------------------------
+     Linux kernel space interface
+     ------------------------------------------------*/
 #ifdef __KERNEL__
-int sfifo_write_user(sfifo_t *f, const void *buf, int len);
-int sfifo_read_user(sfifo_t *f, void *buf, int len);
+    int sfifo_write_user(sfifo_t *f, const void *buf, int len);
+    int sfifo_read_user(sfifo_t *f, void *buf, int len);
 #else
 #	define	sfifo_write_user	sfifo_write
 #	define	sfifo_read_user		sfifo_read
 #endif
-
+    
 #ifdef __cplusplus
 };
 #endif
