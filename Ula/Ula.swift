@@ -41,6 +41,8 @@ final class Ula: InternalUlaOperationDelegate {
     private var ioData: UInt8 = 0x00
     private let semaphore = DispatchSemaphore(value: 0)
     
+    private let soundWaveGenerator = SoundWave()
+    
     init(screen: VmScreen) {
         self.screen = screen
         
@@ -91,7 +93,7 @@ final class Ula: InternalUlaOperationDelegate {
         
         if screenLine >= SCREEN_LINES {
             if kEmulateAudio {
-                semaphore.wait()
+                self.soundWaveGenerator.endFrame()
             }
 
             frames += 1
@@ -145,5 +147,10 @@ final class Ula: InternalUlaOperationDelegate {
         
         // get the border color from value
         borderColor = colorTable[Int(value) & 0x07]
+        
+        if kEmulateAudio {
+            // update sample
+            self.soundWaveGenerator.soundBeeper(t_cycle: self.frameTics, value: value)
+        }
     }
 }
