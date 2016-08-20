@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D24EACF1D3553D7003BA41E /* AudioStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */; };
 		1D2D381B1CD5102D00DA69B6 /* BusComponentBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2D381A1CD5102D00DA69B6 /* BusComponentBase.swift */; };
 		1D2D381D1CD655C200DA69B6 /* Ram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2D381C1CD655C200DA69B6 /* Ram.swift */; };
 		1D2D381F1CD6570E00DA69B6 /* BusComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2D381E1CD6570E00DA69B6 /* BusComponent.swift */; };
@@ -38,7 +37,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioStreamer.swift; sourceTree = "<group>"; };
 		1D2D381A1CD5102D00DA69B6 /* BusComponentBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BusComponentBase.swift; path = ../../Bus/BusComponentBase.swift; sourceTree = "<group>"; };
 		1D2D381C1CD655C200DA69B6 /* Ram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Ram.swift; path = ../../Bus/Ram.swift; sourceTree = "<group>"; };
 		1D2D381E1CD6570E00DA69B6 /* BusComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BusComponent.swift; path = ../../Bus/BusComponent.swift; sourceTree = "<group>"; };
@@ -130,7 +128,6 @@
 				1DD2B07B1D6621AC00A6C5F2 /* sfifo.c */,
 				1DD2B07C1D6621AC00A6C5F2 /* sfifo.h */,
 				1DD2B07D1D6621AC00A6C5F2 /* SoundWave.swift */,
-				1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */,
 				1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */,
 				1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */,
 				1D5A76851D57BFD800346583 /* VmScreen.swift */,
@@ -249,7 +246,6 @@
 				1D53EEDD1CE502A400AF9A16 /* Bus.swift in Sources */,
 				1DEF3B511CDF814200C2646F /* ControlUnit_opcodes_xx.swift in Sources */,
 				1DBABA921D09BE2500E631D5 /* Ula.swift in Sources */,
-				1D24EACF1D3553D7003BA41E /* AudioStreamer.swift in Sources */,
 				1DD7231A1C35871800178421 /* ControlUnit_opcodes_none.swift in Sources */,
 				1DD2B0821D6621AC00A6C5F2 /* SoundWave.swift in Sources */,
 				1DD723131C35871800178421 /* ControlUnit.swift in Sources */,

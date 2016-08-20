@@ -20,7 +20,7 @@ protocol InternalUlaOperationDelegate {
 
 private let kEmulateAudio = true
 
-final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
+final class Ula: InternalUlaOperationDelegate {
     var memory: ULAMemory!
     var io: ULAIo!
     
@@ -38,27 +38,16 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     
     private var key_buffer = [UInt8](repeatElement(0xFF, count: 8))
     
-    private var audioStreamer: AudioStreamer!
-    
-    private var audioData = AudioData(repeating: 0.0, count: kSamplesPerFrame)
-    private var audioWave: AudioDataElement = 0
-    private var dcAverage: AudioDataElement = 0
-    
     private var ioData: UInt8 = 0x00
     private let semaphore = DispatchSemaphore(value: 0)
     
     init(screen: VmScreen) {
         self.screen = screen
-        audioStreamer = AudioStreamer(delegate: self)
         
         memory = ULAMemory(delegate: self)
         io = ULAIo(delegate: self)
         
         screen.memory = memory
-        
-        if kEmulateAudio {
-            audioStreamer.start()
-        }
     }
     
     func step(t_cycle: Int, _ IRQ: inout Bool) {
@@ -71,23 +60,6 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         lineTics += t_cycle
         frameTics += t_cycle
         
-        if kEmulateAudio {
-            // sample ioData to compute new audio data
-            
-            var sample: AudioDataElement = (ioData & 0b00010000) > 0 ? 1.0 : -1.0
-            sample += (ioData & 0b00001000) > 0 ? 0.25 : -0.25
-            
-            dcAverage = (dcAverage + sample) / 2
-            
-            audioWave -= audioWave / 8
-            audioWave += sample / 8
-            
-            let offset: Int = (frameTics * kSamplesPerFrame) / TICS_PER_FRAME;
-            if offset < kSamplesPerFrame {
-                audioData[offset] = audioWave - dcAverage
-            }
-        }
-
         if lineTics > TICS_PER_LINE {
             screenLineCompleted(&IRQ)
         }
@@ -173,12 +145,5 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         
         // get the border color from value
         borderColor = colorTable[Int(value) & 0x07]
-    }
-    
-    // MARK: AudioStreamer delegate
-    func requestAudioData(sender: AudioStreamer) -> AudioData {
-        semaphore.signal()
-        
-        return self.audioData
     }
 }
