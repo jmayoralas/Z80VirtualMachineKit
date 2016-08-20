@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import AudioToolbox
 import BlipBuffer
 
 private let TICS_PER_LINE = 224
@@ -36,6 +37,8 @@ class SoundWave {
     
     private var samples = [Int16]()
     
+    private let semaphore = DispatchSemaphore(value: 0)
+    
     init() {
         bufferRef = new_Blip_Buffer()
         
@@ -59,11 +62,29 @@ class SoundWave {
     }
     
     func endFrame() {
+        if self.samples.count > 0 {
+            self.semaphore.wait()
+        }
+        
         blip_buffer_end_frame(bufferRef, TICS_PER_FRAME)
         
         let samplesRef: BlipSampleRef = BlipSampleRef.allocate(capacity: sound_frame_size)
         let count = blip_buffer_read_samples(bufferRef, samplesRef, sound_frame_size, 0)
         
         self.samples = Array(UnsafeBufferPointer(start: samplesRef, count: count))
-    }    
+    }
+    
+    func render(buffer: AudioBuffer) {
+        let nframes = self.samples.count
+        
+        var ptr = UnsafeMutablePointer<Int16>(buffer.mData!.assumingMemoryBound(to: Int16.self))
+        
+        for i in 0 ..< nframes {
+            ptr.pointee = self.samples[i]
+            ptr = ptr.successor()
+        }
+        
+        self.samples.removeAll()
+        self.semaphore.signal()
+    }
 }
