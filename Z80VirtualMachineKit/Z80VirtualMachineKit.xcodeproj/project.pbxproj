@@ -18,6 +18,11 @@
 		1DBABA941D09BE8700E631D5 /* ULAMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBABA931D09BE8700E631D5 /* ULAMemory.swift */; };
 		1DBABA961D09BE9F00E631D5 /* ULAIo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBABA951D09BE9F00E631D5 /* ULAIo.swift */; };
 		1DBD6D281CE8D90A000456CB /* Rom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBD6D271CE8D90A000456CB /* Rom.swift */; };
+		1DD2B0801D6621AC00A6C5F2 /* sfifo.c in Sources */ = {isa = PBXBuildFile; fileRef = 1DD2B07B1D6621AC00A6C5F2 /* sfifo.c */; };
+		1DD2B0811D6621AC00A6C5F2 /* sfifo.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DD2B07C1D6621AC00A6C5F2 /* sfifo.h */; };
+		1DD2B0821D6621AC00A6C5F2 /* SoundWave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD2B07D1D6621AC00A6C5F2 /* SoundWave.swift */; };
+		1DD2B0851D66244A00A6C5F2 /* blipbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 1DD2B0831D66244A00A6C5F2 /* blipbuffer.c */; };
+		1DD2B0861D66244A00A6C5F2 /* blipbuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DD2B0841D66244A00A6C5F2 /* blipbuffer.h */; };
 		1DD722DA1C35857B00178421 /* Z80VirtualMachineKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DD722E21C3585A800178421 /* Z80VirtualMachineKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */; };
 		1DD723131C35871800178421 /* ControlUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723071C35871800178421 /* ControlUnit.swift */; };
@@ -44,6 +49,12 @@
 		1DBABA931D09BE8700E631D5 /* ULAMemory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ULAMemory.swift; path = ../../Ula/ULAMemory.swift; sourceTree = "<group>"; };
 		1DBABA951D09BE9F00E631D5 /* ULAIo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ULAIo.swift; path = ../../Ula/ULAIo.swift; sourceTree = "<group>"; };
 		1DBD6D271CE8D90A000456CB /* Rom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Rom.swift; path = ../../Bus/Rom.swift; sourceTree = "<group>"; };
+		1DD2B07A1D6621AC00A6C5F2 /* module.map */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.map; sourceTree = "<group>"; };
+		1DD2B07B1D6621AC00A6C5F2 /* sfifo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sfifo.c; sourceTree = "<group>"; };
+		1DD2B07C1D6621AC00A6C5F2 /* sfifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sfifo.h; sourceTree = "<group>"; };
+		1DD2B07D1D6621AC00A6C5F2 /* SoundWave.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundWave.swift; sourceTree = "<group>"; };
+		1DD2B0831D66244A00A6C5F2 /* blipbuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = blipbuffer.c; sourceTree = "<group>"; };
+		1DD2B0841D66244A00A6C5F2 /* blipbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = blipbuffer.h; sourceTree = "<group>"; };
 		1DD722D61C35857B00178421 /* Z80VirtualMachineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Z80VirtualMachineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Z80VirtualMachineKit.h; sourceTree = "<group>"; };
 		1DD722DB1C35857B00178421 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -113,6 +124,12 @@
 		1DD722D81C35857B00178421 /* Z80VirtualMachineKit */ = {
 			isa = PBXGroup;
 			children = (
+				1DD2B0831D66244A00A6C5F2 /* blipbuffer.c */,
+				1DD2B0841D66244A00A6C5F2 /* blipbuffer.h */,
+				1DD2B07A1D6621AC00A6C5F2 /* module.map */,
+				1DD2B07B1D6621AC00A6C5F2 /* sfifo.c */,
+				1DD2B07C1D6621AC00A6C5F2 /* sfifo.h */,
+				1DD2B07D1D6621AC00A6C5F2 /* SoundWave.swift */,
 				1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */,
 				1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */,
 				1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */,
@@ -150,6 +167,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DD2B0861D66244A00A6C5F2 /* blipbuffer.h in Headers */,
+				1DD2B0811D6621AC00A6C5F2 /* sfifo.h in Headers */,
 				1DD722DA1C35857B00178421 /* Z80VirtualMachineKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -232,10 +251,12 @@
 				1DBABA921D09BE2500E631D5 /* Ula.swift in Sources */,
 				1D24EACF1D3553D7003BA41E /* AudioStreamer.swift in Sources */,
 				1DD7231A1C35871800178421 /* ControlUnit_opcodes_none.swift in Sources */,
+				1DD2B0821D6621AC00A6C5F2 /* SoundWave.swift in Sources */,
 				1DD723131C35871800178421 /* ControlUnit.swift in Sources */,
 				1DD723141C35871800178421 /* ControlUnit_opcodes_cb.swift in Sources */,
 				1DD723171C35871800178421 /* ControlUnit_opcodes_ed.swift in Sources */,
 				1D2D381B1CD5102D00DA69B6 /* BusComponentBase.swift in Sources */,
+				1DD2B0801D6621AC00A6C5F2 /* sfifo.c in Sources */,
 				1DD7231E1C35871800178421 /* Z80.swift in Sources */,
 				1DD723161C35871800178421 /* ControlUnit_opcodes_xxcb.swift in Sources */,
 				1DD7231B1C35871800178421 /* extensions.swift in Sources */,
@@ -243,6 +264,7 @@
 				1D2D381D1CD655C200DA69B6 /* Ram.swift in Sources */,
 				1DD7231D1C35871800178421 /* types.swift in Sources */,
 				1D5A76861D57BFD800346583 /* VmScreen.swift in Sources */,
+				1DD2B0851D66244A00A6C5F2 /* blipbuffer.c in Sources */,
 				1DBD6D281CE8D90A000456CB /* Rom.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -291,6 +313,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Z80VirtualMachineKit";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -331,6 +354,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Z80VirtualMachineKit";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};

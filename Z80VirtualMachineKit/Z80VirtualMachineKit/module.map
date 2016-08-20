@@ -1,0 +1,9 @@
+module BlipBuffer [system] {
+    header "blipbuffer.h"
+    export *
+}
+
+module SFifo [system] {
+    header "sfifo.h"
+    export *
+}
