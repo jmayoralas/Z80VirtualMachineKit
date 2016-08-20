@@ -34,11 +34,9 @@ class SoundWave {
     private var synthRef: BlipSynthRef
     private var bufferRef: BlipBufferRef
     
-    private var samplesRef: BlipSampleRef
+    private var samples = [Int16]()
     
-    init(delegate: SoundWaveDelegate) {
-        samplesRef = BlipSampleRef.allocate(capacity: sound_frame_size)
-        
+    init() {
         bufferRef = new_Blip_Buffer()
         
         blip_buffer_set_clock_rate(bufferRef, kProcessorSpeed)
@@ -53,15 +51,19 @@ class SoundWave {
         blip_synth_set_treble_eq(synthRef, 0)
     }
     
-    func soundBeeper(t_cycle: Int, value: Int) {
-        let amp = beeper_ampl[value]
+    func soundBeeper(t_cycle: Int, value: UInt8) {
+        var on = ( (value & 0x10) > 0 ? 2 : 0 ) + ( (value & 0x08) > 0 ? 0 : 1 )
+        let amp = beeper_ampl[on]
         
         blip_synth_update(synthRef, blip_time_t(t_cycle), amp)
     }
     
-    func soundFrame() {
+    func endFrame() {
         blip_buffer_end_frame(bufferRef, TICS_PER_FRAME)
         
-        _ = blip_buffer_read_samples(bufferRef, samplesRef, sound_frame_size, 0)
+        let samplesRef: BlipSampleRef = BlipSampleRef.allocate(capacity: sound_frame_size)
+        let count = blip_buffer_read_samples(bufferRef, samplesRef, sound_frame_size, 0)
+        
+        self.samples = Array(UnsafeBufferPointer(start: samplesRef, count: count))
     }    
 }
