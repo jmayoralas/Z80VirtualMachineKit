@@ -42,14 +42,16 @@ final class Ula: InternalUlaOperationDelegate {
     private let semaphore = DispatchSemaphore(value: 0)
     
     private let soundWaveGenerator = SoundWave()
+    private let audioRender: AudioRender
     
     init(screen: VmScreen) {
         self.screen = screen
+        self.audioRender = AudioRender(soundWave: soundWaveGenerator)
         
-        memory = ULAMemory(delegate: self)
-        io = ULAIo(delegate: self)
+        self.memory = ULAMemory(delegate: self)
+        self.io = ULAIo(delegate: self)
         
-        screen.memory = memory
+        self.screen.memory = self.memory
     }
     
     func step(t_cycle: Int, _ IRQ: inout Bool) {
@@ -94,6 +96,9 @@ final class Ula: InternalUlaOperationDelegate {
         if screenLine >= SCREEN_LINES {
             if kEmulateAudio {
                 self.soundWaveGenerator.endFrame()
+                if !self.audioRender.isStarted() {
+                    self.audioRender.start()
+                }
             }
 
             frames += 1
