@@ -10,6 +10,9 @@ import Foundation
 import AudioToolbox
 import AVFoundation
 
+let kSampleRate: Double = 48000.0
+let kSamplesPerFrame = Int(kSampleRate / 50)
+
 class AudioRender {
     private let ioUnit: AUAudioUnit
     private let soundWave: SoundWave

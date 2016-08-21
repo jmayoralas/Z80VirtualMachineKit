@@ -63,6 +63,10 @@ final class Ula: InternalUlaOperationDelegate {
         
         lineTics += t_cycle
         frameTics += t_cycle
+
+        if kEmulateAudio {
+            soundWaveGenerator.doSample(tCycle: self.frameTics, value: self.ioData)
+        }
         
         if lineTics > TICS_PER_LINE {
             screenLineCompleted(&IRQ)
@@ -95,7 +99,6 @@ final class Ula: InternalUlaOperationDelegate {
         
         if screenLine >= SCREEN_LINES {
             if kEmulateAudio {
-                self.soundWaveGenerator.endFrame()
                 if !self.audioRender.isStarted() {
                     self.audioRender.start()
                 }
@@ -152,10 +155,5 @@ final class Ula: InternalUlaOperationDelegate {
         
         // get the border color from value
         borderColor = colorTable[Int(value) & 0x07]
-        
-        if kEmulateAudio {
-            // update sample
-            self.soundWaveGenerator.soundBeeper(t_cycle: self.frameTics, value: value)
-        }
     }
 }

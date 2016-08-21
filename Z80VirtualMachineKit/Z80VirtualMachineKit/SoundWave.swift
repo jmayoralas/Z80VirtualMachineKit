@@ -35,9 +35,14 @@ class SoundWave {
     private var synthRef: BlipSynthRef
     private var bufferRef: BlipBufferRef
     
-    private var samples = [Int16]()
-    
     private let semaphore = DispatchSemaphore(value: 0)
+    
+    private var samples = [Float](repeating: 0.0, count: kSamplesPerFrame)
+    private var audioWave: Float = 0
+    private var dcAverage: Float = 0
+    
+    private var previousTCycle: Int = 0
+
     
     init() {
         bufferRef = new_Blip_Buffer()
@@ -54,6 +59,30 @@ class SoundWave {
         blip_synth_set_treble_eq(synthRef, 0)
     }
     
+    func doSample(tCycle: Int, value: UInt8) {
+        
+        if tCycle < self.previousTCycle {
+            self.semaphore.wait()
+        }
+        
+        self.previousTCycle = tCycle
+        
+        // sample ioData to compute new audio data
+        
+        var sample: Float = (value & 0b00010000) > 0 ? 1.0 : -1.0
+        sample += (value & 0b00001000) > 0 ? 0.25 : -0.25
+        
+        // dcAverage = (dcAverage + sample) / 2
+        
+        audioWave -= audioWave / 8
+        audioWave += sample / 8
+        
+        let offset: Int = (tCycle * kSamplesPerFrame) / TICS_PER_FRAME;
+        if offset < kSamplesPerFrame {
+            samples[offset] = audioWave - dcAverage
+        }
+    }
+    
     func soundBeeper(t_cycle: Int, value: UInt8) {
         var on = ( (value & 0x10) > 0 ? 2 : 0 ) + ( (value & 0x08) > 0 ? 0 : 1 )
         let amp = beeper_ampl[on]
@@ -61,30 +90,16 @@ class SoundWave {
         blip_synth_update(synthRef, blip_time_t(t_cycle), amp)
     }
     
-    func endFrame() {
-        if self.samples.count > 0 {
-            self.semaphore.wait()
-        }
-        
-        blip_buffer_end_frame(bufferRef, TICS_PER_FRAME)
-        
-        let samplesRef: BlipSampleRef = BlipSampleRef.allocate(capacity: sound_frame_size)
-        let count = blip_buffer_read_samples(bufferRef, samplesRef, sound_frame_size, 0)
-        
-        self.samples = Array(UnsafeBufferPointer(start: samplesRef, count: count))
-    }
-    
     func render(buffer: AudioBuffer) {
         let nframes = self.samples.count
         
-        var ptr = UnsafeMutablePointer<Int16>(buffer.mData!.assumingMemoryBound(to: Int16.self))
+        var ptr = UnsafeMutablePointer<Float>(buffer.mData!.assumingMemoryBound(to: Float.self))
         
         for i in 0 ..< nframes {
             ptr.pointee = self.samples[i]
             ptr = ptr.successor()
         }
         
-        self.samples.removeAll()
         self.semaphore.signal()
     }
 }
