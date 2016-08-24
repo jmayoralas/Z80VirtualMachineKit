@@ -8,10 +8,6 @@
 
 import Foundation
 
-private let TICS_PER_LINE = 224
-private let SCREEN_LINES = 312 // 64 + 192 + 56
-private let TICS_PER_FRAME = TICS_PER_LINE * SCREEN_LINES
-
 protocol InternalUlaOperationDelegate {
     func memoryWrite(_ address: UInt16, value: UInt8)
     func ioWrite(_ address: UInt16, value: UInt8)
@@ -20,7 +16,7 @@ protocol InternalUlaOperationDelegate {
 
 private let kEmulateAudio = true
 
-final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
+final class Ula: InternalUlaOperationDelegate {
     var memory: ULAMemory!
     var io: ULAIo!
     
@@ -34,22 +30,17 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     private var screenLine: Int = 0
     
     private var frames: Int = 0
-    private var frameStartTime: Date!
     
     private var key_buffer = [UInt8](repeatElement(0xFF, count: 8))
     
     private var audioStreamer: AudioStreamer!
     
-    private var audioData = AudioData(repeating: 0.0, count: kSamplesPerFrame)
-    private var audioWave: AudioDataElement = 0
-    private var dcAverage: AudioDataElement = 0
-    
     private var ioData: UInt8 = 0x00
-    private let semaphore = DispatchSemaphore(value: 0)
+
     
     init(screen: VmScreen) {
         self.screen = screen
-        audioStreamer = AudioStreamer(delegate: self)
+        audioStreamer = AudioStreamer()
         
         memory = ULAMemory(delegate: self)
         io = ULAIo(delegate: self)
@@ -63,7 +54,6 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
     
     func step(t_cycle: Int, _ IRQ: inout Bool) {
         if newFrame {
-            frameStartTime = Date()
             newFrame = false
             screen.beginFrame()
         }
@@ -73,19 +63,7 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         
         if kEmulateAudio {
             // sample ioData to compute new audio data
-            
-            var sample: AudioDataElement = (ioData & 0b00010000) > 0 ? 1.0 : -1.0
-            sample += (ioData & 0b00001000) > 0 ? 0.25 : -0.25
-            
-            dcAverage = (dcAverage + sample) / 2
-            
-            audioWave -= audioWave / 8
-            audioWave += sample / 8
-            
-            let offset: Int = (frameTics * kSamplesPerFrame) / TICS_PER_FRAME;
-            if offset < kSamplesPerFrame {
-                audioData[offset] = audioWave - dcAverage
-            }
+            self.audioStreamer.updateSample(tCycle: frameTics, value: self.ioData)
         }
 
         if lineTics > TICS_PER_LINE {
@@ -119,7 +97,7 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         
         if screenLine >= SCREEN_LINES {
             if kEmulateAudio {
-                semaphore.wait()
+                self.audioStreamer.endFrame()
             }
 
             frames += 1
@@ -173,12 +151,5 @@ final class Ula: InternalUlaOperationDelegate, AudioStreamerDelegate {
         
         // get the border color from value
         borderColor = colorTable[Int(value) & 0x07]
-    }
-    
-    // MARK: AudioStreamer delegate
-    func requestAudioData(sender: AudioStreamer) -> AudioData {
-        semaphore.signal()
-        
-        return self.audioData
     }
 }
