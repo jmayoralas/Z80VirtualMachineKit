@@ -160,7 +160,9 @@ private struct UlaUpdateData {
             }
             
             IRQ = false
-            delegate?.Z80VMScreenRefresh?()
+            if ula.screen.changed {
+                delegate?.Z80VMScreenRefresh?()
+            }
         }
     }
     

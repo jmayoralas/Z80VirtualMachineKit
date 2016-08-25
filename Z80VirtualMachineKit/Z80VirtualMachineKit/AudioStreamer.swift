@@ -9,47 +9,46 @@
 import Foundation
 import AudioToolbox
 
+let kTicsPerLine = 224
+let kScreenLines = 312 // 64 + 192 + 56
+let kTicsPerFrame = kTicsPerLine * kScreenLines
+
+private let kSampleRate = 48000.0
+private let kSamplesPerFrame = Int(kSampleRate) / 50
+private let kNumberBuffers = 3
+
 typealias AudioDataElement = Float
 typealias AudioData = [AudioDataElement]
 
-let kSampleRate = 48000.0
-let kSamplesPerFrame = Int(kSampleRate) / 50
-let kNumberBuffers = 3
-
-
-protocol AudioStreamerDelegate {
-    func requestAudioData(sender: AudioStreamer) -> AudioData
-}
-
 class AudioStreamer {
-    var audioData: AudioData?
+    private var outputQueue: AudioQueueRef?
+    private var queueStarted: Bool = false
     
-    var delegate: AudioStreamerDelegate
-    var outputQueue: AudioQueueRef?
+    private var buffers = [AudioQueueBufferRef?](repeatElement(nil, count: kNumberBuffers))
+    private let bufferByteSize = UInt32(kSamplesPerFrame * MemoryLayout<AudioDataElement>.size) // 20 mili sec of audio
     
-    var buffers = [AudioQueueBufferRef?](repeatElement(nil, count: kNumberBuffers))
-    let bufferByteSize = UInt32(kSamplesPerFrame * MemoryLayout<AudioDataElement>.size) // 20 mili sec of audio
+    private var audioData: AudioData!
+    private var sample: AudioDataElement = 0
+
+    private let semaphore = DispatchSemaphore(value: 0)
     
-    var nextAvailableBuffer = 0
-    
-    var streamBasicDescription = AudioStreamBasicDescription(
-        mSampleRate: 48000.0,
-        mFormatID: kAudioFormatLinearPCM,
-        mFormatFlags: kAudioFormatFlagsNativeFloatPacked,
-        mBytesPerPacket: UInt32(MemoryLayout<AudioDataElement>.size),
-        mFramesPerPacket: 1,
-        mBytesPerFrame: UInt32(MemoryLayout<AudioDataElement>.size),
-        mChannelsPerFrame: 1,
-        mBitsPerChannel: UInt32(8 * MemoryLayout<AudioDataElement>.size),
-        mReserved: 0
-    )
-    
-    init(delegate: AudioStreamerDelegate) {
-        self.delegate = delegate
+    init() {
+        self.audioData = AudioData(repeating: 1.0, count: kSamplesPerFrame)
+        var streamBasicDescription = AudioStreamBasicDescription(
+            mSampleRate: kSampleRate,
+            mFormatID: kAudioFormatLinearPCM,
+            mFormatFlags: kAudioFormatFlagsNativeFloatPacked,
+            mBytesPerPacket: UInt32(MemoryLayout<AudioDataElement>.size),
+            mFramesPerPacket: 1,
+            mBytesPerFrame: UInt32(MemoryLayout<AudioDataElement>.size),
+            mChannelsPerFrame: 1,
+            mBitsPerChannel: UInt32(8 * MemoryLayout<AudioDataElement>.size),
+            mReserved: 0
+        )
         
         // create new output audio queue
         AudioQueueNewOutput(
-            &self.streamBasicDescription,
+            &streamBasicDescription,
             AudioStreamerOuputCallback,
             unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self),
             nil,
@@ -81,31 +80,48 @@ class AudioStreamer {
     func start() {
         AudioQueueStart(self.outputQueue!, nil)
     }
-    
-    func enqueueAudioData(_ audioData: AudioData) {
-        // wait for a free audioData buffer
-        self.audioData = audioData
-        NSLog("new audioData")
+
+    func updateSample(tCycle: Int, value: UInt8) {
+        var amplitude: AudioDataElement = (value & 0b00010000) > 0 ? 0.25 : -0.25
+        amplitude += (value & 0b00001000) > 0 ? 0.05 : -0.05
         
-        if self.nextAvailableBuffer < kNumberBuffers {
-            let selfPointer = unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self)
-            AudioStreamerOuputCallback(userData: selfPointer, queueRef: self.outputQueue!, buffer: self.buffers[nextAvailableBuffer]!)
-            self.nextAvailableBuffer += 1
-            
-            if self.nextAvailableBuffer == kNumberBuffers {
-                AudioQueueStart(self.outputQueue!, nil)
-            }
+        sample -= sample / 8
+        sample += amplitude / 8
+        
+        let offset: Int = (tCycle * kSamplesPerFrame) / kTicsPerFrame;
+        if offset < kSamplesPerFrame {
+            audioData[offset] = sample
         }
+    }
+    
+    func clearAudioData() {
+        self.semaphore.signal()
+    }
+    
+    func getAudioData() -> AudioData {
+        return self.audioData
+    }
+    
+    func endFrame() {
+        if !self.queueStarted {
+            self.start()
+        }
+        
+        self.semaphore.wait()
     }
 }
 
-func AudioStreamerOuputCallback(userData: Optional<UnsafeMutableRawPointer>, queueRef: AudioQueueRef, buffer: AudioQueueBufferRef) {
+private func AudioStreamerOuputCallback(userData: Optional<UnsafeMutableRawPointer>, queueRef: AudioQueueRef, buffer: AudioQueueBufferRef) {
     // recover AudioStreamer instance from void * userData
     let this = Unmanaged<AudioStreamer>.fromOpaque(userData!).takeUnretainedValue()
+    var ptr = buffer.pointee.mAudioData.assumingMemoryBound(to: AudioDataElement.self)
     
-    let audioData = this.delegate.requestAudioData(sender: this)
-    memcpy(buffer.pointee.mAudioData, unsafeBitCast(audioData, to: UnsafeMutablePointer<Void>.self), Int(this.bufferByteSize))
+    let audioData = this.getAudioData()
+    for sample in audioData {
+        ptr.pointee = sample
+        ptr = ptr.successor()
+    }
     
     AudioQueueEnqueueBuffer(queueRef, buffer, 0, nil)
-    this.audioData = nil
+    this.clearAudioData()
 }

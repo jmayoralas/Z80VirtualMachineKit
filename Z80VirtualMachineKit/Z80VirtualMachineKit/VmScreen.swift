@@ -60,30 +60,8 @@ let kBaseWidth = 320
     
     public var buffer: [PixelData]
     
-/*
-    public func getBuffer(zoomFactor: Int) -> [PixelData] {
-        let width = kBaseWidth * zoomFactor
-        let height = width * 3 / 4
-        
-        var local_buffer = [PixelData](repeating: WHITE_COLOR, count: width * height)
-        
-        var x = 0
-        var y = 0
-        
-        for pixelData in buffer {
-            for _ in 0 ..< zoomFactor {
-                local_buffer[x + y * width] = pixelData
-                local_buffer[x + (y + 1) * width] = pixelData
-                x += 1
-                
-                if x % width == 0 {
-                    y += 1
-                }
-            }
-        }
-        return local_buffer
-    }
- */
+    var changed: Bool = false
+    
     public init(zoomFactor: Int) {
         self.zoomFactor = zoomFactor
         
@@ -102,6 +80,10 @@ let kBaseWidth = 320
             
             buffer = VmScreen.initBuffer(zoomFactor: zoomFactor)
         }
+    }
+    
+    func beginFrame() {
+        self.changed = false
     }
     
     func fillEightBitLineAt(char x: Int, line y: Int, value: UInt8, attribute: Attribute) {
@@ -187,7 +169,10 @@ let kBaseWidth = 320
     private func setBuffer(atIndex index: Int, withPixelData pixelData: PixelData) {
         for i in 0 ..< zoomFactor {
             for j in 0 ..< zoomFactor {
-                buffer[index + i + j * width] = pixelData
+                if buffer[index + i + j * width] != pixelData {
+                    buffer[index + i + j * width] = pixelData
+                    changed = true
+                }
             }
         }
     }

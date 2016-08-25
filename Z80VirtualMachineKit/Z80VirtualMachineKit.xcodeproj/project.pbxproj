@@ -28,6 +28,7 @@
 		1DD7231B1C35871800178421 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7230F1C35871800178421 /* extensions.swift */; };
 		1DD7231D1C35871800178421 /* types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723111C35871800178421 /* types.swift */; };
 		1DD7231E1C35871800178421 /* Z80.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD723121C35871800178421 /* Z80.swift */; };
+		1DE056C31D648C9500A1EA31 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE056C21D648C9500A1EA31 /* Queue.swift */; };
 		1DEF3B511CDF814200C2646F /* ControlUnit_opcodes_xx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEF3B501CDF814200C2646F /* ControlUnit_opcodes_xx.swift */; };
 /* End PBXBuildFile section */
 
@@ -55,6 +56,7 @@
 		1DD7230F1C35871800178421 /* extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		1DD723111C35871800178421 /* types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = types.swift; sourceTree = "<group>"; };
 		1DD723121C35871800178421 /* Z80.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Z80.swift; sourceTree = "<group>"; };
+		1DE056C21D648C9500A1EA31 /* Queue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
 		1DEF3B501CDF814200C2646F /* ControlUnit_opcodes_xx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlUnit_opcodes_xx.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -119,6 +121,7 @@
 				1DBABA901D09BDBF00E631D5 /* Ula */,
 				1D2D38191CD50A8500DA69B6 /* Bus */,
 				1DD723061C35871800178421 /* Cpu */,
+				1DE056C21D648C9500A1EA31 /* Queue.swift */,
 			);
 			path = Z80VirtualMachineKit;
 			sourceTree = "<group>";
@@ -222,6 +225,7 @@
 				1DD722E21C3585A800178421 /* Z80VirtualMachineKit.swift in Sources */,
 				1DBABA941D09BE8700E631D5 /* ULAMemory.swift in Sources */,
 				1D74EEC91CF35998004B5748 /* GenericIODevice.swift in Sources */,
+				1DE056C31D648C9500A1EA31 /* Queue.swift in Sources */,
 				1DBABA961D09BE9F00E631D5 /* ULAIo.swift in Sources */,
 				1D53EEDD1CE502A400AF9A16 /* Bus.swift in Sources */,
 				1DEF3B511CDF814200C2646F /* ControlUnit_opcodes_xx.swift in Sources */,
