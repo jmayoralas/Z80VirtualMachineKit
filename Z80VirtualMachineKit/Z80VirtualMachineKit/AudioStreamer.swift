@@ -33,7 +33,7 @@ class AudioStreamer {
     private let semaphore = DispatchSemaphore(value: 0)
     
     init() {
-        self.audioData = AudioData(repeating: 1.0, count: kSamplesPerFrame)
+        self.audioData = AudioData(repeating: 0.0, count: kSamplesPerFrame)
         var streamBasicDescription = AudioStreamBasicDescription(
             mSampleRate: kSampleRate,
             mFormatID: kAudioFormatLinearPCM,
