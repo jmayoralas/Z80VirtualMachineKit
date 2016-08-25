@@ -21,40 +21,34 @@ typealias AudioDataElement = Float
 typealias AudioData = [AudioDataElement]
 
 class AudioStreamer {
+    private var outputQueue: AudioQueueRef?
+    private var queueStarted: Bool = false
     
-    private let soundLevel: [Double] = [0.0, 0.77/3.79, 3.66/3.79, 3.79/3.79];
-    
-    var outputQueue: AudioQueueRef?
-    
-    var buffers = [AudioQueueBufferRef?](repeatElement(nil, count: kNumberBuffers))
-    let bufferByteSize = UInt32(kSamplesPerFrame * MemoryLayout<AudioDataElement>.size) // 20 mili sec of audio
-    
-    var nextAvailableBuffer = 0
-    
-    var streamBasicDescription = AudioStreamBasicDescription(
-        mSampleRate: 48000.0,
-        mFormatID: kAudioFormatLinearPCM,
-        mFormatFlags: kAudioFormatFlagsNativeFloatPacked,
-        mBytesPerPacket: UInt32(MemoryLayout<AudioDataElement>.size),
-        mFramesPerPacket: 1,
-        mBytesPerFrame: UInt32(MemoryLayout<AudioDataElement>.size),
-        mChannelsPerFrame: 1,
-        mBitsPerChannel: UInt32(8 * MemoryLayout<AudioDataElement>.size),
-        mReserved: 0
-    )
+    private var buffers = [AudioQueueBufferRef?](repeatElement(nil, count: kNumberBuffers))
+    private let bufferByteSize = UInt32(kSamplesPerFrame * MemoryLayout<AudioDataElement>.size) // 20 mili sec of audio
     
     private var audioData: AudioData!
     private var sample: AudioDataElement = 0
-    private var dcAverage: AudioDataElement = 0
 
     private let semaphore = DispatchSemaphore(value: 0)
     
     init() {
-        self.audioData = AudioData(repeating: 0.0, count: kSamplesPerFrame)
+        self.audioData = AudioData(repeating: 1.0, count: kSamplesPerFrame)
+        var streamBasicDescription = AudioStreamBasicDescription(
+            mSampleRate: kSampleRate,
+            mFormatID: kAudioFormatLinearPCM,
+            mFormatFlags: kAudioFormatFlagsNativeFloatPacked,
+            mBytesPerPacket: UInt32(MemoryLayout<AudioDataElement>.size),
+            mFramesPerPacket: 1,
+            mBytesPerFrame: UInt32(MemoryLayout<AudioDataElement>.size),
+            mChannelsPerFrame: 1,
+            mBitsPerChannel: UInt32(8 * MemoryLayout<AudioDataElement>.size),
+            mReserved: 0
+        )
         
         // create new output audio queue
         AudioQueueNewOutput(
-            &self.streamBasicDescription,
+            &streamBasicDescription,
             AudioStreamerOuputCallback,
             unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self),
             nil,
@@ -86,24 +80,21 @@ class AudioStreamer {
     func start() {
         AudioQueueStart(self.outputQueue!, nil)
     }
-    
+
     func updateSample(tCycle: Int, value: UInt8) {
-        let on = ( (value & 0x10) > 0 ? 2 : 0 ) + ( (value & 0x08) > 0 ? 0 : 1 )
-        let amplitude = Float(self.soundLevel[on])
-        
-        dcAverage = (dcAverage + amplitude) / 2
+        var amplitude: AudioDataElement = (value & 0b00010000) > 0 ? 0.25 : -0.25
+        amplitude += (value & 0b00001000) > 0 ? 0.05 : -0.05
         
         sample -= sample / 8
         sample += amplitude / 8
         
         let offset: Int = (tCycle * kSamplesPerFrame) / kTicsPerFrame;
         if offset < kSamplesPerFrame {
-            audioData[offset] = sample - dcAverage
+            audioData[offset] = sample
         }
     }
     
     func clearAudioData() {
-//        self.audioData = AudioData(repeating: 0.0, count: kSamplesPerFrame)
         self.semaphore.signal()
     }
     
@@ -112,6 +103,10 @@ class AudioStreamer {
     }
     
     func endFrame() {
+        if !self.queueStarted {
+            self.start()
+        }
+        
         self.semaphore.wait()
     }
 }
@@ -119,9 +114,13 @@ class AudioStreamer {
 private func AudioStreamerOuputCallback(userData: Optional<UnsafeMutableRawPointer>, queueRef: AudioQueueRef, buffer: AudioQueueBufferRef) {
     // recover AudioStreamer instance from void * userData
     let this = Unmanaged<AudioStreamer>.fromOpaque(userData!).takeUnretainedValue()
+    var ptr = buffer.pointee.mAudioData.assumingMemoryBound(to: AudioDataElement.self)
     
     let audioData = this.getAudioData()
-    memcpy(buffer.pointee.mAudioData, unsafeBitCast(audioData, to: UnsafeMutablePointer<Void>.self), Int(this.bufferByteSize))
+    for sample in audioData {
+        ptr.pointee = sample
+        ptr = ptr.successor()
+    }
     
     AudioQueueEnqueueBuffer(queueRef, buffer, 0, nil)
     this.clearAudioData()

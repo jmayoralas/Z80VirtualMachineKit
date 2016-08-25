@@ -46,10 +46,6 @@ final class Ula: InternalUlaOperationDelegate {
         io = ULAIo(delegate: self)
         
         screen.memory = memory
-        
-        if kEmulateAudio {
-            audioStreamer.start()
-        }
     }
     
     func step(t_cycle: Int, _ IRQ: inout Bool) {
