@@ -9,18 +9,21 @@
 import Foundation
 import AudioToolbox
 
-let TICS_PER_LINE = 224
-let SCREEN_LINES = 312 // 64 + 192 + 56
-let TICS_PER_FRAME = TICS_PER_LINE * SCREEN_LINES
-
-typealias AudioDataElement = Float
-typealias AudioData = [AudioDataElement]
+let kTicsPerLine = 224
+let kScreenLines = 312 // 64 + 192 + 56
+let kTicsPerFrame = kTicsPerLine * kScreenLines
 
 private let kSampleRate = 48000.0
 private let kSamplesPerFrame = Int(kSampleRate) / 50
 private let kNumberBuffers = 3
 
+typealias AudioDataElement = Float
+typealias AudioData = [AudioDataElement]
+
 class AudioStreamer {
+    
+    private let soundLevel: [Double] = [0.0, 0.77/3.79, 3.66/3.79, 3.79/3.79];
+    
     var outputQueue: AudioQueueRef?
     
     var buffers = [AudioQueueBufferRef?](repeatElement(nil, count: kNumberBuffers))
@@ -85,22 +88,22 @@ class AudioStreamer {
     }
     
     func updateSample(tCycle: Int, value: UInt8) {
-        var amplitude: AudioDataElement = (value & 0b00010000) > 0 ? 1.0 : -1.0
-        amplitude += (value & 0b00001000) > 0 ? 0.25 : -0.25
+        let on = ( (value & 0x10) > 0 ? 2 : 0 ) + ( (value & 0x08) > 0 ? 0 : 1 )
+        let amplitude = Float(self.soundLevel[on])
         
         dcAverage = (dcAverage + amplitude) / 2
         
         sample -= sample / 8
         sample += amplitude / 8
         
-        let offset: Int = (tCycle * kSamplesPerFrame) / TICS_PER_FRAME;
+        let offset: Int = (tCycle * kSamplesPerFrame) / kTicsPerFrame;
         if offset < kSamplesPerFrame {
             audioData[offset] = sample - dcAverage
         }
     }
     
     func clearAudioData() {
-        self.audioData = AudioData(repeating: 0.0, count: kSamplesPerFrame)
+//        self.audioData = AudioData(repeating: 0.0, count: kSamplesPerFrame)
         self.semaphore.signal()
     }
     

@@ -66,7 +66,7 @@ final class Ula: InternalUlaOperationDelegate {
             self.audioStreamer.updateSample(tCycle: frameTics, value: self.ioData)
         }
 
-        if lineTics > TICS_PER_LINE {
+        if lineTics > kTicsPerLine {
             screenLineCompleted(&IRQ)
         }
     }
@@ -91,11 +91,11 @@ final class Ula: InternalUlaOperationDelegate {
     // MARK: Screen management
     private func screenLineCompleted(_ IRQ: inout Bool) {
         screenLine += 1
-        lineTics -= TICS_PER_LINE
+        lineTics -= kTicsPerLine
         
         screen.updateBorder(line: screenLine, color: borderColor)
         
-        if screenLine >= SCREEN_LINES {
+        if screenLine >= kScreenLines {
             if kEmulateAudio {
                 self.audioStreamer.endFrame()
             }
@@ -108,7 +108,7 @@ final class Ula: InternalUlaOperationDelegate {
             }
             
             newFrame = true
-            frameTics -= TICS_PER_FRAME
+            frameTics -= kTicsPerFrame
             screenLine = 0
             
             IRQ = true
