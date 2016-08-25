@@ -35,7 +35,7 @@ let colorTable = [
     PixelData(a: 255, r: 0xFF, g: 0xFF, b: 0xFF),
 ]
 
-let WHITE_COLOR = PixelData(a: 255, r: 0xCD, g: 0xCD, b: 0xCD)
+let kWhiteColor = colorTable[7]
 
 extension PixelData: Equatable {}
 public func ==(lhs: PixelData, rhs: PixelData) -> Bool {
@@ -189,6 +189,6 @@ let kBaseWidth = 320
         let width = kBaseWidth * zoomFactor
         let height = width * 3 / 4
         
-        return [PixelData](repeating: WHITE_COLOR, count: width * height)
+        return [PixelData](repeating: kWhiteColor, count: width * height)
     }
 }

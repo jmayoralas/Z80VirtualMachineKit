@@ -20,7 +20,7 @@ final class Ula: InternalUlaOperationDelegate {
     
     var screen: VmScreen
     
-    private var borderColor: PixelData = WHITE_COLOR
+    private var borderColor: PixelData = kWhiteColor
     
     private var newFrame = true
     private var frameTics: Int = 0
