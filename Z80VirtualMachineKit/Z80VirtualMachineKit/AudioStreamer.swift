@@ -33,7 +33,7 @@ class AudioStreamer {
     private let semaphore = DispatchSemaphore(value: 0)
     
     init() {
-        self.audioData = AudioData(repeating: 1.0, count: kSamplesPerFrame)
+        self.audioData = AudioData(repeating: 0.0, count: kSamplesPerFrame)
         var streamBasicDescription = AudioStreamBasicDescription(
             mSampleRate: kSampleRate,
             mFormatID: kAudioFormatLinearPCM,
@@ -79,6 +79,7 @@ class AudioStreamer {
     
     func start() {
         AudioQueueStart(self.outputQueue!, nil)
+        self.queueStarted = true
     }
 
     func updateSample(tCycle: Int, value: UInt8) {
