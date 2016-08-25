@@ -79,6 +79,7 @@ class AudioStreamer {
     
     func start() {
         AudioQueueStart(self.outputQueue!, nil)
+        self.queueStarted = true
     }
 
     func updateSample(tCycle: Int, value: UInt8) {
