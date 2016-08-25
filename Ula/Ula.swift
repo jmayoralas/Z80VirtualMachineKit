@@ -14,8 +14,6 @@ protocol InternalUlaOperationDelegate {
     func ioRead(_ address: UInt16) -> UInt8
 }
 
-private let kEmulateAudio = true
-
 final class Ula: InternalUlaOperationDelegate {
     var memory: ULAMemory!
     var io: ULAIo!
@@ -36,6 +34,8 @@ final class Ula: InternalUlaOperationDelegate {
     private var audioStreamer: AudioStreamer!
     
     private var ioData: UInt8 = 0x00
+    
+    var audioEnabled = true
 
     
     init(screen: VmScreen) {
@@ -57,7 +57,7 @@ final class Ula: InternalUlaOperationDelegate {
         lineTics += t_cycle
         frameTics += t_cycle
         
-        if kEmulateAudio {
+        if audioEnabled {
             // sample ioData to compute new audio data
             self.audioStreamer.updateSample(tCycle: frameTics, value: self.ioData)
         }
@@ -92,7 +92,7 @@ final class Ula: InternalUlaOperationDelegate {
         screen.updateBorder(line: screenLine, color: borderColor)
         
         if screenLine >= kScreenLines {
-            if kEmulateAudio {
+            if audioEnabled {
                 self.audioStreamer.endFrame()
             }
 
