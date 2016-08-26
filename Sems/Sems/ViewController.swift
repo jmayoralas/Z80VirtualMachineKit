@@ -171,5 +171,9 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         vm.tapeAvailable = false
         vm.reset()
     }
+    
+    @IBAction func warpEmulation(_ sender: AnyObject) {
+        self.vm.toggleWarp()
+    }
 }
 

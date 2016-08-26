@@ -81,6 +81,12 @@ class AudioStreamer {
         AudioQueueStart(self.outputQueue!, nil)
         self.queueStarted = true
     }
+    
+    func stop() {
+        AudioQueueStop(self.outputQueue!, false)
+        self.queueStarted = false
+        self.semaphore.signal()
+    }
 
     func updateSample(tCycle: Int, value: UInt8) {
         var amplitude: AudioDataElement = (value & 0b00010000) > 0 ? 0.25 : -0.25
@@ -95,7 +101,7 @@ class AudioStreamer {
         }
     }
     
-    func clearAudioData() {
+    func audioDataProcessed() {
         self.semaphore.signal()
     }
     
@@ -124,5 +130,5 @@ private func AudioStreamerOuputCallback(userData: Optional<UnsafeMutableRawPoint
     }
     
     AudioQueueEnqueueBuffer(queueRef, buffer, 0, nil)
-    this.clearAudioData()
+    this.audioDataProcessed()
 }

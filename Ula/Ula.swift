@@ -35,7 +35,7 @@ final class Ula: InternalUlaOperationDelegate {
     
     private var ioData: UInt8 = 0x00
     
-    var audioEnabled = true
+    private var audioEnabled = true
 
     
     init(screen: VmScreen) {
@@ -64,6 +64,13 @@ final class Ula: InternalUlaOperationDelegate {
 
         if lineTics > kTicsPerLine {
             screenLineCompleted(&IRQ)
+        }
+    }
+    
+    func toggleAudio() {
+        self.audioEnabled = !self.audioEnabled
+        if !self.audioEnabled {
+            self.audioStreamer.stop()
         }
     }
     

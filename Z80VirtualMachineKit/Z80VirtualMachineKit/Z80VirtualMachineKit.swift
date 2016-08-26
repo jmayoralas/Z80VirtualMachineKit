@@ -218,6 +218,10 @@ private struct UlaUpdateData {
         return cpu.dataBus.dumpFromAddress(fromAddress, count: toAddress - fromAddress + 1)
     }
     
+    public func toggleWarp() {
+        self.ula.toggleAudio()
+    }
+    
     private func tapeLoaderHandler() throws {
         if let bufferRef = delegate!.tapeBlockRequested() {
             let buffer = Array(UnsafeBufferPointer(start: bufferRef, count: Int(cpu.regs.de + 1)))
