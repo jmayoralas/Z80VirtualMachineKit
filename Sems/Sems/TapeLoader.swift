@@ -20,22 +20,8 @@ struct TapeBlock {
             return MemoryLayout<UInt16>.size + data.count
         }
     }
-    
-    var data: [UInt8]
-}
 
-private extension NSData {
-    func getTapeBlock(atLocation location: Int) -> TapeBlock {
-        var size: UInt16 = 0
-        var range = NSRange(location: location, length: MemoryLayout<UInt16>.size)
-        self.getBytes(&size, range: range)
-        
-        range = NSRange(location: location + MemoryLayout<UInt16>.size, length: Int(size))
-        var tapeBlock = TapeBlock(data: [UInt8](repeating: 0, count: Int(size)))
-        self.getBytes(&tapeBlock.data, range: range)
-        
-        return tapeBlock
-    }
+    var data: [UInt8]
 }
 
 final class TapeLoader {
@@ -79,8 +65,6 @@ final class TapeLoader {
     }
     
     func close() {
-        if blocks != nil {
-            blocks = nil
-        }
+        blocks = nil
     }
 }
