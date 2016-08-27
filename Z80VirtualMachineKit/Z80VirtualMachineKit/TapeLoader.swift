@@ -8,9 +8,10 @@
 
 import Foundation
 
-enum TapeLoaderErrors: Error {
+public enum TapeLoaderErrors: Error {
     case FileNotFound
     case OutOfData
+    case NoTapeOpened
 }
 
 struct TapeBlock {

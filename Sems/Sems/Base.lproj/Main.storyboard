@@ -56,18 +56,6 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="File" id="dMs-cI-mzQ">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="File" id="bib-Uj-vzu">
-                                    <items>
-                                        <menuItem title="Open tape..." keyEquivalent="o" id="scO-kW-lM3">
-                                            <connections>
-                                                <action selector="openTape:" target="Ady-hI-5gd" id="xEm-C3-B6x"/>
-                                            </connections>
-                                        </menuItem>
-                                    </items>
-                                </menu>
-                            </menuItem>
                             <menuItem title="Emulation" id="v9A-6N-02m">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Emulation" id="q6o-A0-tjN">
@@ -77,10 +65,26 @@
                                                 <action selector="resetMachine:" target="Ady-hI-5gd" id="ke1-Rm-wxA"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Pause" keyEquivalent="p" id="RYq-1x-85q"/>
                                         <menuItem title="Toggle warp" keyEquivalent="w" id="P8W-Dy-shO">
                                             <connections>
                                                 <action selector="warpEmulation:" target="Ady-hI-5gd" id="seA-N0-cp0"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Tape" id="99r-oS-DHE">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Tape" id="qH2-n6-h4M">
+                                    <items>
+                                        <menuItem title="Open" keyEquivalent="o" id="ckN-Oe-QPw">
+                                            <connections>
+                                                <action selector="openTape:" target="Ady-hI-5gd" id="ZxC-8f-MYD"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Play" keyEquivalent="p" id="BTH-lR-3Fn">
+                                            <connections>
+                                                <action selector="playTape:" target="Ady-hI-5gd" id="z9N-0Z-JB1"/>
                                             </connections>
                                         </menuItem>
                                     </items>

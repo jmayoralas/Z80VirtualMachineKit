@@ -36,7 +36,10 @@ final class Ula: InternalUlaOperationDelegate {
     private var ioData: UInt8 = 0x00
     
     private var audioEnabled = true
+    
+    private var ear: Int = 0
 
+    private var data: UInt8 = 0b10111111
     
     init(screen: VmScreen) {
         self.screen = screen
@@ -72,6 +75,10 @@ final class Ula: InternalUlaOperationDelegate {
         if !self.audioEnabled {
             self.audioStreamer.stop()
         }
+    }
+    
+    func setEarLevel(value: Int) {
+        self.data.bit(6, newVal: value)
     }
     
     // MARK: Keyboard management
@@ -139,14 +146,14 @@ final class Ula: InternalUlaOperationDelegate {
     }
     
     func ioRead(_ address: UInt16) -> UInt8 {
-        var key_scanned: UInt8 = 0b10111111
+        var dataReturned = self.data
         
         for i in 0 ..< 8 {
             if (Int(address.high) >> i) & 0x01 == 0 {
-                key_scanned = key_scanned & key_buffer[i]
+                dataReturned = dataReturned & key_buffer[i]
             }
         }
-        return key_scanned
+        return dataReturned
     }
     
     func ioWrite(_ address: UInt16, value: UInt8)  {
