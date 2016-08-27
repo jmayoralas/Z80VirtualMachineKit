@@ -79,6 +79,8 @@ final class Ula: InternalUlaOperationDelegate {
     
     func setEarLevel(value: Int) {
         self.data.bit(6, newVal: value)
+        self.ioData.bit(4, newVal: value)
+        self.ioData.bit(6, newVal: value)
     }
     
     // MARK: Keyboard management
@@ -158,6 +160,7 @@ final class Ula: InternalUlaOperationDelegate {
     
     func ioWrite(_ address: UInt16, value: UInt8)  {
         self.ioData = value
+        print("\(ioData.binStr)")
         
         // get the border color from value
         borderColor = colorTable[Int(value) & 0x07]

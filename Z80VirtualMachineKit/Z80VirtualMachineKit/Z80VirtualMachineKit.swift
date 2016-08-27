@@ -136,7 +136,7 @@ private struct UlaUpdateData {
         instructions += 1
         
         cpu.t_cycle = 0
-
+/*
         if cpu.regs.pc == 0x056B && self.tape.tapeAvailable {
             do {
                 try tapeLoaderHandler()
@@ -150,10 +150,10 @@ private struct UlaUpdateData {
             
             cpu.regs.pc = 0x05E2
         }
-
+*/
         cpu.step()
         ula.step(t_cycle: cpu.t_cycle, &IRQ)
-        
+        tape.step(tCycle: cpu.t_cycle)
         
         t_cycles = cpu.t_cycle
         
@@ -230,15 +230,7 @@ private struct UlaUpdateData {
     }
     
     public func playTape() throws {
-        guard self.tape.tapeAvailable else {
-            throw TapeLoaderErrors.NoTapeOpened
-        }
-        
-        self.ula.setEarLevel(value: 1)
-    }
-    
-    private func sendLeadingTone() {
-        
+        try self.tape.play()
     }
     
     // MARK: Tape loader
