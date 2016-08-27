@@ -82,7 +82,7 @@
                                                 <action selector="openTape:" target="Ady-hI-5gd" id="ZxC-8f-MYD"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Play" keyEquivalent="p" id="BTH-lR-3Fn">
+                                        <menuItem title="Play / Stop" keyEquivalent="p" id="BTH-lR-3Fn">
                                             <connections>
                                                 <action selector="playTape:" target="Ady-hI-5gd" id="z9N-0Z-JB1"/>
                                             </connections>

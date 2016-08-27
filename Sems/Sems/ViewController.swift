@@ -142,12 +142,16 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     }
     
     @IBAction func playTape(_ sender: AnyObject) {
-        do {
-            try vm.playTape()
-        } catch TapeLoaderErrors.NoTapeOpened {
-            self.errorShow(messageText: "No tape has been opened")
-        } catch {
-            self.errorShow(messageText: "Unknown error")
+        if vm.tapeIsPlaying() {
+            vm.stopTape()
+        } else {
+            do {
+                try vm.startTape()
+            } catch TapeLoaderErrors.NoTapeOpened {
+                self.errorShow(messageText: "No tape has been opened")
+            } catch {
+                self.errorShow(messageText: "Unknown error")
+            }
         }
     }
     

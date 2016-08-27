@@ -229,8 +229,16 @@ private struct UlaUpdateData {
         try tape.open(path: path)
     }
     
-    public func playTape() throws {
-        try self.tape.play()
+    public func startTape() throws {
+        try self.tape.start()
+    }
+    
+    public func stopTape() {
+        self.tape.stop()
+    }
+    
+    public func tapeIsPlaying() -> Bool {
+        return self.tape.isPlaying
     }
     
     // MARK: Tape loader
