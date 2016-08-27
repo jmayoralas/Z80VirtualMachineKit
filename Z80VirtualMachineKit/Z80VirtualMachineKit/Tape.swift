@@ -11,6 +11,7 @@ import Foundation
 private enum TapeStatus {
     case idle
     case sendingLeadingTone
+    case sendingData
 }
 
 private enum EarLevel: Int {
@@ -18,8 +19,9 @@ private enum EarLevel: Int {
     case on = 1
 }
 
-private let kEarOnTStates = 2168
-private let kEarOffTStates = 2168
+private let kTStatesPerSecond = 3500000
+private let kLeadingToneTStatesEdgeDuration = 2168
+private let kLeadingToneTStatesDuration = kTStatesPerSecond * 4
 
 final class Tape {
     let ula: Ula
@@ -32,6 +34,7 @@ final class Tape {
     private var lastLevel = EarLevel.off
     
     private var tCycle: Int = 0
+    private var tCyclesTone: Int = 0
     
     init(ula: Ula) {
         self.ula = ula
@@ -85,6 +88,7 @@ final class Tape {
         }
         
         self.tCycle += tCycle
+        self.tCyclesTone += tCycle
         
         switch self.status {
         case .idle:
@@ -92,6 +96,9 @@ final class Tape {
             
         case .sendingLeadingTone:
             sendLeadingTone()
+            
+        case .sendingData:
+            break
         }
     }
     
@@ -101,23 +108,30 @@ final class Tape {
         if self.status == .idle {
             self.status = .sendingLeadingTone
             self.lastLevel = .on
-            self.ula.setEarLevel(value: self.lastLevel.rawValue)
+            self.ula.setTapeLevel(value: self.lastLevel.rawValue)
         } else {
-            switch self.lastLevel {
-            case .off:
-                if self.tCycle >= kEarOffTStates {
-                    self.lastLevel = .on
-                    self.ula.setEarLevel(value: self.lastLevel.rawValue)
-                    self.tCycle -= kEarOffTStates
-                }
-                
-            case .on:
-                if self.tCycle >= kEarOnTStates {
-                    self.lastLevel = .off
-                    self.ula.setEarLevel(value: self.lastLevel.rawValue)
-                    self.tCycle -= kEarOnTStates
+            if self.tCyclesTone >= kLeadingToneTStatesDuration {
+                self.status = .sendingData
+                self.tCycle = 0
+                self.tCyclesTone = 0
+            } else {
+                switch self.lastLevel {
+                case .off:
+                    if self.tCycle >= kLeadingToneTStatesEdgeDuration {
+                        self.lastLevel = .on
+                        self.ula.setTapeLevel(value: self.lastLevel.rawValue)
+                        self.tCycle -= kLeadingToneTStatesEdgeDuration
+                    }
+                    
+                case .on:
+                    if self.tCycle >= kLeadingToneTStatesEdgeDuration {
+                        self.lastLevel = .off
+                        self.ula.setTapeLevel(value: self.lastLevel.rawValue)
+                        self.tCycle -= kLeadingToneTStatesEdgeDuration
+                    }
                 }
             }
+            
         }
     }
     
