@@ -119,7 +119,6 @@ final class Tape {
         
         self.tCycle += tCycle
         self.tCyclesTone += tCycle
-        self.beginTCycle = self.tCyclesTone
         
         switch self.status {
         case .pause:
