@@ -17,8 +17,6 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     var screen: VmScreen!
     var vm: Z80VirtualMachineKit!
     
-    var tapeLoader = TapeLoader()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -58,19 +56,22 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         var buffer = [UInt8](repeating: 0, count: data.count)
         (data as NSData).getBytes(&buffer, length: data.count)
         
+        do {
+            try vm.loadRomAtAddress(0x0000, data: buffer)
+        } catch RomErrors.bufferLimitReach {
+            self.errorShow(messageText: "Memory full !!")
+        } catch {
+            self.errorShow(messageText: "Unknown error !!")
+        }
+    }
+    
+    private func errorShow(messageText: String) {
         let alert = NSAlert()
         alert.alertStyle = NSAlertStyle.critical
         alert.addButton(withTitle: "OK")
         
-        do {
-            try vm.loadRomAtAddress(0x0000, data: buffer)
-        } catch RomErrors.bufferLimitReach {
-            alert.messageText = "Memory full !!"
-            alert.runModal()
-        } catch {
-            alert.messageText = "Unknown error !!"
-            alert.runModal()
-        }
+        alert.messageText = messageText
+        alert.runModal()
     }
     
     // MARK: Keyboard handling
@@ -112,34 +113,9 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         }
     }
     
-    // MARK: Tape loader
-    func tapeBlockRequested() -> UnsafeMutablePointer<UInt8>? {
-        var tapeBlock: TapeBlock?
-        
-        do {
-            tapeBlock = try tapeLoader.readBlock()
-        } catch TapeLoaderErrors.OutOfData {
-            NSLog("Out of data")
-        } catch {
-            NSLog("error")
-        }
-        
-        var data: UnsafeMutablePointer<UInt8>? = nil
-        
-        if let block = tapeBlock {
-            data = UnsafeMutablePointer(mutating:block.data)
-        }
-        
-        return data
-    }
     
     // MARK: Menu selectors
     @IBAction func openTape(_ sender: AnyObject) {
-        if vm.tapeAvailable {
-            tapeLoader.close()
-            vm.tapeAvailable = false
-        }
-        
         let dialog = NSOpenPanel()
         
         dialog.title = "Choose a file"
@@ -153,23 +129,46 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         if dialog.runModal() == NSModalResponseOK {
             if let result = dialog.url {
                 let path = result.path
-                
+
                 do {
-                    try tapeLoader.open(path: path)
-                    vm.tapeAvailable = true
-                } catch TapeLoaderErrors.FileNotFound {
-                    NSLog("File not found")
+                    try self.vm.openTape(path: path)
+                } catch TapeLoaderError.FileNotFound {
+                    self.errorShow(messageText: "File not found")
                 } catch {
-                    NSLog("Weird error")
+                    self.errorShow(messageText: "Weird error")
                 }
             }
         }
     }
     
+    @IBAction func playTape(_ sender: AnyObject) {
+        self.vm.setInstantLoad(false)
+        
+        if vm.tapeIsPlaying() {
+            vm.stopTape()
+        } else {
+            do {
+                try vm.startTape()
+            } catch TapeLoaderError.NoTapeOpened {
+                self.errorShow(messageText: "No tape has been opened")
+            } catch TapeLoaderError.EndOfTape {
+                self.errorShow(messageText: "Reached the end of the tape")
+            } catch {
+                self.errorShow(messageText: "Unknown error")
+            }
+        }
+    }
+    
     @IBAction func resetMachine(_ sender: AnyObject) {
-        tapeLoader.close()
-        vm.tapeAvailable = false
         vm.reset()
+    }
+    
+    @IBAction func warpEmulation(_ sender: AnyObject) {
+        self.vm.toggleWarp()
+    }
+    
+    @IBAction func instantLoad(_ sender: AnyObject) {
+        self.vm.setInstantLoad(true)
     }
 }
 
