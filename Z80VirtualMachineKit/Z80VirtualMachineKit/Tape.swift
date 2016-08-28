@@ -9,7 +9,8 @@
 import Foundation
 
 private enum TapeStatus {
-    case idle
+    case sendingHeader
+    case sendingData
     case sendingLeadingTone
     case sendingSyncPulse
     case sendingDataBlock
@@ -45,7 +46,7 @@ final class Tape {
     
     var tapeAvailable: Bool = false
     var isPlaying: Bool = false
-    private var status = TapeStatus.idle
+    private var status = TapeStatus.sendingHeader
     
     private var lastLevel = TapeLevel.off
     
@@ -102,13 +103,13 @@ final class Tape {
         }
         
         self.isPlaying = true
+        self.status = .sendingHeader
+        self.tCycle = 0
+        self.tCyclesTone = 0
     }
     
     func stop() {
         self.isPlaying = false
-        self.status = .idle
-        self.tCycle = 0
-        self.tCyclesTone = 0
     }
     
     func step(tCycle: Int) {
@@ -118,18 +119,18 @@ final class Tape {
         
         self.tCycle += tCycle
         self.tCyclesTone += tCycle
+        self.beginTCycle = self.tCyclesTone
         
         switch self.status {
         case .pause:
-            if self.tCycle >= kPauseTStates {
-                self.leadingToneDurationTStates = kLeadingToneDataTStatesDuration
-                self.status = .sendingLeadingTone
-                self.tCycle = 0
-                self.tCyclesTone = 0
-            }
+            self.pause()
             
-        case .idle:
+        case .sendingHeader:
             self.leadingToneDurationTStates = kLeadingToneHeaderTStatesDuration
+            sendLeadingTone()
+            
+        case .sendingData:
+            self.leadingToneDurationTStates = kLeadingToneDataTStatesDuration
             sendLeadingTone()
             
         case .sendingLeadingTone:
@@ -155,10 +156,19 @@ final class Tape {
         }
     }
     
+    private func pause() {
+        if self.tCycle >= kPauseTStates {
+            self.leadingToneDurationTStates = kLeadingToneDataTStatesDuration
+            self.status = .sendingData
+            self.tCycle = 0
+            self.tCyclesTone = 0
+        }
+    }
+    
     private func sendLeadingTone() {
         // this is invoked only with values .idle or .sendingLeadingTone in status
         // no need for checking any other statuses
-        if self.status == .idle {
+        if self.status == .sendingHeader || self.status == .sendingData {
             self.status = .sendingLeadingTone
             self.lastLevel = .on
             self.ula.setTapeLevel(value: self.lastLevel.rawValue)
