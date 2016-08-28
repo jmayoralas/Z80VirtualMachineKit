@@ -8,10 +8,16 @@
 
 import Foundation
 
-public enum TapeLoaderErrors: Error {
+public enum TapeLoaderError: Error {
     case FileNotFound
     case OutOfData
     case NoTapeOpened
+    case EndOfTape
+}
+
+enum TapeBlockType: UInt8 {
+    case Header = 0x00
+    case Data = 0xFF
 }
 
 struct TapeBlock {
@@ -22,6 +28,8 @@ struct TapeBlock {
         }
     }
 
+    var type: TapeBlockType
+    var identifier: String
     var data: [UInt8]
 }
 
@@ -45,8 +53,20 @@ final class TapeLoader {
             
             index = 0
         } else {
-            throw TapeLoaderErrors.FileNotFound
+            throw TapeLoaderError.FileNotFound
         }
+    }
+    
+    func blockCount() -> Int {
+        let count: Int
+        
+        if let blocks = self.blocks {
+            count = blocks.count
+        } else {
+            count = 0
+        }
+        
+        return count
     }
     
     func readBlock() throws -> TapeBlock? {
@@ -54,7 +74,7 @@ final class TapeLoader {
         
         if let blocks = self.blocks {
             guard index < blocks.count else {
-                throw TapeLoaderErrors.OutOfData
+                throw TapeLoaderError.OutOfData
             }
             
             block = blocks[index]
@@ -63,6 +83,10 @@ final class TapeLoader {
         }
         
         return block
+    }
+    
+    func rewind() {
+        self.index = 0
     }
     
     func close() {

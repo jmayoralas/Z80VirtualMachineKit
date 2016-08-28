@@ -132,7 +132,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
 
                 do {
                     try self.vm.openTape(path: path)
-                } catch TapeLoaderErrors.FileNotFound {
+                } catch TapeLoaderError.FileNotFound {
                     self.errorShow(messageText: "File not found")
                 } catch {
                     self.errorShow(messageText: "Weird error")
@@ -142,13 +142,17 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     }
     
     @IBAction func playTape(_ sender: AnyObject) {
+        self.vm.setInstantLoad(false)
+        
         if vm.tapeIsPlaying() {
             vm.stopTape()
         } else {
             do {
                 try vm.startTape()
-            } catch TapeLoaderErrors.NoTapeOpened {
+            } catch TapeLoaderError.NoTapeOpened {
                 self.errorShow(messageText: "No tape has been opened")
+            } catch TapeLoaderError.EndOfTape {
+                self.errorShow(messageText: "Reached the end of the tape")
             } catch {
                 self.errorShow(messageText: "Unknown error")
             }
@@ -161,6 +165,10 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     
     @IBAction func warpEmulation(_ sender: AnyObject) {
         self.vm.toggleWarp()
+    }
+    
+    @IBAction func instantLoad(_ sender: AnyObject) {
+        self.vm.setInstantLoad(true)
     }
 }
 

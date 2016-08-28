@@ -21,10 +21,6 @@ public struct SpecialKeys: OptionSet {
     public static let symbolShift = SpecialKeys(rawValue: 1 << 1)
 }
 
-private enum TapeLoaderError: Error {
-    case OutOfData
-}
-
 private enum UlaKeyOperation {
     case down
     case up
@@ -76,6 +72,7 @@ private struct UlaUpdateData {
     private var previousSpecialKeys = SpecialKeys()
     
     private let tape: Tape
+    private var instantLoad: Bool = false
     
     // MARK: Constructor
     public init(_ screen: VmScreen) {
@@ -136,8 +133,8 @@ private struct UlaUpdateData {
         instructions += 1
         
         cpu.t_cycle = 0
-/*
-        if cpu.regs.pc == 0x056B && self.tape.tapeAvailable {
+
+        if self.instantLoad && cpu.regs.pc == 0x056B && self.tape.tapeAvailable {
             do {
                 try tapeLoaderHandler()
                 
@@ -150,7 +147,7 @@ private struct UlaUpdateData {
             
             cpu.regs.pc = 0x05E2
         }
-*/
+
         cpu.step()
         ula.step(t_cycle: cpu.t_cycle, &IRQ)
         tape.step(tCycle: cpu.t_cycle)
@@ -239,6 +236,10 @@ private struct UlaUpdateData {
     
     public func tapeIsPlaying() -> Bool {
         return self.tape.isPlaying
+    }
+    
+    public func setInstantLoad(_ instantLoad: Bool) {
+        self.instantLoad = instantLoad
     }
     
     // MARK: Tape loader
