@@ -21,10 +21,6 @@ public struct SpecialKeys: OptionSet {
     public static let symbolShift = SpecialKeys(rawValue: 1 << 1)
 }
 
-private enum TapeLoaderError: Error {
-    case OutOfData
-}
-
 private enum UlaKeyOperation {
     case down
     case up
@@ -40,7 +36,6 @@ private struct UlaUpdateData {
     @objc optional func Z80VMMemoryReadAtAddress(_ address: Int, byte: UInt8)
     @objc optional func Z80VMScreenRefresh()
     @objc optional func Z80VMEmulationHalted()
-    @objc func tapeBlockRequested() -> UnsafeMutablePointer<UInt8>?
 }
 
 @objc final public class Z80VirtualMachineKit: NSObject, MemoryChange
@@ -76,11 +71,13 @@ private struct UlaUpdateData {
     private let symbolShiftUlaUpdateData = UlaUpdateData(address: 0x7F, value: 0b11111101)
     private var previousSpecialKeys = SpecialKeys()
     
-    public var tapeAvailable = false
+    private let tape: Tape
+    private var instantLoad: Bool = false
     
     // MARK: Constructor
     public init(_ screen: VmScreen) {
         ula = Ula(screen: screen)
+        self.tape = Tape(ula: ula)
         
         super.init()
         
@@ -104,6 +101,8 @@ private struct UlaUpdateData {
     
     // MARK: Methods
     public func reset() {
+        tape.close()
+
         cpu.reset()
         instructions = 0
         t_cycles = 0
@@ -134,8 +133,8 @@ private struct UlaUpdateData {
         instructions += 1
         
         cpu.t_cycle = 0
-        
-        if cpu.regs.pc == 0x056B && tapeAvailable {
+
+        if self.instantLoad && cpu.regs.pc == 0x056B && self.tape.tapeAvailable {
             do {
                 try tapeLoaderHandler()
                 
@@ -148,9 +147,10 @@ private struct UlaUpdateData {
             
             cpu.regs.pc = 0x05E2
         }
-        
+
         cpu.step()
         ula.step(t_cycle: cpu.t_cycle, &IRQ)
+        tape.step(tCycle: cpu.t_cycle)
         
         t_cycles = cpu.t_cycle
         
@@ -222,9 +222,30 @@ private struct UlaUpdateData {
         self.ula.toggleAudio()
     }
     
+    public func openTape(path: String) throws {
+        try tape.open(path: path)
+    }
+    
+    public func startTape() throws {
+        try self.tape.start()
+    }
+    
+    public func stopTape() {
+        self.tape.stop()
+    }
+    
+    public func tapeIsPlaying() -> Bool {
+        return self.tape.isPlaying
+    }
+    
+    public func setInstantLoad(_ instantLoad: Bool) {
+        self.instantLoad = instantLoad
+    }
+    
+    // MARK: Tape loader
     private func tapeLoaderHandler() throws {
-        if let bufferRef = delegate!.tapeBlockRequested() {
-            let buffer = Array(UnsafeBufferPointer(start: bufferRef, count: Int(cpu.regs.de + 1)))
+        if let buffer = try self.tape.blockRequested() {
+            self.cpu.regs.de += 1
             
             for (index, data) in buffer.enumerated() {
                 if 0 < index {
@@ -233,8 +254,6 @@ private struct UlaUpdateData {
                     cpu.regs.de -= 1
                 }
             }
-        } else {
-            throw TapeLoaderError.OutOfData
         }
     }
     

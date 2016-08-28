@@ -33,10 +33,11 @@ final class Ula: InternalUlaOperationDelegate {
     
     private var audioStreamer: AudioStreamer!
     
-    private var ioData: UInt8 = 0x00
+    private var ioData: UInt8 = 0
     
     private var audioEnabled = true
-
+    
+    private var tapeLevel: Int = 0
     
     init(screen: VmScreen) {
         self.screen = screen
@@ -58,8 +59,10 @@ final class Ula: InternalUlaOperationDelegate {
         frameTics += t_cycle
         
         if audioEnabled {
-            // sample ioData to compute new audio data
-            self.audioStreamer.updateSample(tCycle: frameTics, value: self.ioData)
+            // sample ioData plus tape signal to compute new audio data
+            var signal = self.ioData
+            signal.bit(6, newVal: self.tapeLevel)
+            self.audioStreamer.updateSample(tCycle: frameTics, value: signal)
         }
 
         if lineTics > kTicsPerLine {
@@ -72,6 +75,10 @@ final class Ula: InternalUlaOperationDelegate {
         if !self.audioEnabled {
             self.audioStreamer.stop()
         }
+    }
+    
+    func setTapeLevel(value: Int) {
+        self.tapeLevel = value
     }
     
     // MARK: Keyboard management
@@ -139,14 +146,15 @@ final class Ula: InternalUlaOperationDelegate {
     }
     
     func ioRead(_ address: UInt16) -> UInt8 {
-        var key_scanned: UInt8 = 0b10111111
+        var dataReturned: UInt8 = 0b10111111
+        dataReturned.bit(6, newVal: self.tapeLevel)
         
         for i in 0 ..< 8 {
             if (Int(address.high) >> i) & 0x01 == 0 {
-                key_scanned = key_scanned & key_buffer[i]
+                dataReturned = dataReturned & key_buffer[i]
             }
         }
-        return key_scanned
+        return dataReturned
     }
     
     func ioWrite(_ address: UInt16, value: UInt8)  {

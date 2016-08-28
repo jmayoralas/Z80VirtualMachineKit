@@ -89,7 +89,10 @@ class AudioStreamer {
     }
 
     func updateSample(tCycle: Int, value: UInt8) {
-        var amplitude: AudioDataElement = (value & 0b00010000) > 0 ? 0.25 : -0.25
+        // sample EAR signal or Tape signal
+        var amplitude: AudioDataElement = (value & 0b00010000) > 0 || (value & 0b01000000) > 0 ? 0.25 : -0.25
+        
+        // add MIC signal
         amplitude += (value & 0b00001000) > 0 ? 0.05 : -0.05
         
         sample -= sample / 8
