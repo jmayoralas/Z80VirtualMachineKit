@@ -238,8 +238,32 @@ private struct UlaUpdateData {
         return self.tape.isPlaying
     }
     
-    public func setInstantLoad(_ instantLoad: Bool) {
-        self.instantLoad = instantLoad
+    public func enableInstantLoad() {
+        self.instantLoad = true
+        
+        guard self.tape.tapeAvailable else {
+            return
+        }
+        
+        if self.tapeIsPlaying() {
+            self.tape.stop()
+        }
+        
+        self.tape.rewind()
+    }
+    
+    public func disableInstantLoad() {
+        self.instantLoad = false
+        
+        guard self.tape.tapeAvailable else {
+            return
+        }
+        
+        self.tape.rewind()
+    }
+    
+    public func instantLoadEnabled() -> Bool {
+        return self.instantLoad
     }
     
     // MARK: Tape loader
