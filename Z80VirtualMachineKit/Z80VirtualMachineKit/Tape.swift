@@ -178,7 +178,7 @@ final class Tape {
     }
     
     private func sendLeadingTone() {
-        // this is invoked only with values .idle or .sendingLeadingTone in status
+        // this is invoked only with values .sendingData or .sendingLeadingTone in status
         // no need for checking any other statuses
         if self.status == .sendingData {
             self.status = .sendingLeadingTone
