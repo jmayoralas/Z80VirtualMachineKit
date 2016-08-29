@@ -30,7 +30,7 @@ private let kTStatesPerSecond = 3500000
 private let kPauseTStates: Int = kTStatesPerSecond
 
 private let kLeadingToneTStatesEdgeDuration = 2168
-private let kLeadingToneDataTStatesDuration = Int(Double(kTStatesPerSecond) * 3)
+private let kLeadingToneDataTStatesDuration = kTStatesPerSecond * 3
 
 private let kSyncPulseOffTStates = 667
 private let kSyncPulseOnTStates = 735
