@@ -79,6 +79,10 @@ final class Tape {
         self.tapeAvailable = false
     }
     
+    func rewind() {
+        self.loader.rewind()
+    }
+    
     func blockRequested() throws -> [UInt8]? {
         var tapeBlock: TapeBlock?
         
@@ -164,6 +168,7 @@ final class Tape {
     private func sendData() {
         if self.blocksSentCount < self.loader.blockCount() {
             self.blocksSentCount += 1
+            self.tapeBlockToSend = try! loader.readBlock()
             self.leadingToneDurationTStates = kLeadingToneDataTStatesDuration
             self.sendLeadingTone()
         } else {
@@ -202,7 +207,6 @@ final class Tape {
     }
 
     private func sendDataBlock() {
-        self.tapeBlockToSend = try! loader.readBlock()
         self.indexByteToSend = 0
         self.indexBitToSend = 7
         self.status = .sendingBit
