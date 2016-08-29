@@ -9,13 +9,20 @@
 import Cocoa
 import Z80VirtualMachineKit
 
-let kColorSpace = CGColorSpaceCreateDeviceRGB()
+private let kColorSpace = CGColorSpaceCreateDeviceRGB()
+private let kInstantLoadEnabled = "(Instant load enabled)"
+private let kInstantLoadDisabled = "(Instant load disabled)"
 
 class ViewController: NSViewController, Z80VirtualMachineStatus {
     @IBOutlet weak var screenView: NSImageView!
     
     var screen: VmScreen!
     var vm: Z80VirtualMachineKit!
+    let appVersionString = String(
+        format: "Sems v%@.%@",
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String,
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
+    )
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,12 +34,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     }
     
     override func viewDidAppear() {
-        let appVersionString = String(
-            format: "Sems v%@.%@",
-            Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String,
-            Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
-        )
-        self.view.window!.title = appVersionString
+        self.view.window!.title = String(format: "%@ %@", appVersionString, kInstantLoadDisabled)
     }
 
     // MARK: Initialization
@@ -142,7 +144,10 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
     }
     
     @IBAction func playTape(_ sender: AnyObject) {
-        self.vm.setInstantLoad(false)
+        guard !self.vm.instantLoadEnabled() else {
+            self.errorShow(messageText: "Cannot play a tape when instant load is enabled")
+            return
+        }
         
         if vm.tapeIsPlaying() {
             vm.stopTape()
@@ -167,8 +172,14 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         self.vm.toggleWarp()
     }
     
-    @IBAction func instantLoad(_ sender: AnyObject) {
-        self.vm.setInstantLoad(true)
+    @IBAction func toggleInstantLoad(_ sender: AnyObject) {
+        if self.vm.instantLoadEnabled() {
+            self.view.window!.title = String(format: "%@ %@", self.appVersionString, kInstantLoadDisabled)
+            self.vm.disableInstantLoad()
+        } else {
+            self.view.window!.title = String(format: "%@ %@", self.appVersionString, kInstantLoadEnabled)
+            self.vm.enableInstantLoad()
+        }
     }
 }
 

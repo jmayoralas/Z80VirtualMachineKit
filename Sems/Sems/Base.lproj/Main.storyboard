@@ -87,9 +87,10 @@
                                                 <action selector="playTape:" target="Ady-hI-5gd" id="z9N-0Z-JB1"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Instant load" keyEquivalent="i" id="gNH-ma-tPv">
+                                        <menuItem isSeparatorItem="YES" id="CaH-np-b4P"/>
+                                        <menuItem title="Toggle instant load" keyEquivalent="i" id="gNH-ma-tPv">
                                             <connections>
-                                                <action selector="instantLoad:" target="Ady-hI-5gd" id="UX2-kK-JH6"/>
+                                                <action selector="toggleInstantLoad:" target="Ady-hI-5gd" id="O7f-6V-etR"/>
                                             </connections>
                                         </menuItem>
                                     </items>
