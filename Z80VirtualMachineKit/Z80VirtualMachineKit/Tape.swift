@@ -30,7 +30,8 @@ private let kTStatesPerSecond = 3500000
 private let kPauseTStates: Int = kTStatesPerSecond
 
 private let kLeadingToneTStatesEdgeDuration = 2168
-private let kLeadingToneDataTStatesDuration = kTStatesPerSecond * 3
+private let kLeadingToneHeaderPulsesCount = 8063
+private let kLeadingToneDataPulsesCount = 3223
 
 private let kSyncPulseOffTStates = 667
 private let kSyncPulseOnTStates = 735
@@ -57,6 +58,7 @@ final class Tape {
     private var blocksSentCount: Int = 0
     
     private var leadingToneDurationTStates: Int = 0
+    private var pulsesCount: Int = 0
     
     init(ula: Ula) {
         self.ula = ula
@@ -145,7 +147,7 @@ final class Tape {
         
         case .sendingBit:
             self.sendBit()
-        
+            
         case .endBit:
             self.endBit()
             
@@ -169,7 +171,12 @@ final class Tape {
         if self.blocksSentCount < self.loader.blockCount() {
             self.blocksSentCount += 1
             self.tapeBlockToSend = try! loader.readBlock()
-            self.leadingToneDurationTStates = kLeadingToneDataTStatesDuration
+            if self.tapeBlockToSend.type == .Header {
+                self.pulsesCount = kLeadingToneHeaderPulsesCount
+            } else {
+                self.pulsesCount = kLeadingToneDataPulsesCount
+            }
+            
             self.sendLeadingTone()
         } else {
             self.stop()
@@ -182,22 +189,17 @@ final class Tape {
         // no need for checking any other statuses
         if self.status == .sendingData {
             self.status = .sendingLeadingTone
-            self.lastLevel = .on
-            self.ula.setTapeLevel(value: self.lastLevel.rawValue)
         } else {
-            if self.tCyclesTone >= self.leadingToneDurationTStates {
+            if self.pulsesCount < 0 {
                 self.lastLevel = .off
                 self.ula.setTapeLevel(value: self.lastLevel.rawValue)
                 
+                self.pulsesCount = 2
                 self.status = .sendingSyncPulse
                 self.tCycle = 0
                 self.tCyclesTone = 0
             } else {
-                if self.tCycle >= kLeadingToneTStatesEdgeDuration {
-                    self.lastLevel = (self.lastLevel == .off) ? .on : .off
-                    self.ula.setTapeLevel(value: self.lastLevel.rawValue)
-                    self.tCycle -= kLeadingToneTStatesEdgeDuration
-                }
+                self.sendPulse(offTStates: kLeadingToneTStatesEdgeDuration, onTStates: kLeadingToneTStatesEdgeDuration, statusAfterPulse: .sendingLeadingTone)
             }
         }
     }
@@ -242,17 +244,29 @@ final class Tape {
             if self.tCycle >= offTStates {
                 self.lastLevel = .on
                 self.ula.setTapeLevel(value: self.lastLevel.rawValue)
+                
                 self.tCycle -= offTStates
+                
+                if self.pulsesCount >= 0 {
+                    self.pulsesCount -= 1
+                }
+
             }
         case .on:
             if self.tCycle >= onTStates {
                 self.lastLevel = .off
                 self.ula.setTapeLevel(value: self.lastLevel.rawValue)
+                
                 self.tCycle -= onTStates
                 self.tCyclesTone -= onTStates
+                
                 self.status = statusAfterPulse
+                
+                if self.pulsesCount >= 0 {
+                    self.pulsesCount -= 1
+                }
             }
         }
-        
     }
+    
 }

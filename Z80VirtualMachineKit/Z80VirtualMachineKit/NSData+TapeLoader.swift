@@ -10,14 +10,6 @@ import Foundation
 
 extension NSData {
     
-    func getTapeBlock(atLocation location: Int) -> TapeBlock {
-        let size = self.getNumber(location: location, size: 2)
-        let data = self.getBytes(location: location + 2, size: size)
-        let (type, identifier) = self.getTapeBlockTypeAndIdentifier(data: data)
-        
-        return TapeBlock(type: type, identifier: identifier, data: data)
-    }
-    
     func getNumber(location: Int, size: Int) -> Int {
         var number: Int = 0
         
@@ -41,7 +33,14 @@ extension NSData {
         return data
     }
     
-    func getTapeBlockTypeAndIdentifier(data: [UInt8]) -> (TapeBlockType, String) {
+    func getTapeBlock(atLocation location: Int) -> TapeBlock {
+        let size = self.getNumber(location: location, size: 2)
+        let data = self.getBytes(location: location + 2, size: size)
+        
+        return self.getTapeBlock(data: data)
+    }
+    
+    func getTapeBlock(data: [UInt8]) -> TapeBlock {
         let type = data[0] == 0x00 ? TapeBlockType.Header : TapeBlockType.Data
         let identifier: String
         
@@ -52,7 +51,7 @@ extension NSData {
             identifier = "[DATA]"
         }
         
-        return (type, identifier)
+        return TapeBlock(type: type, identifier: identifier, data: data)
     }
     
 }
