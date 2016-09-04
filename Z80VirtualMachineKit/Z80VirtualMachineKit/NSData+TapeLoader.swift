@@ -43,15 +43,18 @@ extension NSData {
     func getTapeBlock(data: [UInt8]) -> TapeBlock {
         let type = data[0] == 0x00 ? TapeBlockType.Header : TapeBlockType.Data
         let identifier: String
+        let tapeBlockInfo: TapeBlockInfo
         
         if type == .Header {
             let name : [UInt8] = Array(data[2...11])
             identifier = String(data: Data(name), encoding: String.Encoding.ascii)!
+            tapeBlockInfo = kTapeBlockInfoStandardROMHeader
         } else {
             identifier = "[DATA]"
+            tapeBlockInfo = kTapeBlockInfoStandardROMData
         }
         
-        return TapeBlock(type: type, identifier: identifier, data: data)
+        return TapeBlock(info: tapeBlockInfo, identifier: identifier, data: data)
     }
     
 }

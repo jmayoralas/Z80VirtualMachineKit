@@ -20,6 +20,36 @@ enum TapeBlockType: UInt8 {
     case Data = 0xFF
 }
 
+struct TapeBlockInfo {
+    var pilotPulseLength: Int
+    var syncFirstPulseLength: Int
+    var syncSecondPulseLength: Int
+    var resetBitPulseLength: Int
+    var setBitPulseLength: Int
+    var pilotTonePulsesCount: Int
+    var pauseAfterBlock: Int
+}
+
+let kTapeBlockInfoStandardROMHeader = TapeBlockInfo(
+    pilotPulseLength: 2168,
+    syncFirstPulseLength: 667,
+    syncSecondPulseLength: 735,
+    resetBitPulseLength: 855,
+    setBitPulseLength: 1710,
+    pilotTonePulsesCount: 8063,
+    pauseAfterBlock: 1000
+)
+
+let kTapeBlockInfoStandardROMData = TapeBlockInfo(
+    pilotPulseLength: 2168,
+    syncFirstPulseLength: 667,
+    syncSecondPulseLength: 735,
+    resetBitPulseLength: 855,
+    setBitPulseLength: 1710,
+    pilotTonePulsesCount: 3223,
+    pauseAfterBlock: 1000
+)
+
 struct TapeBlock {
     var size : Int {
         get {
@@ -28,9 +58,9 @@ struct TapeBlock {
         }
     }
 
-    var type: TapeBlockType
-    var identifier: String
-    var data: [UInt8]
+    let info: TapeBlockInfo
+    let identifier: String
+    let data: [UInt8]
 }
 
 final class TapeLoader {

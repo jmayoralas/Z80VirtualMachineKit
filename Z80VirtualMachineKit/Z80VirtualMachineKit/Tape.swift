@@ -26,18 +26,6 @@ private struct Pulse {
 
 private let kTStatesPerSecond = 3500000
 
-private let kPauseTStates: Int = kTStatesPerSecond
-
-private let kLeadingToneTStatesEdgeDuration = 2168
-private let kLeadingToneHeaderPulsesCount = 8063
-private let kLeadingToneDataPulsesCount = 3223
-
-private let kSyncPulseOffTStates = 667
-private let kSyncPulseOnTStates = 735
-
-private let kResetBitTStates = 855
-private let kSetBitTStates = kResetBitTStates * 2
-
 private typealias AfterPulsesCallback = () -> Void
 
 private let kEndPulseSequence = Pulse(tapeLevel: nil, tStates: 0)
@@ -146,7 +134,7 @@ final class Tape {
     }
     
     private func pause() {
-        if self.tCycle >= kPauseTStates {
+        if self.tCycle >= (self.tapeBlockToSend.info.pauseAfterBlock / 1000) * kTStatesPerSecond {
             self.status = .sendingData
             self.tCycle = 0
         }
@@ -158,12 +146,6 @@ final class Tape {
             
             self.tapeBlockToSend = try! loader.readBlock()
             
-            if self.tapeBlockToSend.type == .Header {
-                self.pulsesCount = kLeadingToneHeaderPulsesCount
-            } else {
-                self.pulsesCount = kLeadingToneDataPulsesCount
-            }
-            
             self.sendLeadingTone()
         } else {
             self.stop()
@@ -172,18 +154,10 @@ final class Tape {
     }
     
     private func sendLeadingTone() {
-        let pulsesCount: Int
-        
-        if self.tapeBlockToSend.type == .Header {
-            pulsesCount = kLeadingToneHeaderPulsesCount
-        } else {
-            pulsesCount = kLeadingToneDataPulsesCount
-        }
-        
         self.pulses = []
         
-        for _ in 1...pulsesCount {
-            self.pulses!.append(Pulse(tapeLevel: nil, tStates: kLeadingToneTStatesEdgeDuration))
+        for _ in 1 ... self.tapeBlockToSend.info.pilotTonePulsesCount {
+            self.pulses!.append(Pulse(tapeLevel: nil, tStates: self.tapeBlockToSend.info.pilotPulseLength))
         }
         self.pulses!.append(kEndPulseSequence)
         
@@ -196,8 +170,8 @@ final class Tape {
     
     private func sendSyncPulse() {
         self.pulses = [
-            Pulse(tapeLevel: .off, tStates: kSyncPulseOffTStates),
-            Pulse(tapeLevel: .on, tStates: kSyncPulseOnTStates),
+            Pulse(tapeLevel: .off, tStates: self.tapeBlockToSend.info.syncFirstPulseLength),
+            Pulse(tapeLevel: .on, tStates: self.tapeBlockToSend.info.syncSecondPulseLength),
             kEndPulseSequence
         ]
         
@@ -235,9 +209,9 @@ final class Tape {
         let bitToSend = self.tapeBlockToSend.data[self.indexByteToSend].bit(self.indexBitToSend)
         
         if bitToSend == 0 {
-            bitTStates = kResetBitTStates
+            bitTStates = self.tapeBlockToSend.info.resetBitPulseLength
         } else {
-            bitTStates = kSetBitTStates
+            bitTStates = self.tapeBlockToSend.info.setBitPulseLength
         }
         
         self.pulses = [
