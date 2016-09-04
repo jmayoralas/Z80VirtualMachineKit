@@ -134,10 +134,8 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
 
                 do {
                     try self.vm.openTape(path: path)
-                } catch TapeLoaderError.FileNotFound {
-                    self.errorShow(messageText: "File not found")
-                } catch TapeLoaderError.UnsupportedTapeBlockFormat {
-                    self.errorShow(messageText: "Unsupported tape block format")
+                } catch let error as TapeLoaderError {
+                    self.handleTapeError(error: error)
                 } catch {
                     self.errorShow(messageText: "Weird error")
                 }
@@ -156,10 +154,8 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         } else {
             do {
                 try vm.startTape()
-            } catch TapeLoaderError.NoTapeOpened {
-                self.errorShow(messageText: "No tape has been opened")
-            } catch TapeLoaderError.EndOfTape {
-                self.errorShow(messageText: "Reached the end of the tape")
+            } catch let error as TapeLoaderError {
+                self.handleTapeError(error: error)
             } catch {
                 self.errorShow(messageText: "Unknown error")
             }
@@ -182,6 +178,11 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
             self.view.window!.title = String(format: "%@ %@", self.appVersionString, kInstantLoadEnabled)
             self.vm.enableInstantLoad()
         }
+    }
+    
+    // MARK: Error handlers
+    func handleTapeError(error: TapeLoaderError) {
+        self.errorShow(messageText: error.description)
     }
 }
 

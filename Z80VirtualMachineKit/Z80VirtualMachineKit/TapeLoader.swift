@@ -8,12 +8,31 @@
 
 import Foundation
 
-public enum TapeLoaderError: Error {
-    case FileNotFound
+public enum TapeLoaderError: Error, CustomStringConvertible {
+    case FileNotFound(path: String)
     case OutOfData
     case NoTapeOpened
     case EndOfTape
-    case UnsupportedTapeBlockFormat
+    case UnsupportedTapeBlockFormat(blockId: UInt8, location: Int)
+    
+    public var description: String {
+        let description: String
+        
+        switch self {
+        case .FileNotFound(let path):
+            description = String(format: "File not found: %@", path)
+        case .OutOfData:
+            description = "Out of data in tape block"
+        case .NoTapeOpened:
+            description = "No tape has been opened"
+        case .EndOfTape:
+            description = "Reached the end of tape"
+        case .UnsupportedTapeBlockFormat(let blockId, let location):
+            description = String(format: "Unsupported tape block id. Location %d, block id 0x%@", location, blockId.hexStr())
+        }
+        
+        return description
+    }
 }
 
 enum TapeFormat: UInt8 {
@@ -84,7 +103,7 @@ final class TapeLoader {
             
             index = 0
         } else {
-            throw TapeLoaderError.FileNotFound
+            throw TapeLoaderError.FileNotFound(path: path)
         }
     }
     

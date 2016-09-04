@@ -8,8 +8,13 @@
 
 import Foundation
 
+private enum TzxBlockId: UInt8 {
+    case StandardSpeed = 0x10
+}
+
 extension NSData {
-    var tapeFormat: TapeFormat {
+
+    private var tapeFormat: TapeFormat {
         get {
             // get first 8 bytes and search for TZX signature
             let range = NSRange(location: 0, length: 7)
@@ -28,6 +33,7 @@ extension NSData {
         }
     }
     
+    // MARK: Public methods
     func getLocationFirstTapeDataBlock() -> Int {
         var firstDataBlock: Int = 0
         
@@ -40,29 +46,6 @@ extension NSData {
         
         return firstDataBlock
         
-    }
-    
-    func getNumber(location: Int, size: Int) -> Int {
-        var number: Int = 0
-        
-        let range = NSRange(location: location, length: size)
-        var bytes = [UInt8](repeatElement(0, count: size))
-        
-        self.getBytes(&bytes, range: range)
-        
-        for i in (0 ..< size).reversed() {
-            number += Int(bytes[i]) << (8 * i)
-        }
-        
-        return number
-    }
-    
-    func getBytes(location: Int, size: Int) -> [UInt8] {
-        let range = NSRange(location: location, length: Int(size))
-        var data = [UInt8](repeating: 0, count: Int(size))
-        self.getBytes(&data, range: range)
-        
-        return data
     }
     
     func getTapeBlock(atLocation location: Int) throws -> TapeBlock? {
@@ -78,14 +61,38 @@ extension NSData {
         return tapeBlock
     }
     
-    func getTapTapeBlock(atLocation location: Int) -> TapeBlock {
+    // MARK: Private methods
+    private func getNumber(location: Int, size: Int) -> Int {
+        var number: Int = 0
+        
+        let range = NSRange(location: location, length: size)
+        var bytes = [UInt8](repeatElement(0, count: size))
+        
+        self.getBytes(&bytes, range: range)
+        
+        for i in (0 ..< size).reversed() {
+            number += Int(bytes[i]) << (8 * i)
+        }
+        
+        return number
+    }
+    
+    private func getBytes(location: Int, size: Int) -> [UInt8] {
+        let range = NSRange(location: location, length: Int(size))
+        var data = [UInt8](repeating: 0, count: Int(size))
+        self.getBytes(&data, range: range)
+        
+        return data
+    }
+    
+    private func getTapTapeBlock(atLocation location: Int) -> TapeBlock {
         let size = self.getNumber(location: location, size: 2)
         let data = self.getBytes(location: location + 2, size: size)
         
         return self.getTapTapeBlock(data: data)
     }
     
-    func getTapTapeBlock(data: [UInt8]) -> TapeBlock {
+    private func getTapTapeBlock(data: [UInt8]) -> TapeBlock {
         let identifier: String
         let tapeBlockInfo: TapeBlockInfo
         
@@ -101,8 +108,13 @@ extension NSData {
         return TapeBlock(info: tapeBlockInfo, identifier: identifier, data: data)
     }
 
-    func getTzxTapeBlock(atLocation location: Int) throws -> TapeBlock? {
-        throw TapeLoaderError.UnsupportedTapeBlockFormat
+    private func getTzxTapeBlock(atLocation location: Int) throws -> TapeBlock? {
+        let blockIdValue = UInt8(self.getNumber(location: location, size: 1))
+        
+        guard let blockId = TzxBlockId(rawValue: blockIdValue) else {
+            throw TapeLoaderError.UnsupportedTapeBlockFormat(blockId: blockIdValue, location: location)
+        }
+        
         return nil
     }
 }
