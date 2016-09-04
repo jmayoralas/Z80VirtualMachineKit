@@ -13,11 +13,12 @@ public enum TapeLoaderError: Error {
     case OutOfData
     case NoTapeOpened
     case EndOfTape
+    case UnsupportedTapeBlockFormat
 }
 
-enum TapeBlockType: UInt8 {
-    case Header = 0x00
-    case Data = 0xFF
+enum TapeFormat: UInt8 {
+    case Tap
+    case Tzx
 }
 
 struct TapeBlockInfo {
@@ -70,15 +71,15 @@ final class TapeLoader {
     
     func open(path: String) throws {
         if let buffer = NSData(contentsOfFile: path) {
-            var location = 0
+            var location = buffer.getLocationFirstTapeDataBlock()
             
-            blocks = [TapeBlock]()
+            blocks = []
             
             while (location < buffer.length) {
-                let tapeBlock = buffer.getTapeBlock(atLocation: location)
-                blocks!.append(tapeBlock)
-                
-                location += tapeBlock.size
+                if let tapeBlock = try buffer.getTapeBlock(atLocation: location) {
+                    blocks!.append(tapeBlock)
+                    location += tapeBlock.size
+                }
             }
             
             index = 0
