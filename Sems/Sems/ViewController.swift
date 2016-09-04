@@ -126,7 +126,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         dialog.canChooseDirectories = true
         dialog.canCreateDirectories = true
         dialog.allowsMultipleSelection = false
-        dialog.allowedFileTypes = ["tap"]
+        dialog.allowedFileTypes = ["tap", "tzx"]
         
         if dialog.runModal() == NSModalResponseOK {
             if let result = dialog.url {
@@ -136,6 +136,8 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
                     try self.vm.openTape(path: path)
                 } catch TapeLoaderError.FileNotFound {
                     self.errorShow(messageText: "File not found")
+                } catch TapeLoaderError.UnsupportedTapeBlockFormat {
+                    self.errorShow(messageText: "Unsupported tape block format")
                 } catch {
                     self.errorShow(messageText: "Weird error")
                 }
