@@ -24,7 +24,7 @@ private struct Pulse {
     var tStates: Int
 }
 
-private let kTStatesPerSecond = 3500000
+private let kTStatesPerMiliSecond = 3500
 
 private typealias AfterPulsesCallback = () -> Void
 
@@ -134,7 +134,12 @@ final class Tape {
     }
     
     private func pause() {
-        if self.tCycle >= (self.tapeBlockToSend.info.pauseAfterBlock / 1000) * kTStatesPerSecond {
+        guard self.tapeBlockToSend.info.pauseAfterBlock > 0 else {
+            self.stop()
+            return
+        }
+        
+        if self.tCycle >= self.tapeBlockToSend.info.pauseAfterBlock * kTStatesPerMiliSecond {
             self.status = .sendingData
             self.tCycle = 0
         }
@@ -146,7 +151,12 @@ final class Tape {
             
             self.tapeBlockToSend = try! loader.readBlock()
             
-            self.sendLeadingTone()
+            if self.tapeBlockToSend.identifier == kPauseTapeBlockIdentifier {
+                self.status = .pause
+            } else {
+                self.sendLeadingTone()
+            }
+            
         } else {
             self.stop()
         }

@@ -10,6 +10,10 @@ import Foundation
 
 private enum TzxBlockId: UInt8 {
     case StandardSpeed = 0x10
+    case DirectRecording = 0x15
+    case PauseOrStopTape = 0x20
+    case TextDescription = 0x30
+    case ArchiveInfo = 0x32
 }
 
 extension NSData {
@@ -41,15 +45,15 @@ extension NSData {
         case .Tap:
             firstDataBlock = 0
         case .Tzx:
-            firstDataBlock = 0x0A
+            firstDataBlock = 10
         }
         
         return firstDataBlock
         
     }
     
-    func getTapeBlock(atLocation location: Int) throws -> TapeBlock? {
-        let tapeBlock: TapeBlock?
+    func getTapeBlock(atLocation location: Int) throws -> TapeBlock {
+        let tapeBlock: TapeBlock
         
         switch self.tapeFormat {
         case .Tap:
@@ -105,16 +109,56 @@ extension NSData {
             tapeBlockInfo = kTapeBlockInfoStandardROMData
         }
         
-        return TapeBlock(info: tapeBlockInfo, identifier: identifier, data: data)
+        return TapeBlock(size: data.count + 2, info: tapeBlockInfo, identifier: identifier, data: data)
     }
 
-    private func getTzxTapeBlock(atLocation location: Int) throws -> TapeBlock? {
+    private func getTzxTapeBlock(atLocation location: Int) throws -> TapeBlock {
         let blockIdValue = UInt8(self.getNumber(location: location, size: 1))
         
         guard let blockId = TzxBlockId(rawValue: blockIdValue) else {
             throw TapeLoaderError.UnsupportedTapeBlockFormat(blockId: blockIdValue, location: location)
         }
         
-        return nil
+        return try self.getTzxTapeBlock(blockId: blockId, location: location + 1)
+    }
+    
+    private func getTzxTapeBlock(blockId: TzxBlockId, location: Int) throws -> TapeBlock {
+        var block: TapeBlock
+        
+        switch blockId {
+        case .StandardSpeed:
+            let pause = self.getNumber(location: location, size: 2)
+            
+            block = self.getTapTapeBlock(atLocation: location + 2)
+        
+            block.size += 3
+            if pause > 0 {
+                block.info.pauseAfterBlock = pause
+            }
+            
+        case .DirectRecording:
+            let size = self.getNumber(location: location + 6, size: 1)
+            guard size == 0 else {
+                throw TapeLoaderError.UnsupportedTapeBlockFormat(blockId: blockId.rawValue, location: location - 1)
+            }
+            
+            block = TapeBlock(size: size + 10)
+            
+        case .ArchiveInfo:
+            let size = self.getNumber(location: location, size: 2)
+            block = TapeBlock(size: size + 3)
+            
+        case .PauseOrStopTape:
+            let pause = self.getNumber(location: location, size: 2)
+            block = TapeBlock(size: 3)
+            block.info.pauseAfterBlock = pause
+            block.identifier = kPauseTapeBlockIdentifier
+            
+        case .TextDescription:
+            let size = self.getNumber(location: location, size: 1)
+            block = TapeBlock(size: size + 2)
+        }
+        
+        return block
     }
 }

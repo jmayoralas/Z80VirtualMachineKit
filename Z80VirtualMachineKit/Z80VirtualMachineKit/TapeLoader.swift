@@ -70,17 +70,28 @@ let kTapeBlockInfoStandardROMData = TapeBlockInfo(
     pauseAfterBlock: 1000
 )
 
-struct TapeBlock {
-    var size : Int {
-        get {
-            // a tape block has a UInt16 header with the data buffer size, and the data buffer
-            return MemoryLayout<UInt16>.size + data.count
-        }
-    }
+let kDummyTapeBlockIdentifier = "dummy"
+let kPauseTapeBlockIdentifier = "pause"
 
-    let info: TapeBlockInfo
-    let identifier: String
+struct TapeBlock {
+    var size : Int
+    var info: TapeBlockInfo
+    var identifier: String
     let data: [UInt8]
+    
+    init(size: Int, info: TapeBlockInfo, identifier: String, data: [UInt8]) {
+        self.size = size
+        self.info = info
+        self.identifier = identifier
+        self.data = data
+    }
+    
+    init(size: Int) {
+        self.size = size
+        self.info = kTapeBlockInfoStandardROMData
+        self.identifier = kDummyTapeBlockIdentifier
+        self.data = []
+    }
 }
 
 final class TapeLoader {
@@ -95,10 +106,13 @@ final class TapeLoader {
             blocks = []
             
             while (location < buffer.length) {
-                if let tapeBlock = try buffer.getTapeBlock(atLocation: location) {
+                let tapeBlock = try buffer.getTapeBlock(atLocation: location)
+                
+                if tapeBlock.identifier != kDummyTapeBlockIdentifier {
                     blocks!.append(tapeBlock)
-                    location += tapeBlock.size
                 }
+                
+                location += tapeBlock.size
             }
             
             index = 0
