@@ -131,27 +131,35 @@ struct TapeBlock {
 }
 
 final class TapeLoader {
+    var eof: Bool {
+        get {
+            guard let blocks = self.blocks else {
+                return true
+            }
+            
+            return self.index == blocks.count
+        }
+    }
+    
     private var blocks: [TapeBlock]?
     
     private var index = 0
     
     func open(path: String) throws {
         if let buffer = TapeData(contentsOfFile: path) {
-            var location = buffer.getLocationFirstTapeDataBlock()
             
             blocks = []
             
-            while (location < buffer.length) {
-                let tapeBlock = try buffer.getTapeBlock(atLocation: location)
+            while (!buffer.eof) {
+                let tapeBlock = try buffer.getNextTapeBlock()
                 
                 if tapeBlock.identifier != kDummyTapeBlockIdentifier {
                     blocks!.append(tapeBlock)
                 }
-                
-                location += tapeBlock.size
             }
             
             index = 0
+            
         } else {
             throw TapeLoaderError.FileNotFound(path: path)
         }
@@ -173,8 +181,8 @@ final class TapeLoader {
         var block: TapeBlock? = nil
         
         if let blocks = self.blocks {
-            guard index < blocks.count else {
-                throw TapeLoaderError.OutOfData
+            guard !self.eof else {
+                throw TapeLoaderError.EndOfTape
             }
             
             block = blocks[index]

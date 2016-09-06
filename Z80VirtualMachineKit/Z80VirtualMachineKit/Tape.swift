@@ -47,7 +47,6 @@ final class Tape {
     private var tapeBlockToSend: TapeBlock!
     private var indexByteToSend: Int = 0
     private var indexBitToSend: Int = 0
-    private var blocksSentCount: Int = 0
     
     private var leadingToneDurationTStates: Int = 0
     private var pulsesCount: Int = 0
@@ -69,7 +68,6 @@ final class Tape {
         
         try loader.open(path: path)
         self.tapeAvailable = true
-        self.blocksSentCount = 0
     }
     
     func getBlockDirectory() throws -> [TapeBlock] {
@@ -108,7 +106,7 @@ final class Tape {
             throw TapeLoaderError.NoTapeOpened
         }
         
-        guard self.blocksSentCount < self.loader.blockCount() else {
+        guard !self.loader.eof else {
             throw TapeLoaderError.EndOfTape
         }
         if self.isPlaying {
@@ -156,9 +154,7 @@ final class Tape {
     }
     
     private func sendData() {
-        if self.blocksSentCount < self.loader.blockCount() {
-            self.blocksSentCount += 1
-            
+        if !self.loader.eof {
             self.tapeBlockToSend = try! loader.readBlock()
             
             if self.tapeBlockToSend.identifier == kPauseTapeBlockIdentifier {
