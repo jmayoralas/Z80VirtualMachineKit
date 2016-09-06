@@ -14,6 +14,7 @@ public enum TapeLoaderError: Error, CustomStringConvertible {
     case NoTapeOpened
     case EndOfTape
     case UnsupportedTapeBlockFormat(blockId: UInt8, location: Int)
+    case DataIncoherent(blockId: UInt8, location: Int)
     
     public var description: String {
         let description: String
@@ -29,6 +30,8 @@ public enum TapeLoaderError: Error, CustomStringConvertible {
             description = "Reached the end of tape"
         case .UnsupportedTapeBlockFormat(let blockId, let location):
             description = String(format: "Unsupported tape block id. Location %d, block id 0x%@", location, blockId.hexStr())
+        case .DataIncoherent(let blockId, let location):
+            description = String(format: "Incoherent data found. Location %d for block id 0x%@", location, blockId.hexStr())
         }
         
         return description
