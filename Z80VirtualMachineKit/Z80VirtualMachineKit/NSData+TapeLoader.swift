@@ -98,18 +98,25 @@ extension NSData {
     
     private func getTapTapeBlock(data: [UInt8]) -> TapeBlock {
         let identifier: String
-        let tapeBlockInfo: TapeBlockInfo
+        let tapeBlockTimingInfo: TapeBlockTimingInfo
+        let type: TapeBlockType
         
         if data[0] == 0x00 {
             let name : [UInt8] = Array(data[2...11])
             identifier = String(data: Data(name), encoding: String.Encoding.ascii)!
-            tapeBlockInfo = kTapeBlockInfoStandardROMHeader
+            tapeBlockTimingInfo = kTapeBlockTimingInfoStandardROMHeader
+            if let typeFromData = TapeBlockType(rawValue: Int(data[1])) {
+                type = typeFromData
+            } else {
+                type = .Dummy
+            }
         } else {
             identifier = "[DATA]"
-            tapeBlockInfo = kTapeBlockInfoStandardROMData
+            tapeBlockTimingInfo = kTapeBlockTimingInfoStandardROMData
+            type = .Dummy
         }
         
-        return TapeBlock(size: data.count + 2, info: tapeBlockInfo, identifier: identifier, data: data)
+        return TapeBlock(size: data.count + 2, info: tapeBlockTimingInfo, identifier: identifier, type: type, data: data)
     }
 
     private func getTzxTapeBlock(atLocation location: Int) throws -> TapeBlock {
@@ -133,7 +140,7 @@ extension NSData {
         
             block.size += 3
             if pause > 0 {
-                block.info.pauseAfterBlock = pause
+                block.timingInfo.pauseAfterBlock = pause
             }
             
         case .DirectRecording:
@@ -151,7 +158,7 @@ extension NSData {
         case .PauseOrStopTape:
             let pause = self.getNumber(location: location, size: 2)
             block = TapeBlock(size: 3)
-            block.info.pauseAfterBlock = pause
+            block.timingInfo.pauseAfterBlock = pause
             block.identifier = kPauseTapeBlockIdentifier
             
         case .TextDescription:

@@ -21,6 +21,11 @@ public struct SpecialKeys: OptionSet {
     public static let symbolShift = SpecialKeys(rawValue: 1 << 1)
 }
 
+public struct TapeBlockDirectoryEntry {
+    public let type: TapeBlockType
+    public let identifier: String
+}
+
 private enum UlaKeyOperation {
     case down
     case up
@@ -224,6 +229,22 @@ private struct UlaUpdateData {
     
     public func openTape(path: String) throws {
         try tape.open(path: path)
+    }
+    
+    public func getBlockDirectory() throws -> [TapeBlockDirectoryEntry] {
+        let blocks = try self.tape.getBlockDirectory()
+        
+        var blockDirectory = [TapeBlockDirectoryEntry]()
+        
+        for block in blocks {
+            blockDirectory.append(TapeBlockDirectoryEntry(type: block.type, identifier: block.identifier))
+        }
+        
+        return blockDirectory
+    }
+    
+    public func setCurrentTapeBlock(index: Int) throws {
+        try self.tape.setCurrentBlock(index: index)
     }
     
     public func startTape() throws {

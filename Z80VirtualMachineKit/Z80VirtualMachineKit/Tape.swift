@@ -31,11 +31,13 @@ private typealias AfterPulsesCallback = () -> Void
 private let kEndPulseSequence = Pulse(tapeLevel: nil, tStates: 0)
 
 final class Tape {
-    let ula: Ula
-    let loader: TapeLoader
     
     var tapeAvailable: Bool = false
     var isPlaying: Bool = false
+    
+    private let ula: Ula
+    private let loader: TapeLoader
+    
     private var status = TapeStatus.sendingData
     
     private var lastLevel = TapeLevel.off
@@ -70,6 +72,10 @@ final class Tape {
         self.blocksSentCount = 0
     }
     
+    func getBlockDirectory() throws -> [TapeBlock] {
+        return try self.loader.getBlockDirectory()
+    }
+    
     func close() {
         self.loader.close()
         self.tapeAvailable = false
@@ -77,6 +83,10 @@ final class Tape {
     
     func rewind() {
         self.loader.rewind()
+    }
+    
+    func setCurrentBlock(index: Int) throws {
+        try self.loader.setCurrentBlock(index: index)
     }
     
     func blockRequested() throws -> [UInt8]? {
@@ -134,12 +144,12 @@ final class Tape {
     }
     
     private func pause() {
-        guard self.tapeBlockToSend.info.pauseAfterBlock > 0 else {
+        guard self.tapeBlockToSend.timingInfo.pauseAfterBlock > 0 else {
             self.stop()
             return
         }
         
-        if self.tCycle >= self.tapeBlockToSend.info.pauseAfterBlock * kTStatesPerMiliSecond {
+        if self.tCycle >= self.tapeBlockToSend.timingInfo.pauseAfterBlock * kTStatesPerMiliSecond {
             self.status = .sendingData
             self.tCycle = 0
         }
@@ -166,8 +176,8 @@ final class Tape {
     private func sendLeadingTone() {
         self.pulses = []
         
-        for _ in 1 ... self.tapeBlockToSend.info.pilotTonePulsesCount {
-            self.pulses!.append(Pulse(tapeLevel: nil, tStates: self.tapeBlockToSend.info.pilotPulseLength))
+        for _ in 1 ... self.tapeBlockToSend.timingInfo.pilotTonePulsesCount {
+            self.pulses!.append(Pulse(tapeLevel: nil, tStates: self.tapeBlockToSend.timingInfo.pilotPulseLength))
         }
         self.pulses!.append(kEndPulseSequence)
         
@@ -180,8 +190,8 @@ final class Tape {
     
     private func sendSyncPulse() {
         self.pulses = [
-            Pulse(tapeLevel: .off, tStates: self.tapeBlockToSend.info.syncFirstPulseLength),
-            Pulse(tapeLevel: .on, tStates: self.tapeBlockToSend.info.syncSecondPulseLength),
+            Pulse(tapeLevel: .off, tStates: self.tapeBlockToSend.timingInfo.syncFirstPulseLength),
+            Pulse(tapeLevel: .on, tStates: self.tapeBlockToSend.timingInfo.syncSecondPulseLength),
             kEndPulseSequence
         ]
         
@@ -219,9 +229,9 @@ final class Tape {
         let bitToSend = self.tapeBlockToSend.data[self.indexByteToSend].bit(self.indexBitToSend)
         
         if bitToSend == 0 {
-            bitTStates = self.tapeBlockToSend.info.resetBitPulseLength
+            bitTStates = self.tapeBlockToSend.timingInfo.resetBitPulseLength
         } else {
-            bitTStates = self.tapeBlockToSend.info.setBitPulseLength
+            bitTStates = self.tapeBlockToSend.timingInfo.setBitPulseLength
         }
         
         self.pulses = [
