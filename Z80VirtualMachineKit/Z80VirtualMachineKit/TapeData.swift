@@ -10,22 +10,30 @@ import Foundation
 
 private enum TzxBlockId: UInt8 {
     case StandardSpeed = 0x10
+    case PureTone = 0x12
     case DirectRecording = 0x15
     case PauseOrStopTape = 0x20
     case GroupStart = 0x21
+    case GroupEnd = 0x22
+    case LoopStart = 0x24
+    case LoopEnd = 0x25
     case TextDescription = 0x30
     case ArchiveInfo = 0x32
 }
 
 final class TapeData {
 
-    private var data: NSData
-
-    var length: Int {
+    var eof: Bool {
         get {
-            return self.data.length
+            return self.location >= self.data.length
         }
     }
+    
+    private var location: Int = 0
+    private var data: NSData
+    private var groupStarted: Bool = false
+    private var loopCount: Int = 0
+    private var loopStartLocation: Int = 0
     
     init?(contentsOfFile path: String) {
         guard let data = NSData(contentsOfFile: path) else {
@@ -33,10 +41,8 @@ final class TapeData {
         }
         
         self.data = data
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        
+        self.location = self.getLocationFirstTapeDataBlock()
     }
     
     private var tapeFormat: TapeFormat {
@@ -57,9 +63,21 @@ final class TapeData {
             return tapeFormat
         }
     }
-    
+
     // MARK: Public methods
-    func getLocationFirstTapeDataBlock() -> Int {
+    func getNextTapeBlock() throws -> TapeBlock {
+        var tapeBlock: TapeBlock
+        
+        repeat {
+            tapeBlock = try self.getTapeBlock(atLocation: self.location)
+            self.location += tapeBlock.size
+        } while tapeBlock.type == .Dummy
+        
+        return tapeBlock
+    }
+
+    // MARK: Private methods
+    private func getLocationFirstTapeDataBlock() -> Int {
         var firstDataBlock: Int = 0
         
         switch tapeFormat {
@@ -73,7 +91,8 @@ final class TapeData {
         
     }
     
-    func getTapeBlock(atLocation location: Int) throws -> TapeBlock {
+    
+    private func getTapeBlock(atLocation location: Int) throws -> TapeBlock {
         let tapeBlock: TapeBlock
         
         switch self.tapeFormat {
@@ -86,7 +105,7 @@ final class TapeData {
         return tapeBlock
     }
     
-    // MARK: Private methods
+    
     private func getNumber(location: Int, size: Int) -> Int {
         var number: Int = 0
         
@@ -134,10 +153,10 @@ final class TapeData {
         } else {
             identifier = "[DATA]"
             tapeBlockTimingInfo = kTapeBlockTimingInfoStandardROMData
-            type = .Dummy
+            type = .Data
         }
         
-        return TapeBlock(size: data.count + 2, info: tapeBlockTimingInfo, identifier: identifier, type: type, data: data)
+        return TapeBlock(size: data.count + 2, timingInfo: tapeBlockTimingInfo, identifier: identifier, type: type, data: data)
     }
 
     private func getTzxTapeBlock(atLocation location: Int) throws -> TapeBlock {
@@ -188,7 +207,49 @@ final class TapeData {
             
         case .GroupStart:
             let size = self.getNumber(location: location, size: 1)
+            self.groupStarted = true
             block = TapeBlock(size: size + 2)
+
+        case .GroupEnd:
+            self.groupStarted = false
+            block = TapeBlock(size: 1)
+            
+        case .LoopStart:
+            let size = 3
+            
+            guard self.loopCount == 0 else {
+                throw TapeLoaderError.DataIncoherent(blockId: blockId.rawValue, location: location)
+            }
+            
+            self.loopCount = self.getNumber(location: location, size: 2)
+            guard self.loopCount > 1 else {
+                throw TapeLoaderError.DataIncoherent(blockId: blockId.rawValue, location: location)
+            }
+
+            block = TapeBlock(size: size)
+            self.loopStartLocation = location + size - 1
+            
+        case .LoopEnd:
+            self.loopCount -= 1
+            
+            if self.loopCount >= 0 {
+                self.location = self.loopStartLocation
+            }
+            
+            block = TapeBlock(size: 0)
+        
+        case .PureTone:
+            let timings = TapeBlockTimingInfo(
+                pilotPulseLength: self.getNumber(location: location, size: 2),
+                syncFirstPulseLength: 0,
+                syncSecondPulseLength: 0,
+                resetBitPulseLength: 0,
+                setBitPulseLength: 0,
+                pilotTonePulsesCount: self.getNumber(location: location + 2, size: 2),
+                pauseAfterBlock: 0
+            )
+            
+            block = TapeBlock(size: 5, timingInfo: timings, identifier: kDummyTapeBlockIdentifier, type: .TzxTone, data: [])
         }
         
         return block

@@ -39,27 +39,33 @@ public enum TapeLoaderError: Error, CustomStringConvertible {
 }
 
 public enum TapeBlockType: Int, CustomStringConvertible {
-    case Program = 0
-    case NumberArray
-    case CharacterArray
-    case Bytes
+    case ProgramHeader = 0
+    case NumberArrayHeader
+    case CharacterArrayHeader
+    case BytesHeader
     case Dummy = 99
+    case Data
+    case TzxTone
     
     public var description: String {
         get {
             let description: String
             
             switch self {
-            case .Program:
+            case .ProgramHeader:
                 description = "Program"
-            case .NumberArray:
+            case .NumberArrayHeader:
                 description = "Number array"
-            case .CharacterArray:
+            case .CharacterArrayHeader:
                 description = "Character array"
-            case .Bytes:
+            case .BytesHeader:
                 description = "Bytes"
             case .Dummy:
+                fallthrough
+            case .Data:
                 description = ""
+            case .TzxTone:
+                description = "Pure tone"
             }
             
             return description
@@ -113,9 +119,9 @@ struct TapeBlock {
     
     let data: [UInt8]
     
-    init(size: Int, info: TapeBlockTimingInfo, identifier: String, type: TapeBlockType, data: [UInt8]) {
+    init(size: Int, timingInfo: TapeBlockTimingInfo, identifier: String, type: TapeBlockType, data: [UInt8]) {
         self.size = size
-        self.timingInfo = info
+        self.timingInfo = timingInfo
         self.identifier = identifier
         self.type = type
         self.data = data
