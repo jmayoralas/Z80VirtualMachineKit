@@ -133,7 +133,7 @@ final class TapeLoader {
     private var index = 0
     
     func open(path: String) throws {
-        if let buffer = NSData(contentsOfFile: path) {
+        if let buffer = TapeData(contentsOfFile: path) {
             var location = buffer.getLocationFirstTapeDataBlock()
             
             blocks = []

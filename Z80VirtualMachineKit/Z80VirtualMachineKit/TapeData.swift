@@ -12,12 +12,33 @@ private enum TzxBlockId: UInt8 {
     case StandardSpeed = 0x10
     case DirectRecording = 0x15
     case PauseOrStopTape = 0x20
+    case GroupStart = 0x21
     case TextDescription = 0x30
     case ArchiveInfo = 0x32
 }
 
-extension NSData {
+final class TapeData {
 
+    private var data: NSData
+
+    var length: Int {
+        get {
+            return self.data.length
+        }
+    }
+    
+    init?(contentsOfFile path: String) {
+        guard let data = NSData(contentsOfFile: path) else {
+            return nil
+        }
+        
+        self.data = data
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     private var tapeFormat: TapeFormat {
         get {
             // get first 8 bytes and search for TZX signature
@@ -25,7 +46,7 @@ extension NSData {
             var tapeFormat: TapeFormat = .Tap
             
             var signatureBytes = [UInt8](repeating: 0, count: 7)
-            self.getBytes(&signatureBytes, range: range)
+            self.data.getBytes(&signatureBytes, range: range)
             
             if let signature = String(bytes: signatureBytes, encoding: String.Encoding.utf8) {
                 if signature == "ZXTape!" {
@@ -72,7 +93,7 @@ extension NSData {
         let range = NSRange(location: location, length: size)
         var bytes = [UInt8](repeatElement(0, count: size))
         
-        self.getBytes(&bytes, range: range)
+        self.data.getBytes(&bytes, range: range)
         
         for i in (0 ..< size).reversed() {
             number += Int(bytes[i]) << (8 * i)
@@ -84,7 +105,7 @@ extension NSData {
     private func getBytes(location: Int, size: Int) -> [UInt8] {
         let range = NSRange(location: location, length: Int(size))
         var data = [UInt8](repeating: 0, count: Int(size))
-        self.getBytes(&data, range: range)
+        self.data.getBytes(&data, range: range)
         
         return data
     }
@@ -162,6 +183,10 @@ extension NSData {
             block.identifier = kPauseTapeBlockIdentifier
             
         case .TextDescription:
+            let size = self.getNumber(location: location, size: 1)
+            block = TapeBlock(size: size + 2)
+            
+        case .GroupStart:
             let size = self.getNumber(location: location, size: 1)
             block = TapeBlock(size: size + 2)
         }
