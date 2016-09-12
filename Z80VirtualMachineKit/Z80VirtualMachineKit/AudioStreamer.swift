@@ -50,7 +50,7 @@ class AudioStreamer {
         AudioQueueNewOutput(
             &streamBasicDescription,
             AudioStreamerOuputCallback,
-            unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self),
+            unsafeBitCast(self, to: UnsafeMutableRawPointer.self),
             nil,
             nil,
             0,
