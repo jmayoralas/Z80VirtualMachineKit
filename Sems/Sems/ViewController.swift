@@ -126,7 +126,7 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         dialog.canChooseDirectories = true
         dialog.canCreateDirectories = true
         dialog.allowsMultipleSelection = false
-        dialog.allowedFileTypes = ["tap"]
+        dialog.allowedFileTypes = ["tap", "tzx"]
         
         if dialog.runModal() == NSModalResponseOK {
             if let result = dialog.url {
@@ -134,10 +134,10 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
 
                 do {
                     try self.vm.openTape(path: path)
-                } catch TapeLoaderError.FileNotFound {
-                    self.errorShow(messageText: "File not found")
+                } catch let error as TapeLoaderError {
+                    self.handleTapeError(error: error)
                 } catch {
-                    self.errorShow(messageText: "Weird error")
+                    self.handleUnknownError()
                 }
             }
         }
@@ -154,10 +154,8 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
         } else {
             do {
                 try vm.startTape()
-            } catch TapeLoaderError.NoTapeOpened {
-                self.errorShow(messageText: "No tape has been opened")
-            } catch TapeLoaderError.EndOfTape {
-                self.errorShow(messageText: "Reached the end of the tape")
+            } catch let error as TapeLoaderError {
+                self.handleTapeError(error: error)
             } catch {
                 self.errorShow(messageText: "Unknown error")
             }
@@ -180,6 +178,52 @@ class ViewController: NSViewController, Z80VirtualMachineStatus {
             self.view.window!.title = String(format: "%@ %@", self.appVersionString, kInstantLoadEnabled)
             self.vm.enableInstantLoad()
         }
+    }
+    
+    @IBAction func showTapeBlockSelector(_ sender: AnyObject) {
+        // do some validations here
+        do {
+            let tapeBlockDirectory = try self.vm.getBlockDirectory()
+            
+            let storyBoard = NSStoryboard(name: "Main", bundle: nil)
+            
+            let tapeBlockSelectorWindowController = storyBoard.instantiateController(withIdentifier: "TapeBlockSelectorWindowController") as! NSWindowController
+            
+            if let tapeBlockSelectorWindow = tapeBlockSelectorWindowController.window {
+                let tapeBlockSelectorViewController = tapeBlockSelectorWindowController.contentViewController as! TapeBlockSelectorViewController
+                
+                tapeBlockSelectorViewController.setBlockDirectory(blockDirectory: tapeBlockDirectory)
+                
+                let application = NSApplication.shared()
+                let modalResult = application.runModal(for: tapeBlockSelectorWindow)
+                
+                self.view.window!.makeMain()
+                self.view.window!.makeKey()
+                
+                if modalResult == NSModalResponseOK {
+                    do {
+                        try self.vm.setCurrentTapeBlock(index: tapeBlockSelectorViewController.getSelectedTapeBlockIndex())
+                    } catch let error as TapeLoaderError {
+                        self.handleTapeError(error: error)
+                    } catch {
+                        self.handleUnknownError()
+                    }
+                }
+            }
+        } catch let error as TapeLoaderError {
+            self.handleTapeError(error: error)
+        } catch {
+            self.handleUnknownError()
+        }
+    }
+    
+    // MARK: Error handlers
+    func handleTapeError(error: TapeLoaderError) {
+        self.errorShow(messageText: error.description)
+    }
+    
+    func handleUnknownError() {
+        self.errorShow(messageText: "Unknown error!")
     }
 }
 
