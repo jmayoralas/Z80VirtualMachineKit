@@ -105,7 +105,7 @@ let kBaseWidth = 320
         var bit = 0
         
         for i in (0...7).reversed() {
-            var index = getBufferIndex(bitmap_x + bit, bitmap_y)
+            let index = getBufferIndex(bitmap_x + bit, bitmap_y)
             let pixelData: PixelData = ((Int(value) & 1 << i) > 0) ? inkColor : paperColor
             
             setBuffer(atIndex: index, withPixelData: pixelData)

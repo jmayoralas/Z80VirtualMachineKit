@@ -297,7 +297,6 @@ extension Z80 {
     }
     
     func addRelative(displacement: UInt8, toAddress address: UInt16) -> UInt16 {
-        var corrected_displacement: Int = 0
         var newAddress: UInt16 = 0
         
         if displacement.comp2 < 0 {

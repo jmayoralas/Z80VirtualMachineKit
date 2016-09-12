@@ -9,14 +9,8 @@
 import Foundation
 
 private enum TapeStatus {
+    case sendingPulses
     case sendingData
-    case sendingLeadingTone
-    case sendingSyncPulse
-    case sendingDataBlock
-    case sendingBit
-    case endBit
-    case endByte
-    case endDataBlock
     case pause
 }
 
@@ -25,38 +19,41 @@ private enum TapeLevel: Int {
     case on = 1
 }
 
-private let kTStatesPerSecond = 3500000
+private struct Pulse {
+    var tapeLevel: TapeLevel?
+    var tStates: Int
+}
 
-private let kPauseTStates: Int = kTStatesPerSecond
+private let kTStatesPerMiliSecond = 3500
 
-private let kLeadingToneTStatesEdgeDuration = 2168
-private let kLeadingToneDataTStatesDuration = Int(Double(kTStatesPerSecond) * 3)
+private typealias AfterPulsesCallback = () -> Void
 
-private let kSyncPulseOffTStates = 667
-private let kSyncPulseOnTStates = 735
-
-private let kResetBitTStates = 855
-private let kSetBitTStates = kResetBitTStates * 2
+private let kEndPulseSequence = Pulse(tapeLevel: nil, tStates: 0)
 
 final class Tape {
-    let ula: Ula
-    let loader: TapeLoader
     
     var tapeAvailable: Bool = false
     var isPlaying: Bool = false
+    
+    private let ula: Ula
+    private let loader: TapeLoader
+    
     private var status = TapeStatus.sendingData
     
     private var lastLevel = TapeLevel.off
     
     private var tCycle: Int = 0
-    private var tCyclesTone: Int = 0
 
     private var tapeBlockToSend: TapeBlock!
     private var indexByteToSend: Int = 0
     private var indexBitToSend: Int = 0
-    private var blocksSentCount: Int = 0
     
     private var leadingToneDurationTStates: Int = 0
+    private var pulsesCount: Int = 0
+    private var tStatesWait: Int = 0
+    private var pulses: [Pulse]?
+    private var indexPulse: Int = 0
+    private var afterPulsesCallback: AfterPulsesCallback?
     
     init(ula: Ula) {
         self.ula = ula
@@ -71,7 +68,10 @@ final class Tape {
         
         try loader.open(path: path)
         self.tapeAvailable = true
-        self.blocksSentCount = 0
+    }
+    
+    func getBlockDirectory() throws -> [TapeBlock] {
+        return try self.loader.getBlockDirectory()
     }
     
     func close() {
@@ -81,6 +81,10 @@ final class Tape {
     
     func rewind() {
         self.loader.rewind()
+    }
+    
+    func setCurrentBlock(index: Int) throws {
+        try self.loader.setCurrentBlock(index: index)
     }
     
     func blockRequested() throws -> [UInt8]? {
@@ -102,7 +106,7 @@ final class Tape {
             throw TapeLoaderError.NoTapeOpened
         }
         
-        guard self.blocksSentCount < self.loader.blockCount() else {
+        guard !self.loader.eof else {
             throw TapeLoaderError.EndOfTape
         }
         if self.isPlaying {
@@ -112,7 +116,6 @@ final class Tape {
         self.isPlaying = true
         self.status = .sendingData
         self.tCycle = 0
-        self.tCyclesTone = 0
     }
     
     func stop() {
@@ -125,52 +128,41 @@ final class Tape {
         }
         
         self.tCycle += tCycle
-        self.tCyclesTone += tCycle
         
         switch self.status {
+        case .sendingPulses:
+            self.sendPulses()
+            
         case .pause:
             self.pause()
             
         case .sendingData:
             self.sendData()
-            
-        case .sendingLeadingTone:
-            self.sendLeadingTone()
-            
-        case .sendingSyncPulse:
-            self.sendSyncPulse()
-            
-        case .sendingDataBlock:
-            self.sendDataBlock()
-        
-        case .sendingBit:
-            self.sendBit()
-        
-        case .endBit:
-            self.endBit()
-            
-        case .endByte:
-            self.endByte()
-            
-        case .endDataBlock:
-            self.endDataBlock()
         }
     }
     
     private func pause() {
-        if self.tCycle >= kPauseTStates {
+        guard self.tapeBlockToSend.timingInfo.pauseAfterBlock > 0 else {
+            self.stop()
+            return
+        }
+        
+        if self.tCycle >= self.tapeBlockToSend.timingInfo.pauseAfterBlock * kTStatesPerMiliSecond {
             self.status = .sendingData
             self.tCycle = 0
-            self.tCyclesTone = 0
         }
     }
     
     private func sendData() {
-        if self.blocksSentCount < self.loader.blockCount() {
-            self.blocksSentCount += 1
+        if !self.loader.eof {
             self.tapeBlockToSend = try! loader.readBlock()
-            self.leadingToneDurationTStates = kLeadingToneDataTStatesDuration
-            self.sendLeadingTone()
+            
+            if self.tapeBlockToSend.identifier == kPauseTapeBlockIdentifier {
+                self.status = .pause
+            } else {
+                self.sendLeadingTone()
+            }
+            
         } else {
             self.stop()
         }
@@ -178,38 +170,38 @@ final class Tape {
     }
     
     private func sendLeadingTone() {
-        // this is invoked only with values .idle or .sendingLeadingTone in status
-        // no need for checking any other statuses
-        if self.status == .sendingData {
-            self.status = .sendingLeadingTone
-            self.lastLevel = .on
-            self.ula.setTapeLevel(value: self.lastLevel.rawValue)
-        } else {
-            if self.tCyclesTone >= self.leadingToneDurationTStates {
-                self.lastLevel = .off
-                self.ula.setTapeLevel(value: self.lastLevel.rawValue)
-                
-                self.status = .sendingSyncPulse
-                self.tCycle = 0
-                self.tCyclesTone = 0
-            } else {
-                if self.tCycle >= kLeadingToneTStatesEdgeDuration {
-                    self.lastLevel = (self.lastLevel == .off) ? .on : .off
-                    self.ula.setTapeLevel(value: self.lastLevel.rawValue)
-                    self.tCycle -= kLeadingToneTStatesEdgeDuration
-                }
-            }
+        self.pulses = []
+        
+        for _ in 1 ... self.tapeBlockToSend.timingInfo.pilotTonePulsesCount {
+            self.pulses!.append(Pulse(tapeLevel: nil, tStates: self.tapeBlockToSend.timingInfo.pilotPulseLength))
         }
+        self.pulses!.append(kEndPulseSequence)
+        
+        self.indexPulse = 0
+        self.tCycle = 0
+        
+        self.status = .sendingPulses
+        self.afterPulsesCallback = self.sendSyncPulse
     }
     
     private func sendSyncPulse() {
-        self.sendPulse(offTStates: kSyncPulseOffTStates, onTStates: kSyncPulseOnTStates, statusAfterPulse: .sendingDataBlock)
+        self.pulses = [
+            Pulse(tapeLevel: .off, tStates: self.tapeBlockToSend.timingInfo.syncFirstPulseLength),
+            Pulse(tapeLevel: .on, tStates: self.tapeBlockToSend.timingInfo.syncSecondPulseLength),
+            kEndPulseSequence
+        ]
+        
+        self.indexPulse = 0
+        self.tCycle = 0
+        
+        self.status = .sendingPulses
+        self.afterPulsesCallback = self.sendDataBlock
     }
 
     private func sendDataBlock() {
         self.indexByteToSend = 0
         self.indexBitToSend = 7
-        self.status = .sendingBit
+        self.sendBit()
     }
 
     private func endDataBlock() {
@@ -219,40 +211,73 @@ final class Tape {
     private func endByte() {
         self.indexByteToSend += 1
         self.indexBitToSend = 7
-        self.status = (self.indexByteToSend > (self.tapeBlockToSend.data.count - 1)) ? .endDataBlock : .sendingBit
+        
+        if self.indexByteToSend >= self.tapeBlockToSend.data.count {
+            self.endDataBlock()
+        } else {
+            self.sendBit()
+        }
     }
 
     private func sendBit() {
+        let bitTStates: Int
+        
         let bitToSend = self.tapeBlockToSend.data[self.indexByteToSend].bit(self.indexBitToSend)
+        
         if bitToSend == 0 {
-            self.sendPulse(offTStates: kResetBitTStates, onTStates: kResetBitTStates, statusAfterPulse: .endBit)
+            bitTStates = self.tapeBlockToSend.timingInfo.resetBitPulseLength
         } else {
-            self.sendPulse(offTStates: kSetBitTStates, onTStates: kSetBitTStates, statusAfterPulse: .endBit)
+            bitTStates = self.tapeBlockToSend.timingInfo.setBitPulseLength
         }
+        
+        self.pulses = [
+            Pulse(tapeLevel: .off, tStates: bitTStates),
+            Pulse(tapeLevel: .on, tStates: bitTStates),
+            kEndPulseSequence
+        ]
+        
+        self.indexPulse = 0
+        self.tCycle = 0
+        
+        self.status = .sendingPulses
+        self.afterPulsesCallback = self.endBit
     }
     
     private func endBit() {
         self.indexBitToSend -= 1
-        self.status = self.indexBitToSend < 0 ? .endByte : .sendingBit
+        if self.indexBitToSend < 0 {
+            self.endByte()
+        } else {
+            self.sendBit()
+        }
     }
     
-    private func sendPulse(offTStates: Int, onTStates: Int, statusAfterPulse: TapeStatus) {
-        switch self.lastLevel {
-        case .off:
-            if self.tCycle >= offTStates {
-                self.lastLevel = .on
-                self.ula.setTapeLevel(value: self.lastLevel.rawValue)
-                self.tCycle -= offTStates
-            }
-        case .on:
-            if self.tCycle >= onTStates {
-                self.lastLevel = .off
-                self.ula.setTapeLevel(value: self.lastLevel.rawValue)
-                self.tCycle -= onTStates
-                self.tCyclesTone -= onTStates
-                self.status = statusAfterPulse
-            }
+    private func sendPulses() {
+        if self.tCycle <= self.tStatesWait {
+            return
         }
         
+        self.tCycle -= self.tStatesWait
+        
+        if self.indexPulse < self.pulses!.count {
+            let pulse = self.pulses![self.indexPulse]
+            
+            if let pulseTapeLevel = pulse.tapeLevel {
+                self.lastLevel = pulseTapeLevel
+            } else {
+                self.lastLevel = self.lastLevel == .off ? .on : .off
+            }
+
+            self.ula.setTapeLevel(value: self.lastLevel.rawValue)
+            
+            self.tStatesWait = pulse.tStates
+            
+            self.indexPulse += 1
+        } else {
+            self.tStatesWait = 0
+            self.pulses = nil
+            
+            self.afterPulsesCallback?()
+        }
     }
 }

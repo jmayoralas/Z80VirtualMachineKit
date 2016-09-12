@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1D429D481D22E6A6003DA7FC /* KeyEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D429D471D22E6A6003DA7FC /* KeyEventHandler.swift */; };
+		1DAD32081D7D979200B6BF57 /* TapeBlockSelectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DAD32071D7D979200B6BF57 /* TapeBlockSelectorViewController.swift */; };
 		1DF397EA1D21929F00045D06 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF397E91D21929F00045D06 /* AppDelegate.swift */; };
 		1DF397EC1D21929F00045D06 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF397EB1D21929F00045D06 /* ViewController.swift */; };
 		1DF397EE1D21929F00045D06 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DF397ED1D21929F00045D06 /* Assets.xcassets */; };
@@ -32,6 +33,7 @@
 
 /* Begin PBXFileReference section */
 		1D429D471D22E6A6003DA7FC /* KeyEventHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyEventHandler.swift; sourceTree = "<group>"; };
+		1DAD32071D7D979200B6BF57 /* TapeBlockSelectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TapeBlockSelectorViewController.swift; sourceTree = "<group>"; };
 		1DF397E61D21929F00045D06 /* Sems.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sems.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF397E91D21929F00045D06 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1DF397EB1D21929F00045D06 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 				1DF397ED1D21929F00045D06 /* Assets.xcassets */,
 				1DF397EF1D21929F00045D06 /* Main.storyboard */,
 				1DF397F21D21929F00045D06 /* Info.plist */,
+				1DAD32071D7D979200B6BF57 /* TapeBlockSelectorViewController.swift */,
 			);
 			path = Sems;
 			sourceTree = "<group>";
@@ -156,6 +159,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D429D481D22E6A6003DA7FC /* KeyEventHandler.swift in Sources */,
+				1DAD32081D7D979200B6BF57 /* TapeBlockSelectorViewController.swift in Sources */,
 				1DF397EC1D21929F00045D06 /* ViewController.swift in Sources */,
 				1DF397EA1D21929F00045D06 /* AppDelegate.swift in Sources */,
 			);
