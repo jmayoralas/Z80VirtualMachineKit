@@ -8,8 +8,19 @@
 
 import Foundation
 
+private let kPilotToneHeaderPulsesCount = 8063
+private let kPilotToneDataPulsesCount = 3223
+private let kPilotTonePulseLength = 2168
+private let kPilotTonePause = 1000
+private let kSyncPulseFirstLength = 667
+private let kSyncPulseSecondLength = 735
+private let kResetBitLength = 855
+private let kSetBitLength = kResetBitLength * 2
+
+
 private enum TzxBlockId: UInt8 {
     case StandardSpeed = 0x10
+/*
     case PureTone = 0x12
     case DirectRecording = 0x15
     case PauseOrStopTape = 0x20
@@ -19,6 +30,7 @@ private enum TzxBlockId: UInt8 {
     case LoopEnd = 0x25
     case TextDescription = 0x30
     case ArchiveInfo = 0x32
+*/
 }
 
 final class TapeData {
@@ -66,12 +78,8 @@ final class TapeData {
 
     // MARK: Public methods
     func getNextTapeBlock() throws -> TapeBlock {
-        var tapeBlock: TapeBlock
-        
-        repeat {
-            tapeBlock = try self.getTapeBlock(atLocation: self.location)
-            self.location += tapeBlock.size
-        } while tapeBlock.type == .Dummy
+        var tapeBlock = try self.getTapeBlock(atLocation: self.location)
+        self.location += tapeBlock.size
         
         return tapeBlock
     }
@@ -133,30 +141,43 @@ final class TapeData {
         let size = self.getNumber(location: location, size: 2)
         let data = self.getBytes(location: location + 2, size: size)
         
-        return self.getTapTapeBlock(data: data)
+        return self.getStandardSpeedDataBlock(data: data)
     }
     
-    private func getTapTapeBlock(data: [UInt8]) -> TapeBlock {
-        let identifier: String
-        let tapeBlockTimingInfo: TapeBlockTimingInfo
-        let type: TapeBlockType
+    private func getStandardSpeedDataBlock(data: [UInt8]) -> TapeBlock {
+        let flagByte = data[0]
         
-        if data[0] == 0x00 {
+        let description: String
+        let type: TapeBlockType
+        let pilotTonePulsesCount: Int
+        
+        if flagByte < 128 {
             let name : [UInt8] = Array(data[2...11])
-            identifier = String(data: Data(name), encoding: String.Encoding.ascii)!
-            tapeBlockTimingInfo = kTapeBlockTimingInfoStandardROMHeader
-            if let typeFromData = TapeBlockType(rawValue: Int(data[1])) {
-                type = typeFromData
+            let identifier = String(data: Data(name), encoding: String.Encoding.ascii)!
+            
+            pilotTonePulsesCount = kPilotToneHeaderPulsesCount
+            
+            if let descriptionFromData = TapeBlockDescription(rawValue: Int(data[1])) {
+                description = String(format: "%@: %@", descriptionFromData.description, identifier)
             } else {
-                type = .Dummy
+                description = String(format: "Unknown block type: %d", Int(data[1]))
             }
         } else {
-            identifier = "[DATA]"
-            tapeBlockTimingInfo = kTapeBlockTimingInfoStandardROMData
-            type = .Data
+            description = "[DATA]"
+            pilotTonePulsesCount = kPilotToneDataPulsesCount
         }
         
-        return TapeBlock(size: data.count + 2, timingInfo: tapeBlockTimingInfo, identifier: identifier, type: type, data: data)
+        // a standard speed data block consists of:
+        // a pilot tone
+        let pilotTone = TapeBlockPartPulse(size: 0, pulsesCount: pilotTonePulsesCount, tStatesDuration: kPilotTonePulseLength)
+        
+        // a two pulse sync signal
+        let syncPulse = TapeBlockPartPulse(size: 0, firstPulseTStates: kSyncPulseFirstLength, secondPulseTStates: kSyncPulseSecondLength)
+        
+        // a pure data block
+        let dataBlock = TapeBlockPartData(size: data.count + 2, resetBitPulseLength: kResetBitLength, setBitPulseLength: kSetBitLength, usedBitsLastByte: 8, data: data)
+
+        return TapeBlock(description: description, parts: [pilotTone, syncPulse, dataBlock], pauseAfterBlock: kPilotTonePause)
     }
 
     private func getTzxTapeBlock(atLocation location: Int) throws -> TapeBlock {
@@ -179,10 +200,11 @@ final class TapeData {
             block = self.getTapTapeBlock(atLocation: location + 2)
         
             block.size += 3
-            if pause > 0 {
-                block.timingInfo.pauseAfterBlock = pause
-            }
             
+            if pause > 0 {
+                block.pauseAfterBlock = pause
+            }
+/*
         case .DirectRecording:
             let size = self.getNumber(location: location + 6, size: 1)
             guard size == 0 else {
@@ -250,8 +272,9 @@ final class TapeData {
             )
             
             block = TapeBlock(size: 5, timingInfo: timings, identifier: kDummyTapeBlockIdentifier, type: .TzxTone, data: [])
+*/
         }
-        
+ 
         return block
     }
 }
