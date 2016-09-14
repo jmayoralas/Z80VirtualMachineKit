@@ -23,6 +23,32 @@ enum TapeBlockType {
     case Data
 }
 
+public enum TapeBlockDescription: Int, CustomStringConvertible {
+    case ProgramHeader = 0
+    case NumberArrayHeader
+    case CharacterArrayHeader
+    case BytesHeader
+    
+    public var description: String {
+        get {
+            let description: String
+            
+            switch self {
+            case .ProgramHeader:
+                description = "Program"
+            case .NumberArrayHeader:
+                description = "Number array"
+            case .CharacterArrayHeader:
+                description = "Character array"
+            case .BytesHeader:
+                description = "Bytes"
+            }
+            
+            return description
+        }
+    }
+}
+
 protocol TapeBlockPart: CustomStringConvertible {
     var type: TapeBlockType { get }
     var size: Int { get }

@@ -17,6 +17,10 @@ private let kSyncPulseSecondLength = 735
 private let kResetBitLength = 855
 private let kSetBitLength = kResetBitLength * 2
 
+private enum TapeFormat: UInt8 {
+    case Tap
+    case Tzx
+}
 
 private enum TzxBlockId: UInt8 {
     case StandardSpeed = 0x10
