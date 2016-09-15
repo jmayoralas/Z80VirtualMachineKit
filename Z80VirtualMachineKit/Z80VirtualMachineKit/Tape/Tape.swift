@@ -75,17 +75,27 @@ final class Tape {
     }
     
     func blockRequested() throws -> [UInt8]? {
-        var tapeBlock: TapeBlock?
-        
-        tapeBlock = try loader.readBlock()
-        
-        var data: [UInt8]? = nil
-        
-        if let block = tapeBlock {
-//            data = block.data
+        if self.loader.eof {
+            self.loader.rewind()
         }
         
-        return data
+        var tapeBlock: TapeBlock?
+        
+        var data = [UInt8]()
+        
+        while !self.loader.eof && data.count == 0  {
+            tapeBlock = try self.loader.readBlock()
+            
+            if let block = tapeBlock {
+                for part in block.parts {
+                    if part.type == .Data {
+                        data.append(contentsOf: (part as! TapeBlockPartData).data)
+                    }
+                }
+            }
+        }
+        
+        return data.count == 0 ? nil : data
     }
     
     func start() throws {
@@ -134,11 +144,6 @@ final class Tape {
             return
         }
         
-        guard pauseValue > 0 else {
-            self.stop()
-            return
-        }
-        
         if self.tCycle >= pauseValue * kTStatesPerMiliSecond {
             self.status = .sendingData
             self.tCycle = 0
@@ -148,8 +153,17 @@ final class Tape {
     private func sendData() {
         if !self.loader.eof {
             self.tapeBlockToSend = try! loader.readBlock()
-            self.indexTapeBlockPart = 0
-            self.sendTapeBlockPart()
+            
+            if self.tapeBlockToSend.description == "Pause" {
+                if self.tapeBlockToSend.pauseAfterBlock == 0 {
+                    self.stop()
+                } else {
+                    self.status = .pause
+                }
+            } else {
+                self.indexTapeBlockPart = 0
+                self.sendTapeBlockPart()
+            }
         } else {
             self.stop()
         }
@@ -164,6 +178,8 @@ final class Tape {
             self.sendTone()
         case .Data:
             self.sendDataBlock()
+        case .Info:
+            self.status = .pause
         }
     }
     
@@ -198,7 +214,9 @@ final class Tape {
     
     private func sendByte() {
         let dataBlock = self.tapeBlockToSend.parts[self.indexTapeBlockPart] as! TapeBlockPartData
+        
         self.pulses = dataBlock.getPulses(byteIndex: self.indexByteToSend)
+        self.pulses!.append(kEndPulseSequence)
         
         self.indexPulse = 0
         self.tCycle = 0

@@ -18,9 +18,12 @@ struct Pulse {
     var tStates: Int
 }
 
-enum TapeBlockType {
+let kEndPulseSequence = Pulse(tapeLevel: nil, tStates: 0)
+
+enum TapeBlockPartType {
     case Pulse
     case Data
+    case Info
 }
 
 public enum TapeBlockDescription: Int, CustomStringConvertible {
@@ -49,15 +52,19 @@ public enum TapeBlockDescription: Int, CustomStringConvertible {
     }
 }
 
+
+
+
 protocol TapeBlockPart: CustomStringConvertible {
-    var type: TapeBlockType { get }
+    var type: TapeBlockPartType { get }
     var size: Int { get }
 }
 
-private let kEndPulseSequence = Pulse(tapeLevel: nil, tStates: 0)
+
+
 
 struct TapeBlockPartPulse : TapeBlockPart {
-    var type: TapeBlockType = .Pulse
+    var type: TapeBlockPartType = .Pulse
     var size: Int
     
     var description: String {
@@ -77,8 +84,6 @@ struct TapeBlockPartPulse : TapeBlockPart {
             pulses.append(Pulse(tapeLevel: nil, tStates: tStatesDuration))
         }
         
-        pulses.append(kEndPulseSequence)
-        
         self.pulses = pulses
     }
     
@@ -88,7 +93,6 @@ struct TapeBlockPartPulse : TapeBlockPart {
         self.pulses = [
             Pulse(tapeLevel: .off, tStates: firstPulseTStates),
             Pulse(tapeLevel: .on, tStates: secondPulseTStates),
-            kEndPulseSequence
         ]
     }
     
@@ -97,8 +101,11 @@ struct TapeBlockPartPulse : TapeBlockPart {
     }
 }
 
+
+
+
 struct TapeBlockPartData: TapeBlockPart {
-    var type: TapeBlockType = .Data
+    var type: TapeBlockPartType = .Data
     var size: Int
     
     var description: String {
@@ -135,15 +142,17 @@ struct TapeBlockPartData: TapeBlockPart {
             pulses.append(contentsOf: self.getBitPulses(byteIndex: byteIndex, bitIndex: bit))
         }
         
-        pulses.append(kEndPulseSequence)
-        
         return pulses
     }
     
     private func getBitPulses(byteIndex: Int, bitIndex: Int) -> [Pulse] {
         let bitToSend = self.data[byteIndex].bit(bitIndex)
         
-        let bitTStates = bitToSend == 0 ? self.resetBitPulseLength : self.setBitPulseLength
+        return self.getBitPulses(forBitValue: bitToSend)
+    }
+    
+    private func getBitPulses(forBitValue bitValue: Int) -> [Pulse] {
+        let bitTStates = bitValue == 0 ? self.resetBitPulseLength : self.setBitPulseLength
         
         return [
             Pulse(tapeLevel: .off, tStates: bitTStates),
@@ -151,6 +160,20 @@ struct TapeBlockPartData: TapeBlockPart {
         ]
     }
 }
+
+
+struct TapeBlockPartInfo: TapeBlockPart {
+    var type = TapeBlockPartType.Info
+    var size: Int
+    
+    var description: String
+    
+    init(size: Int, description: String) {
+        self.size = size
+        self.description = description
+    }
+}
+
 
 struct TapeBlock: CustomStringConvertible {
     var description: String
@@ -160,12 +183,18 @@ struct TapeBlock: CustomStringConvertible {
     
     var size: Int = 0
     
-    init(description: String, parts: [TapeBlockPart], pauseAfterBlock: Int) {
+    init(description: String, parts: [TapeBlockPart], pauseAfterBlock: Int?) {
         self.description = description
         self.parts = parts
         self.pauseAfterBlock = pauseAfterBlock
         
         self.size = self.getPartsSize()
+    }
+    
+    init(size: Int) {
+        self.description = "dummy"
+        self.size = size
+        self.parts = []
     }
     
     func getPartsSize() -> Int {

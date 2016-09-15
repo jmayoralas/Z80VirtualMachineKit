@@ -97,6 +97,10 @@ final class TapeLoader {
         return block
     }
     
+    func rewindBlock() {
+        self.index -= 1
+    }
+    
     func getBlockDirectory() throws -> [TapeBlock] {
         guard let blocks = self.blocks else {
             throw TapeLoaderError.NoTapeOpened

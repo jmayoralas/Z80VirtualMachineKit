@@ -24,9 +24,9 @@ private enum TapeFormat: UInt8 {
 
 private enum TzxBlockId: UInt8 {
     case StandardSpeed = 0x10
-/*
     case PureTone = 0x12
-    case DirectRecording = 0x15
+    case PulseSequence = 0x13
+    case PureData = 0x14
     case PauseOrStopTape = 0x20
     case GroupStart = 0x21
     case GroupEnd = 0x22
@@ -34,7 +34,6 @@ private enum TzxBlockId: UInt8 {
     case LoopEnd = 0x25
     case TextDescription = 0x30
     case ArchiveInfo = 0x32
-*/
 }
 
 final class TapeData {
@@ -82,13 +81,29 @@ final class TapeData {
 
     // MARK: Public methods
     func getNextTapeBlock() throws -> TapeBlock {
-        var tapeBlock = try self.getTapeBlock(atLocation: self.location)
-        self.location += tapeBlock.size
+        var tapeBlock: TapeBlock
+        
+        repeat {
+            tapeBlock = try self.getTapeBlock(atLocation: self.location)
+            self.location += tapeBlock.size
+        } while tapeBlock.description == "dummy"
         
         return tapeBlock
     }
-
+    
     // MARK: Private methods
+    private func getDataFromTapeBlock(tapeBlock: TapeBlock) -> [UInt8] {
+        var data = [UInt8]()
+        
+        for part in tapeBlock.parts {
+            if part.type == .Data {
+                data.append(contentsOf: (part as! TapeBlockPartData).data)
+            }
+        }
+        
+        return data
+    }
+    
     private func getLocationFirstTapeDataBlock() -> Int {
         var firstDataBlock: Int = 0
         
@@ -152,7 +167,7 @@ final class TapeData {
         let flagByte = data[0]
         
         let description: String
-        let type: TapeBlockType
+        let type: TapeBlockPartType
         let pilotTonePulsesCount: Int
         
         if flagByte < 128 {
@@ -173,13 +188,13 @@ final class TapeData {
         
         // a standard speed data block consists of:
         // a pilot tone
-        let pilotTone = TapeBlockPartPulse(size: 0, pulsesCount: pilotTonePulsesCount, tStatesDuration: kPilotTonePulseLength)
+        let pilotTone = TapeBlockPartPulse(size: 1, pulsesCount: pilotTonePulsesCount, tStatesDuration: kPilotTonePulseLength)
         
         // a two pulse sync signal
-        let syncPulse = TapeBlockPartPulse(size: 0, firstPulseTStates: kSyncPulseFirstLength, secondPulseTStates: kSyncPulseSecondLength)
+        let syncPulse = TapeBlockPartPulse(size: 1, firstPulseTStates: kSyncPulseFirstLength, secondPulseTStates: kSyncPulseSecondLength)
         
         // a pure data block
-        let dataBlock = TapeBlockPartData(size: data.count + 2, resetBitPulseLength: kResetBitLength, setBitPulseLength: kSetBitLength, usedBitsLastByte: 8, data: data)
+        let dataBlock = TapeBlockPartData(size: data.count, resetBitPulseLength: kResetBitLength, setBitPulseLength: kSetBitLength, usedBitsLastByte: 8, data: data)
 
         return TapeBlock(description: description, parts: [pilotTone, syncPulse, dataBlock], pauseAfterBlock: kPilotTonePause)
     }
@@ -208,37 +223,32 @@ final class TapeData {
             if pause > 0 {
                 block.pauseAfterBlock = pause
             }
-/*
-        case .DirectRecording:
-            let size = self.getNumber(location: location + 6, size: 1)
-            guard size == 0 else {
-                throw TapeLoaderError.UnsupportedTapeBlockFormat(blockId: blockId.rawValue, location: location - 1)
-            }
-            
-            block = TapeBlock(size: size + 10)
             
         case .ArchiveInfo:
             let size = self.getNumber(location: location, size: 2)
-            block = TapeBlock(size: size + 3)
+            let part = TapeBlockPartInfo(size: size + 3, description: "")
+            block = TapeBlock(description: "Archive Info", parts: [part], pauseAfterBlock: nil)
             
         case .PauseOrStopTape:
             let pause = self.getNumber(location: location, size: 2)
-            block = TapeBlock(size: 3)
-            block.timingInfo.pauseAfterBlock = pause
-            block.identifier = kPauseTapeBlockIdentifier
+            block = TapeBlock(description: "Pause", parts: [], pauseAfterBlock: pause)
+            block.size = 3
             
         case .TextDescription:
             let size = self.getNumber(location: location, size: 1)
-            block = TapeBlock(size: size + 2)
+            let part = TapeBlockPartInfo(size: size + 2, description: "")
+            block = TapeBlock(description: "Description", parts: [part], pauseAfterBlock: nil)
             
         case .GroupStart:
             let size = self.getNumber(location: location, size: 1)
             self.groupStarted = true
-            block = TapeBlock(size: size + 2)
-
+            let part = TapeBlockPartInfo(size: size + 2, description: "")
+            block = TapeBlock(description: "Group start", parts: [part], pauseAfterBlock: nil)
+            
         case .GroupEnd:
             self.groupStarted = false
-            block = TapeBlock(size: 1)
+            let part = TapeBlockPartInfo(size: 1, description: "")
+            block = TapeBlock(description: "Group end", parts: [part], pauseAfterBlock: nil)
             
         case .LoopStart:
             let size = 3
@@ -251,32 +261,51 @@ final class TapeData {
             guard self.loopCount > 1 else {
                 throw TapeLoaderError.DataIncoherent(blockId: blockId.rawValue, location: location)
             }
-
+            
             block = TapeBlock(size: size)
             self.loopStartLocation = location + size - 1
             
         case .LoopEnd:
             self.loopCount -= 1
             
-            if self.loopCount >= 0 {
-                self.location = self.loopStartLocation
-            }
+            self.location = self.loopCount > 0 ? self.loopStartLocation : self.location + 1
             
             block = TapeBlock(size: 0)
-        
-        case .PureTone:
-            let timings = TapeBlockTimingInfo(
-                pilotPulseLength: self.getNumber(location: location, size: 2),
-                syncFirstPulseLength: 0,
-                syncSecondPulseLength: 0,
-                resetBitPulseLength: 0,
-                setBitPulseLength: 0,
-                pilotTonePulsesCount: self.getNumber(location: location + 2, size: 2),
-                pauseAfterBlock: 0
-            )
             
-            block = TapeBlock(size: 5, timingInfo: timings, identifier: kDummyTapeBlockIdentifier, type: .TzxTone, data: [])
-*/
+        case .PureTone:
+            let toneLength = self.getNumber(location: location, size: 2)
+            let tonePulsesCount = self.getNumber(location: location + 2, size: 2)
+            let part = TapeBlockPartPulse(size: 5, pulsesCount: tonePulsesCount, tStatesDuration: toneLength)
+            
+            block = TapeBlock(description: "Pure tone", parts: [part], pauseAfterBlock: nil)
+            
+        case .PulseSequence:
+            let pulsesCount = self.getNumber(location: location, size: 1)
+            
+            var parts = [TapeBlockPart]()
+            
+            for i in 0 ..< pulsesCount / 2 {
+                let firstPulseLength = self.getNumber(location: location + 2 * i + 1, size: 2)
+                let secondPulseLength = self.getNumber(location: location + 4 * i + 1, size: 2)
+                
+                parts.append(TapeBlockPartPulse(size: 4, firstPulseTStates: firstPulseLength, secondPulseTStates: secondPulseLength))
+            }
+            
+            block = TapeBlock(description: "Pulse sequence", parts: parts, pauseAfterBlock: nil)
+            block.size += 2
+            
+        case .PureData:
+            let resetBitLength = self.getNumber(location: location, size: 2)
+            let setBitLength = self.getNumber(location: location + 2, size: 2)
+            let usedBitsLastByte = self.getNumber(location: location + 4, size: 1)
+            let pause = self.getNumber(location: location + 5, size: 2)
+            let size = self.getNumber(location: location + 7, size: 3)
+            let data = self.getBytes(location: location + 10, size: size)
+            
+            let dataPart = TapeBlockPartData(size: data.count + 10, resetBitPulseLength: resetBitLength, setBitPulseLength: setBitLength, usedBitsLastByte: usedBitsLastByte, data: data)
+            block = TapeBlock(description: "Pure data", parts: [dataPart], pauseAfterBlock: pause)
+            block.size += 1
+            
         }
  
         return block
