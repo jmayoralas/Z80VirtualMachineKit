@@ -113,6 +113,9 @@ final class Tape {
         self.isPlaying = true
         self.status = .sendingData
         self.tCycle = 0
+        
+        self.lastLevel = .off
+        self.ula.setTapeLevel(value: self.lastLevel.rawValue)
     }
     
     func stop() {
@@ -131,17 +134,32 @@ final class Tape {
             self.sendPulses()
             
         case .pause:
-            self.pause()
+            self.pause(tCycle: tCycle)
             
         case .sendingData:
             self.sendData()
         }
     }
     
-    private func pause() {
+    private func pause(tCycle: Int) {
         guard let pauseValue = self.tapeBlockToSend.pauseAfterBlock else {
             self.status = .sendingData
             return
+        }
+        
+        guard pauseValue > 0 else {
+            self.status = .sendingData
+            return
+        }
+        
+        if self.tCycle - tCycle == 0 {
+            self.lastLevel = self.lastLevel == .off ? .on : .off
+            self.ula.setTapeLevel(value: self.lastLevel.rawValue)
+        }
+        
+        if self.tCycle >= kTStatesPerMiliSecond {
+            self.lastLevel = .off
+            self.ula.setTapeLevel(value: self.lastLevel.rawValue)
         }
         
         if self.tCycle >= pauseValue * kTStatesPerMiliSecond {
@@ -184,6 +202,8 @@ final class Tape {
     }
     
     private func endTapeBlockPart() {
+        self.tCycle = 0
+
         self.indexTapeBlockPart += 1
         if self.indexTapeBlockPart < self.tapeBlockToSend.parts.count {
             self.sendTapeBlockPart()
@@ -216,7 +236,6 @@ final class Tape {
         let dataBlock = self.tapeBlockToSend.parts[self.indexTapeBlockPart] as! TapeBlockPartData
         
         self.pulses = dataBlock.getPulses(byteIndex: self.indexByteToSend)
-        self.pulses!.append(kEndPulseSequence)
         
         self.indexPulse = 0
         self.tCycle = 0
