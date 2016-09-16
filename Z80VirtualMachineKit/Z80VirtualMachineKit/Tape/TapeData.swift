@@ -284,9 +284,9 @@ final class TapeData {
             
             var parts = [TapeBlockPart]()
             
-            for i in 0 ..< pulsesCount / 2 {
-                let firstPulseLength = self.getNumber(location: location + 2 * i + 1, size: 2)
-                let secondPulseLength = self.getNumber(location: location + 4 * i + 1, size: 2)
+            for i in 1 ... pulsesCount / 2 {
+                let firstPulseLength = self.getNumber(location: location + (i * 4 - 4) + 1, size: 2)
+                let secondPulseLength = self.getNumber(location: location + (i * 4 - 4) + 3, size: 2)
                 
                 parts.append(TapeBlockPartPulse(size: 4, firstPulseTStates: firstPulseLength, secondPulseTStates: secondPulseLength))
             }
