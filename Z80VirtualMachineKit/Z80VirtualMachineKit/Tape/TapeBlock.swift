@@ -80,8 +80,12 @@ struct TapeBlockPartPulse : TapeBlockPart {
         
         var pulses = [Pulse]()
         
-        for _ in 1 ... pulsesCount {
-            pulses.append(Pulse(tapeLevel: nil, tStates: tStatesDuration))
+        var tapeLevel: TapeLevel?
+        
+        for i in 1 ... pulsesCount {
+            // make sure a tone always start with an off tape level
+            tapeLevel = i == 1 ? .off : nil
+            pulses.append(Pulse(tapeLevel: tapeLevel, tStates: tStatesDuration))
         }
         
         self.pulses = pulses
@@ -91,8 +95,8 @@ struct TapeBlockPartPulse : TapeBlockPart {
         self.size = size
         
         self.pulses = [
-            Pulse(tapeLevel: .off, tStates: firstPulseTStates),
-            Pulse(tapeLevel: .on, tStates: secondPulseTStates),
+            Pulse(tapeLevel: nil, tStates: firstPulseTStates),
+            Pulse(tapeLevel: nil, tStates: secondPulseTStates),
         ]
     }
     
@@ -155,8 +159,8 @@ struct TapeBlockPartData: TapeBlockPart {
         let bitTStates = bitValue == 0 ? self.resetBitPulseLength : self.setBitPulseLength
         
         return [
-            Pulse(tapeLevel: .off, tStates: bitTStates),
-            Pulse(tapeLevel: .on, tStates: bitTStates),
+            Pulse(tapeLevel: nil, tStates: bitTStates),
+            Pulse(tapeLevel: nil, tStates: bitTStates),
         ]
     }
 }

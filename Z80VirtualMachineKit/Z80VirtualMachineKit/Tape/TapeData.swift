@@ -189,13 +189,7 @@ final class TapeData {
         // a pilot tone
         
         let pilotTonePulsesLength = self.getNumber(location: location, size: 2)
-        
-        let flagByte = data[0]
-        var pilotTonePulsesCount = flagByte < 128 ? kPilotToneHeaderPulsesCount : kPilotToneDataPulsesCount
-        
-        let blockPilotTonePulsesCount = self.getNumber(location: location + 0x0A, size: 2)
-        pilotTonePulsesCount = max(pilotTonePulsesCount, blockPilotTonePulsesCount)
-        
+        let pilotTonePulsesCount = self.getNumber(location: location + 0x0A, size: 2)
         let pilotTone = TapeBlockPartPulse(size: 1, pulsesCount: pilotTonePulsesCount, tStatesDuration: pilotTonePulsesLength)
         
         // a two pulse sync signal
