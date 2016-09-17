@@ -52,7 +52,7 @@ final class TapeBlockSelectorViewController: NSViewController, NSTableViewDataSo
         if tableColumn!.identifier == "identifier" {
             cellView.textField!.stringValue = blockDirectory![row].identifier
         } else {
-            cellView.textField!.stringValue = blockDirectory![row].type.description
+            cellView.textField!.stringValue = blockDirectory![row].type
         }
         
         

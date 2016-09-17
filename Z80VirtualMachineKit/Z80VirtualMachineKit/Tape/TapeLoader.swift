@@ -38,104 +38,6 @@ public enum TapeLoaderError: Error, CustomStringConvertible {
     }
 }
 
-public enum TapeBlockType: Int, CustomStringConvertible {
-    case ProgramHeader = 0
-    case NumberArrayHeader
-    case CharacterArrayHeader
-    case BytesHeader
-    case Dummy = 99
-    case Data
-    case TzxTone
-    
-    public var description: String {
-        get {
-            let description: String
-            
-            switch self {
-            case .ProgramHeader:
-                description = "Program"
-            case .NumberArrayHeader:
-                description = "Number array"
-            case .CharacterArrayHeader:
-                description = "Character array"
-            case .BytesHeader:
-                description = "Bytes"
-            case .Dummy:
-                fallthrough
-            case .Data:
-                description = ""
-            case .TzxTone:
-                description = "Pure tone"
-            }
-            
-            return description
-        }
-    }
-}
-
-enum TapeFormat: UInt8 {
-    case Tap
-    case Tzx
-}
-
-struct TapeBlockTimingInfo {
-    var pilotPulseLength: Int
-    var syncFirstPulseLength: Int
-    var syncSecondPulseLength: Int
-    var resetBitPulseLength: Int
-    var setBitPulseLength: Int
-    var pilotTonePulsesCount: Int
-    var pauseAfterBlock: Int
-}
-
-let kTapeBlockTimingInfoStandardROMHeader = TapeBlockTimingInfo(
-    pilotPulseLength: 2168,
-    syncFirstPulseLength: 667,
-    syncSecondPulseLength: 735,
-    resetBitPulseLength: 855,
-    setBitPulseLength: 1710,
-    pilotTonePulsesCount: 8063,
-    pauseAfterBlock: 1000
-)
-
-let kTapeBlockTimingInfoStandardROMData = TapeBlockTimingInfo(
-    pilotPulseLength: 2168,
-    syncFirstPulseLength: 667,
-    syncSecondPulseLength: 735,
-    resetBitPulseLength: 855,
-    setBitPulseLength: 1710,
-    pilotTonePulsesCount: 3223,
-    pauseAfterBlock: 1000
-)
-
-let kDummyTapeBlockIdentifier = "dummy"
-let kPauseTapeBlockIdentifier = "pause"
-
-struct TapeBlock {
-    var size : Int
-    var timingInfo: TapeBlockTimingInfo
-    var identifier: String
-    var type: TapeBlockType
-    
-    let data: [UInt8]
-    
-    init(size: Int, timingInfo: TapeBlockTimingInfo, identifier: String, type: TapeBlockType, data: [UInt8]) {
-        self.size = size
-        self.timingInfo = timingInfo
-        self.identifier = identifier
-        self.type = type
-        self.data = data
-    }
-    
-    init(size: Int) {
-        self.size = size
-        self.timingInfo = kTapeBlockTimingInfoStandardROMData
-        self.identifier = kDummyTapeBlockIdentifier
-        self.type = .Dummy
-        self.data = []
-    }
-}
-
 final class TapeLoader {
     var eof: Bool {
         get {
@@ -157,11 +59,7 @@ final class TapeLoader {
             blocks = []
             
             while (!buffer.eof) {
-                let tapeBlock = try buffer.getNextTapeBlock()
-                
-                if tapeBlock.identifier != kDummyTapeBlockIdentifier {
-                    blocks!.append(tapeBlock)
-                }
+                blocks!.append(try buffer.getNextTapeBlock())
             }
             
             index = 0
@@ -197,6 +95,10 @@ final class TapeLoader {
         }
         
         return block
+    }
+    
+    func rewindBlock() {
+        self.index -= 1
     }
     
     func getBlockDirectory() throws -> [TapeBlock] {
