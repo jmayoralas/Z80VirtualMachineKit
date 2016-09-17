@@ -119,6 +119,8 @@ final class Tape {
     }
     
     func stop() {
+        self.lastLevel = .off
+        self.ula.setTapeLevel(value: self.lastLevel.rawValue)
         self.isPlaying = false
     }
     
