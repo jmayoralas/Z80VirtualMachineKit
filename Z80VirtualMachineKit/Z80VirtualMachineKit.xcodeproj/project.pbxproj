@@ -8,15 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		1D24EACF1D3553D7003BA41E /* AudioStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */; };
+		1D2975391D896D4B00DF20EA /* Tape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2975361D896D4B00DF20EA /* Tape.swift */; };
+		1D29753A1D896D4B00DF20EA /* TapeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2975371D896D4B00DF20EA /* TapeData.swift */; };
+		1D29753B1D896D4B00DF20EA /* TapeLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2975381D896D4B00DF20EA /* TapeLoader.swift */; };
 		1D2D381B1CD5102D00DA69B6 /* BusComponentBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2D381A1CD5102D00DA69B6 /* BusComponentBase.swift */; };
 		1D2D381D1CD655C200DA69B6 /* Ram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2D381C1CD655C200DA69B6 /* Ram.swift */; };
 		1D2D381F1CD6570E00DA69B6 /* BusComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2D381E1CD6570E00DA69B6 /* BusComponent.swift */; };
 		1D53EEDD1CE502A400AF9A16 /* Bus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D53EEDC1CE502A400AF9A16 /* Bus.swift */; };
 		1D5A76861D57BFD800346583 /* VmScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5A76851D57BFD800346583 /* VmScreen.swift */; };
 		1D74EEC91CF35998004B5748 /* GenericIODevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D74EEC81CF35998004B5748 /* GenericIODevice.swift */; };
-		1DAF497B1D70B785008F1960 /* TapeLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DAF497A1D70B785008F1960 /* TapeLoader.swift */; };
-		1DAF497F1D70C2E0008F1960 /* Tape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DAF497E1D70C2E0008F1960 /* Tape.swift */; };
-		1DB39EF61D7EFE850039D47F /* TapeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB39EF51D7EFE850039D47F /* TapeData.swift */; };
+		1D89DD201D884C8300282518 /* TapeBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D89DD1F1D884C8300282518 /* TapeBlock.swift */; };
 		1DBABA921D09BE2500E631D5 /* Ula.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBABA911D09BE2500E631D5 /* Ula.swift */; };
 		1DBABA941D09BE8700E631D5 /* ULAMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBABA931D09BE8700E631D5 /* ULAMemory.swift */; };
 		1DBABA961D09BE9F00E631D5 /* ULAIo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBABA951D09BE9F00E631D5 /* ULAIo.swift */; };
@@ -36,15 +37,16 @@
 
 /* Begin PBXFileReference section */
 		1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioStreamer.swift; sourceTree = "<group>"; };
+		1D2975361D896D4B00DF20EA /* Tape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tape.swift; sourceTree = "<group>"; };
+		1D2975371D896D4B00DF20EA /* TapeData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TapeData.swift; sourceTree = "<group>"; };
+		1D2975381D896D4B00DF20EA /* TapeLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TapeLoader.swift; sourceTree = "<group>"; };
 		1D2D381A1CD5102D00DA69B6 /* BusComponentBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BusComponentBase.swift; path = ../../Bus/BusComponentBase.swift; sourceTree = "<group>"; };
 		1D2D381C1CD655C200DA69B6 /* Ram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Ram.swift; path = ../../Bus/Ram.swift; sourceTree = "<group>"; };
 		1D2D381E1CD6570E00DA69B6 /* BusComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BusComponent.swift; path = ../../Bus/BusComponent.swift; sourceTree = "<group>"; };
 		1D53EEDC1CE502A400AF9A16 /* Bus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Bus.swift; path = ../../Bus/Bus.swift; sourceTree = "<group>"; };
 		1D5A76851D57BFD800346583 /* VmScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VmScreen.swift; sourceTree = "<group>"; };
 		1D74EEC81CF35998004B5748 /* GenericIODevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GenericIODevice.swift; path = ../../Bus/GenericIODevice.swift; sourceTree = "<group>"; };
-		1DAF497A1D70B785008F1960 /* TapeLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TapeLoader.swift; sourceTree = "<group>"; };
-		1DAF497E1D70C2E0008F1960 /* Tape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tape.swift; sourceTree = "<group>"; };
-		1DB39EF51D7EFE850039D47F /* TapeData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TapeData.swift; sourceTree = "<group>"; };
+		1D89DD1F1D884C8300282518 /* TapeBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TapeBlock.swift; sourceTree = "<group>"; };
 		1DBABA911D09BE2500E631D5 /* Ula.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Ula.swift; path = ../../Ula/Ula.swift; sourceTree = "<group>"; };
 		1DBABA931D09BE8700E631D5 /* ULAMemory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ULAMemory.swift; path = ../../Ula/ULAMemory.swift; sourceTree = "<group>"; };
 		1DBABA951D09BE9F00E631D5 /* ULAIo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ULAIo.swift; path = ../../Ula/ULAIo.swift; sourceTree = "<group>"; };
@@ -88,6 +90,17 @@
 			name = Bus;
 			sourceTree = "<group>";
 		};
+		1D89DD1A1D884C3500282518 /* Tape */ = {
+			isa = PBXGroup;
+			children = (
+				1D2975361D896D4B00DF20EA /* Tape.swift */,
+				1D2975371D896D4B00DF20EA /* TapeData.swift */,
+				1D2975381D896D4B00DF20EA /* TapeLoader.swift */,
+				1D89DD1F1D884C8300282518 /* TapeBlock.swift */,
+			);
+			path = Tape;
+			sourceTree = "<group>";
+		};
 		1DBABA901D09BDBF00E631D5 /* Ula */ = {
 			isa = PBXGroup;
 			children = (
@@ -117,13 +130,11 @@
 		1DD722D81C35857B00178421 /* Z80VirtualMachineKit */ = {
 			isa = PBXGroup;
 			children = (
-				1DB39EF51D7EFE850039D47F /* TapeData.swift */,
-				1DAF497A1D70B785008F1960 /* TapeLoader.swift */,
+				1D89DD1A1D884C3500282518 /* Tape */,
 				1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */,
 				1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */,
 				1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */,
 				1D5A76851D57BFD800346583 /* VmScreen.swift */,
-				1DAF497E1D70C2E0008F1960 /* Tape.swift */,
 				1DD722DB1C35857B00178421 /* Info.plist */,
 				1DBABA901D09BDBF00E631D5 /* Ula */,
 				1D2D38191CD50A8500DA69B6 /* Bus */,
@@ -228,6 +239,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1D29753B1D896D4B00DF20EA /* TapeLoader.swift in Sources */,
 				1DD722E21C3585A800178421 /* Z80VirtualMachineKit.swift in Sources */,
 				1DBABA941D09BE8700E631D5 /* ULAMemory.swift in Sources */,
 				1D74EEC91CF35998004B5748 /* GenericIODevice.swift in Sources */,
@@ -235,20 +247,20 @@
 				1D53EEDD1CE502A400AF9A16 /* Bus.swift in Sources */,
 				1DEF3B511CDF814200C2646F /* ControlUnit_opcodes_xx.swift in Sources */,
 				1DBABA921D09BE2500E631D5 /* Ula.swift in Sources */,
+				1D29753A1D896D4B00DF20EA /* TapeData.swift in Sources */,
+				1D2975391D896D4B00DF20EA /* Tape.swift in Sources */,
 				1D24EACF1D3553D7003BA41E /* AudioStreamer.swift in Sources */,
 				1DD7231A1C35871800178421 /* ControlUnit_opcodes_none.swift in Sources */,
 				1DD723131C35871800178421 /* ControlUnit.swift in Sources */,
-				1DAF497F1D70C2E0008F1960 /* Tape.swift in Sources */,
 				1DD723141C35871800178421 /* ControlUnit_opcodes_cb.swift in Sources */,
 				1DD723171C35871800178421 /* ControlUnit_opcodes_ed.swift in Sources */,
-				1DB39EF61D7EFE850039D47F /* TapeData.swift in Sources */,
 				1D2D381B1CD5102D00DA69B6 /* BusComponentBase.swift in Sources */,
 				1DD7231E1C35871800178421 /* Z80.swift in Sources */,
 				1DD723161C35871800178421 /* ControlUnit_opcodes_xxcb.swift in Sources */,
-				1DAF497B1D70B785008F1960 /* TapeLoader.swift in Sources */,
 				1DD7231B1C35871800178421 /* extensions.swift in Sources */,
 				1D2D381F1CD6570E00DA69B6 /* BusComponent.swift in Sources */,
 				1D2D381D1CD655C200DA69B6 /* Ram.swift in Sources */,
+				1D89DD201D884C8300282518 /* TapeBlock.swift in Sources */,
 				1DD7231D1C35871800178421 /* types.swift in Sources */,
 				1D5A76861D57BFD800346583 /* VmScreen.swift in Sources */,
 				1DBD6D281CE8D90A000456CB /* Rom.swift in Sources */,

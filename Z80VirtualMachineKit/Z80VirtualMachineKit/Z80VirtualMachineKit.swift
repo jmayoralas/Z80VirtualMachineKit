@@ -22,7 +22,7 @@ public struct SpecialKeys: OptionSet {
 }
 
 public struct TapeBlockDirectoryEntry {
-    public let type: TapeBlockType
+    public let type: String
     public let identifier: String
 }
 
@@ -237,7 +237,7 @@ private struct UlaUpdateData {
         var blockDirectory = [TapeBlockDirectoryEntry]()
         
         for block in blocks {
-            blockDirectory.append(TapeBlockDirectoryEntry(type: block.type, identifier: block.identifier))
+            blockDirectory.append(TapeBlockDirectoryEntry(type: block.description, identifier: " "))
         }
         
         return blockDirectory
