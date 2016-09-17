@@ -13,7 +13,7 @@ private enum TapeStatus {
     case sendingData
     case pause
 }
-private let kTStatesPerMiliSecond = 3500
+private let kTStatesPerMilliSecond = 3500
 
 private typealias AfterPulsesCallback = () -> Void
 
@@ -159,12 +159,12 @@ final class Tape {
             self.ula.setTapeLevel(value: self.lastLevel.rawValue)
         }
         
-        if self.tCycle >= kTStatesPerMiliSecond {
+        if self.tCycle >= kTStatesPerMilliSecond {
             self.lastLevel = .off
             self.ula.setTapeLevel(value: self.lastLevel.rawValue)
         }
         
-        if self.tCycle >= pauseValue * kTStatesPerMiliSecond {
+        if self.tCycle >= pauseValue * kTStatesPerMilliSecond {
             self.status = .sendingData
             self.tCycle = 0
         }
