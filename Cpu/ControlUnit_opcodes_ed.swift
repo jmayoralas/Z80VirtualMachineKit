@@ -285,6 +285,9 @@ extension Z80 {
             } else {
                 self.regs.f.resetBit(Z)
             }
+            self.regs.f.bit(3, newVal: self.regs.a.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.a.bit(5))
+            
             self.regs.f.resetBit(H)
             self.regs.f.bit(PV, newVal: self.checkParity(self.regs.a))
             self.regs.f.resetBit(N)
@@ -344,9 +347,13 @@ extension Z80 {
             } else {
                 self.regs.f.resetBit(Z)
             }
+            self.regs.f.bit(3, newVal: self.regs.a.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.a.bit(5))
+            
             self.regs.f.resetBit(H)
             self.regs.f.bit(PV, newVal: self.checkParity(self.regs.a))
             self.regs.f.resetBit(N)
+            
             self.dataBus.write(self.regs.hl, value: data)
         }
         opcodes[0x70] = { // IN _,(C)
@@ -458,7 +465,7 @@ extension Z80 {
         opcodes[0xA1] = { // CPI
             self.t_cycle += 8
             let data = self.dataBus.read(self.regs.hl)
-            let _ = self.aluCall(self.regs.a, data, ulaOp: .sub, ignoreCarry: true)
+            let _ = self.aluCall(self.regs.a, data, ulaOp: .cp, ignoreCarry: true)
             
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .add)
@@ -513,7 +520,7 @@ extension Z80 {
         opcodes[0xA9] = { // CPD
             self.t_cycle += 8
             let data = self.dataBus.read(self.regs.hl)
-            let _ = self.aluCall(self.regs.a, data, ulaOp: .sub, ignoreCarry: true)
+            let _ = self.aluCall(self.regs.a, data, ulaOp: .cp, ignoreCarry: true)
             
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .sub)
@@ -560,7 +567,7 @@ extension Z80 {
         }
         opcodes[0xB1] = { // CPIR
             self.t_cycle += 8
-            let _ = self.aluCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .sub, ignoreCarry: true)
+            let _ = self.aluCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .cp, ignoreCarry: true)
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .add)
             self.regs.bc = self.aluCall16(self.regs.bc, 1, ulaOp: .sub)
@@ -619,7 +626,7 @@ extension Z80 {
         }
         opcodes[0xB9] = { // CPDR
             self.t_cycle += 8
-            let _ = self.aluCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .sub, ignoreCarry: true)
+            let _ = self.aluCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .cp, ignoreCarry: true)
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .sub)
             self.regs.bc = self.aluCall16(self.regs.bc, 1, ulaOp: .sub)
