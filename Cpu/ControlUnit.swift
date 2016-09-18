@@ -47,7 +47,7 @@ extension Z80 {
     
     func aluCall(_ operandA: UInt8, _ operandB: UInt8, ulaOp: UlaOp, ignoreCarry: Bool) -> UInt8 {
         /*
-        Bit      0 1 2 3 4  5  6 7
+        Bit      7 6 5 4 3  2  1 0
         ￼￼Position S Z X H X P/V N C
         */
         
