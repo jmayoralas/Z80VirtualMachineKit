@@ -325,11 +325,16 @@ extension Z80 {
             self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x37] = { // SCF
+            let result = self.regs.q == 1 ? self.regs.a : self.regs.a | self.regs.f
+            
             self.regs.f.setBit(C)
             self.regs.f.resetBit(H)
             self.regs.f.resetBit(N)
-            self.regs.f.bit(3, newVal: self.regs.a.bit(3))
-            self.regs.f.bit(5, newVal: self.regs.a.bit(5))
+            
+            self.regs.f.bit(3, newVal: result.bit(3))
+            self.regs.f.bit(5, newVal: result.bit(5))
+            
+            self.regs.q = 1
         }
         opcodes[0x38] = { // JR C &00
             self.t_cycle += 3
@@ -365,6 +370,8 @@ extension Z80 {
             self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0x3F] = { // CCF
+            let result = self.regs.q == 1 ? self.regs.a : self.regs.a | self.regs.f
+            
             self.regs.f.bit(H, newVal: self.regs.f.bit(C))
             if self.regs.f.bit(C) == 0 {
                 self.regs.f.setBit(C)
@@ -373,8 +380,10 @@ extension Z80 {
             }
             self.regs.f.resetBit(N)
             
-            self.regs.f.bit(3, newVal: self.regs.a.bit(3))
-            self.regs.f.bit(5, newVal: self.regs.a.bit(5))
+            self.regs.f.bit(3, newVal: result.bit(3))
+            self.regs.f.bit(5, newVal: result.bit(5))
+            
+            self.regs.q = 1
         }
         opcodes[0x40] = { // LD B,B
             self.regs.b = self.regs.b

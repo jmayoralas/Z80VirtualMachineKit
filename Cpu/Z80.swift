@@ -104,7 +104,15 @@ class Z80 {
     
     func processInstruction() {
         getNextOpcode()
+        
+        // save flags register before execute the opcode
+        let fBackup = self.regs.f
         opcode_tables[id_opcode_table][Int(regs.ir)]()
+        
+        // test for flags changes and update q register acordingly
+        if id_opcode_table != table_NONE || (id_opcode_table == table_NONE && self.regs.ir != 0x37 && self.regs.ir != 0x3F) {
+            self.regs.q = fBackup != self.regs.f ? 1 : 0
+        }
     }
     
     func getNextOpcode() {

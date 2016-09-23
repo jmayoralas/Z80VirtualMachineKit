@@ -131,6 +131,9 @@ public struct Registers {
     public var IFF2 : Bool = false
 
     public var int_mode : Int = 0
+    
+    // undocumented register for flag affection of scf/ccf opcodes
+    public var q : UInt8 = 0
 }
 
 enum UlaOp {
