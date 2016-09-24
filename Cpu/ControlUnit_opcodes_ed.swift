@@ -26,6 +26,7 @@ extension Z80 {
             }
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
+            self.regs.f.resetBit(H)
             
             self.regs.b = data
         }
@@ -73,6 +74,7 @@ extension Z80 {
             }
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
+            self.regs.f.resetBit(H)
             
             self.regs.c = data
         }
@@ -119,6 +121,7 @@ extension Z80 {
             }
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
+            self.regs.f.resetBit(H)
             
             self.regs.d = data
         }
@@ -183,6 +186,7 @@ extension Z80 {
             }
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
+            self.regs.f.resetBit(H)
             
             self.regs.e = data
         }
@@ -246,6 +250,7 @@ extension Z80 {
             }
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
+            self.regs.f.resetBit(H)
             
             self.regs.h = data
         }
@@ -308,6 +313,7 @@ extension Z80 {
             }
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
+            self.regs.f.resetBit(H)
             
             self.regs.l = data
         }
@@ -371,6 +377,7 @@ extension Z80 {
             }
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
+            self.regs.f.resetBit(H)
         }
         opcodes[0x71] = { // OUT (C),_
             self.t_cycle += 4
@@ -414,6 +421,7 @@ extension Z80 {
             }
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
+            self.regs.f.resetBit(H)
             
             self.regs.a = data
         }
