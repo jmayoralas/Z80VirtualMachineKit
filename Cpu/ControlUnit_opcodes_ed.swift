@@ -446,7 +446,7 @@ extension Z80 {
         opcodes[0xA0] = { // LDI
             self.t_cycle += 8
             
-            let data = self.dataBus.read(self.regs.hl)
+            var data = self.dataBus.read(self.regs.hl)
             self.dataBus.write(self.regs.de, value: data)
             
             let f_backup = self.regs.f
@@ -461,11 +461,14 @@ extension Z80 {
             } else {
                 self.regs.f.resetBit(PV)
             }
+            
+            data = data &+ self.regs.a
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(1))
         }
         opcodes[0xA1] = { // CPI
             self.t_cycle += 8
-            let data = self.dataBus.read(self.regs.hl)
-            let _ = self.aluCall(self.regs.a, data, ulaOp: .cp, ignoreCarry: true)
+            var data = self.aluCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .cp, ignoreCarry: true)
             
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .add)
@@ -476,6 +479,10 @@ extension Z80 {
             } else {
                 self.regs.f.resetBit(PV)
             }
+            
+            data = data &- UInt8(self.regs.f.bit(H))
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(1))
         }
         opcodes[0xA2] = { // INI
             self.t_cycle += 8
@@ -501,7 +508,7 @@ extension Z80 {
         opcodes[0xA8] = { // LDD
             self.t_cycle += 8
             
-            let data = self.dataBus.read(self.regs.hl)
+            var data = self.dataBus.read(self.regs.hl)
             self.dataBus.write(self.regs.de, value: data)
             
             let f_backup = self.regs.f
@@ -516,11 +523,14 @@ extension Z80 {
             } else {
                 self.regs.f.resetBit(PV)
             }
+            
+            data = data &+ self.regs.a
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(1))
         }
         opcodes[0xA9] = { // CPD
             self.t_cycle += 8
-            let data = self.dataBus.read(self.regs.hl)
-            let _ = self.aluCall(self.regs.a, data, ulaOp: .cp, ignoreCarry: true)
+            var data = self.aluCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .cp, ignoreCarry: true)
             
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .sub)
@@ -531,6 +541,10 @@ extension Z80 {
             } else {
                 self.regs.f.resetBit(PV)
             }
+            
+            data = data &- UInt8(self.regs.f.bit(H))
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(1))
         }
         opcodes[0xAA] = { // IND
             self.t_cycle += 8
@@ -550,7 +564,8 @@ extension Z80 {
         }
         opcodes[0xB0] = { // LDIR
             self.t_cycle += 8
-            self.dataBus.write(self.regs.de, value: self.dataBus.read(self.regs.hl))
+            var data = self.dataBus.read(self.regs.hl)
+            self.dataBus.write(self.regs.de, value: data)
             let f_backup = self.regs.f
             self.regs.de = self.aluCall16(self.regs.de, 1, ulaOp: .add)
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .add)
@@ -564,10 +579,14 @@ extension Z80 {
                 self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
             }
+            
+            data = data &+ self.regs.a
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(1))
         }
         opcodes[0xB1] = { // CPIR
             self.t_cycle += 8
-            let _ = self.aluCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .cp, ignoreCarry: true)
+            var data = self.aluCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .cp, ignoreCarry: true)
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .add)
             self.regs.bc = self.aluCall16(self.regs.bc, 1, ulaOp: .sub)
@@ -580,6 +599,10 @@ extension Z80 {
                     self.regs.pc = self.regs.pc &- 2
                 }
             }
+            
+            data = data &- UInt8(self.regs.f.bit(H))
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(1))
         }
         opcodes[0xB2] = { // INIR
             self.t_cycle += 8
@@ -609,7 +632,9 @@ extension Z80 {
         }
         opcodes[0xB8] = { // LDDR
             self.t_cycle += 8
-            self.dataBus.write(self.regs.de, value: self.dataBus.read(self.regs.hl))
+            
+            var data = self.dataBus.read(self.regs.hl)
+            self.dataBus.write(self.regs.de, value: data)
             let f_backup = self.regs.f
             self.regs.de = self.aluCall16(self.regs.de, 1, ulaOp: .sub)
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .sub)
@@ -623,15 +648,23 @@ extension Z80 {
                 self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
             }
+        
+            data = data &+ self.regs.a
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(1))
         }
         opcodes[0xB9] = { // CPDR
             self.t_cycle += 8
-            let _ = self.aluCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .cp, ignoreCarry: true)
+            
+            var data = self.aluCall(self.regs.a, self.dataBus.read(self.regs.hl), ulaOp: .cp, ignoreCarry: true)
+            
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .sub)
             self.regs.bc = self.aluCall16(self.regs.bc, 1, ulaOp: .sub)
             self.regs.f = f_backup
+            
             self.regs.f.resetBit(PV)
+            
             if self.regs.bc != 0 {
                 self.regs.f.setBit(PV)
                 if self.regs.f.bit(Z) == 0 {
@@ -639,6 +672,10 @@ extension Z80 {
                     self.regs.pc = self.regs.pc &- 2
                 }
             }
+            
+            data = data &- UInt8(self.regs.f.bit(H))
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(1))
         }
         opcodes[0xBA] = { // INDR
             self.t_cycle += 8
