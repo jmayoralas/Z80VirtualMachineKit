@@ -28,6 +28,9 @@ extension Z80 {
             self.regs.f.resetBit(N)
             self.regs.f.resetBit(H)
             
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(5))
+            
             self.regs.b = data
         }
         opcodes[0x41] = { // OUT (C),B
@@ -53,6 +56,7 @@ extension Z80 {
             self.regs.IFF1 = self.regs.IFF2
         }
         opcodes[0x46] = { // IM 0
+            // FIX-ME: rom keyboard scanning subroutine stop responding when IM 0 is executed
             self.regs.int_mode = 0
         }
         opcodes[0x47] = { // LD I,A
@@ -75,6 +79,9 @@ extension Z80 {
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
             self.regs.f.resetBit(H)
+            
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(5))
             
             self.regs.c = data
         }
@@ -122,6 +129,9 @@ extension Z80 {
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
             self.regs.f.resetBit(H)
+            
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(5))
             
             self.regs.d = data
         }
@@ -188,6 +198,9 @@ extension Z80 {
             self.regs.f.resetBit(N)
             self.regs.f.resetBit(H)
             
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(5))
+            
             self.regs.e = data
         }
         opcodes[0x59] = { // OUT (C),E
@@ -252,6 +265,9 @@ extension Z80 {
             self.regs.f.resetBit(N)
             self.regs.f.resetBit(H)
             
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(5))
+            
             self.regs.h = data
         }
         opcodes[0x61] = { // OUT (C),H
@@ -314,6 +330,9 @@ extension Z80 {
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
             self.regs.f.resetBit(H)
+            
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(5))
             
             self.regs.l = data
         }
@@ -378,6 +397,9 @@ extension Z80 {
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
             self.regs.f.resetBit(H)
+            
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(5))
         }
         opcodes[0x71] = { // OUT (C),_
             self.t_cycle += 4
@@ -422,6 +444,9 @@ extension Z80 {
             self.regs.f.bit(PV, newVal: self.checkParity(data))
             self.regs.f.resetBit(N)
             self.regs.f.resetBit(H)
+            
+            self.regs.f.bit(3, newVal: data.bit(3))
+            self.regs.f.bit(5, newVal: data.bit(5))
             
             self.regs.a = data
         }
@@ -502,16 +527,47 @@ extension Z80 {
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .add)
             self.regs.f = f_backup
             self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
+            
+            self.regs.f.bit(N, newVal: data.bit(7))
+            
+            let data2 = data &+ self.regs.c &+ 1
+            
+            if data2 > data {
+                self.regs.f.resetBit(H)
+                self.regs.f.resetBit(C)
+            } else {
+                self.regs.f.setBit(H)
+                self.regs.f.setBit(C)
+            }
+            
+            let parityValue = (data2 & 0x07) ^ self.regs.b
+            self.regs.f.bit(PV, newVal: self.checkParity(parityValue))
         }
         opcodes[0xA3] = { // OUTI
             self.t_cycle += 8
             
             let data = self.dataBus.read(self.regs.hl)
-            self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
-            self.ioBus.write(self.regs.bc, value: data)
+            
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .add)
             self.regs.f = f_backup
+            
+            self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
+            self.ioBus.write(self.regs.bc, value: data)
+            
+            self.regs.f.bit(N, newVal: data.bit(7))
+            
+            let data2 = data &+ self.regs.l
+            if data2 >= data {
+                self.regs.f.resetBit(H)
+                self.regs.f.resetBit(C)
+            } else {
+                self.regs.f.setBit(H)
+                self.regs.f.setBit(C)
+            }
+            
+            let parityValue = (data2 & 0x07) ^ self.regs.b
+            self.regs.f.bit(PV, newVal: self.checkParity(parityValue))
         }
         opcodes[0xA8] = { // LDD
             self.t_cycle += 8
@@ -556,19 +612,55 @@ extension Z80 {
         }
         opcodes[0xAA] = { // IND
             self.t_cycle += 8
-            self.dataBus.write(self.regs.hl, value: self.ioBus.read(self.regs.bc))
+            
+            let data = self.ioBus.read(self.regs.bc)
+            self.dataBus.write(self.regs.hl, value: data)
+            
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .sub)
             self.regs.f = f_backup
             self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
+            
+            self.regs.f.bit(N, newVal: data.bit(7))
+            
+            let data2 = data &+ self.regs.c &- 1
+            
+            if data2 >= data {
+                self.regs.f.resetBit(H)
+                self.regs.f.resetBit(C)
+            } else {
+                self.regs.f.setBit(H)
+                self.regs.f.setBit(C)
+            }
+            
+            let parityValue = (data2 & 0x07) ^ self.regs.b
+            self.regs.f.bit(PV, newVal: self.checkParity(parityValue))
         }
         opcodes[0xAB] = { // OUTD
             self.t_cycle += 8
-            self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
-            self.ioBus.write(self.regs.bc, value: self.dataBus.read(self.regs.hl))
+            
+            let data = self.dataBus.read(self.regs.hl)
+            
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .sub)
             self.regs.f = f_backup
+            
+            self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
+            self.ioBus.write(self.regs.bc, value: data)
+            
+            self.regs.f.bit(N, newVal: data.bit(7))
+            
+            let data2 = data &+ self.regs.l
+            if data2 >= data {
+                self.regs.f.resetBit(H)
+                self.regs.f.resetBit(C)
+            } else {
+                self.regs.f.setBit(H)
+                self.regs.f.setBit(C)
+            }
+            
+            let parityValue = (data2 & 0x07) ^ self.regs.b
+            self.regs.f.bit(PV, newVal: self.checkParity(parityValue))
         }
         opcodes[0xB0] = { // LDIR
             self.t_cycle += 8
@@ -614,28 +706,66 @@ extension Z80 {
         }
         opcodes[0xB2] = { // INIR
             self.t_cycle += 8
-            self.dataBus.write(self.regs.hl, value: self.ioBus.read(self.regs.bc))
+            
+            let data = self.ioBus.read(self.regs.bc)
+            self.dataBus.write(self.regs.hl, value: data)
+            
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .add)
             self.regs.f = f_backup
             self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
+            
+            self.regs.f.bit(N, newVal: data.bit(7))
+            
+            let data2 = data &+ self.regs.c &+ 1
+            
+            if data2 > data {
+                self.regs.f.resetBit(H)
+                self.regs.f.resetBit(C)
+            } else {
+                self.regs.f.setBit(H)
+                self.regs.f.setBit(C)
+            }
+            
             if self.regs.b != 0 {
                 self.t_cycle += 5
                 self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
+            } else {
+                let parityValue = (data2 & 0x07) ^ self.regs.b
+                self.regs.f.bit(PV, newVal: self.checkParity(parityValue))
             }
         }
         opcodes[0xB3] = { // OTIR
             self.t_cycle += 8
-            self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
-            self.ioBus.write(self.regs.bc, value: self.dataBus.read(self.regs.hl))
+            
+            let data = self.dataBus.read(self.regs.hl)
+            
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .add)
             self.regs.f = f_backup
+            
+            self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
+            self.ioBus.write(self.regs.bc, value: data)
+            
+            self.regs.f.bit(N, newVal: data.bit(7))
+            
+            let data2 = data &+ self.regs.l
+            if data2 >= data {
+                self.regs.f.resetBit(H)
+                self.regs.f.resetBit(C)
+            } else {
+                self.regs.f.setBit(H)
+                self.regs.f.setBit(C)
+            }
+            
             if self.regs.b != 0 {
                 self.t_cycle += 5
                 self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
+            } else {
+                let parityValue = (data2 & 0x07) ^ self.regs.b
+                self.regs.f.bit(PV, newVal: self.checkParity(parityValue))
             }
         }
         opcodes[0xB8] = { // LDDR
@@ -687,28 +817,65 @@ extension Z80 {
         }
         opcodes[0xBA] = { // INDR
             self.t_cycle += 8
-            self.dataBus.write(self.regs.hl, value: self.ioBus.read(self.regs.bc))
+            
+            let data = self.ioBus.read(self.regs.bc)
+            self.dataBus.write(self.regs.hl, value: data)
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .sub)
             self.regs.f = f_backup
             self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
+            
+            self.regs.f.bit(N, newVal: data.bit(7))
+            
+            let data2 = data &+ self.regs.c &- 1
+            
+            if data2 >= data {
+                self.regs.f.resetBit(H)
+                self.regs.f.resetBit(C)
+            } else {
+                self.regs.f.setBit(H)
+                self.regs.f.setBit(C)
+            }
+            
             if self.regs.b != 0 {
                 self.t_cycle += 5
                 self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
+            } else {
+                let parityValue = (data2 & 0x07) ^ self.regs.b
+                self.regs.f.bit(PV, newVal: self.checkParity(parityValue))
             }
         }
         opcodes[0xBB] = { // OTDR
             self.t_cycle += 8
-            self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
-            self.ioBus.write(self.regs.bc, value: self.dataBus.read(self.regs.hl))
+            
+            let data = self.dataBus.read(self.regs.hl)
+            
             let f_backup = self.regs.f
             self.regs.hl = self.aluCall16(self.regs.hl, 1, ulaOp: .sub)
             self.regs.f = f_backup
+            
+            self.regs.b = self.aluCall(self.regs.b, 1, ulaOp: .sub, ignoreCarry: true)
+            self.ioBus.write(self.regs.bc, value: data)
+            
+            self.regs.f.bit(N, newVal: data.bit(7))
+            
+            let data2 = data &+ self.regs.l
+            if data2 >= data {
+                self.regs.f.resetBit(H)
+                self.regs.f.resetBit(C)
+            } else {
+                self.regs.f.setBit(H)
+                self.regs.f.setBit(C)
+            }
+            
             if self.regs.b != 0 {
                 self.t_cycle += 5
                 self.regs.pc = self.regs.pc &- 2
                 self.regs.f.setBit(PV)
+            } else {
+                let parityValue = (data2 & 0x07) ^ self.regs.b
+                self.regs.f.bit(PV, newVal: self.checkParity(parityValue))
             }
         }
     }
