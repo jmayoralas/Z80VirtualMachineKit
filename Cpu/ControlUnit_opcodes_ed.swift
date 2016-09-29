@@ -180,6 +180,8 @@ extension Z80 {
             }
             self.regs.f.resetBit(N)
             
+            self.regs.f.bit(3, newVal: self.regs.a.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.a.bit(5))
         }
         opcodes[0x58] = { // IN E,(C)
             self.t_cycle += 4
@@ -247,6 +249,9 @@ extension Z80 {
                 self.regs.f.resetBit(PV)
             }
             self.regs.f.resetBit(N)
+            
+            self.regs.f.bit(3, newVal: self.regs.a.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.a.bit(5))
         }
         opcodes[0x60] = { // IN H,(C)
             self.t_cycle += 4
