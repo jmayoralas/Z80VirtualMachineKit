@@ -131,10 +131,13 @@ public struct Registers {
     public var IFF2 : Bool = false
 
     public var int_mode : Int = 0
+    
+    // undocumented register for flag affection of scf/ccf opcodes
+    public var q : UInt8 = 0
 }
 
 enum UlaOp {
-    case add, adc, sub, sbc, and, or, xor, rlc, rrc, rl, rr, sla, sra, sll, srl, sls, bit
+    case add, adc, cp, sub, sbc, and, or, xor, rlc, rrc, rl, rr, sla, sra, sll, srl, sls, bit
 }
 
 public enum Z80Error : Error {

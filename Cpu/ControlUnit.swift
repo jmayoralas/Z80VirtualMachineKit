@@ -47,11 +47,14 @@ extension Z80 {
     
     func aluCall(_ operandA: UInt8, _ operandB: UInt8, ulaOp: UlaOp, ignoreCarry: Bool) -> UInt8 {
         /*
-        Bit      0 1 2 3 4  5  6 7
+        Bit      7 6 5 4 3  2  1 0
         ￼￼Position S Z X H X P/V N C
         */
+
+        var originalUlaOp = ulaOp
+        var ulaOp = ulaOp != .cp ? ulaOp : .sub
         
-        var result: UInt8 = 0
+        var result: UInt8
         var old_carry: UInt8 = 0
         
         switch ulaOp {
@@ -181,6 +184,8 @@ extension Z80 {
                 result = operandA ^ operandB
                 regs.f.resetBit(H)
             default:
+                // This is weird. Never shouldn't happen
+                result = operandA
                 break
             }
             
@@ -193,12 +198,13 @@ extension Z80 {
             
             regs.f.resetBit(S)
             
-            if operandA.bit(Int(operandB)) == 0 {
+            if result.bit(Int(operandB)) == 0 {
                 regs.f.setBit(Z)
                 regs.f.setBit(PV)
             } else {
                 regs.f.resetBit(Z)
                 regs.f.resetBit(PV)
+                
                 if operandB == 7 {
                     regs.f.setBit(S)
                 }
@@ -207,13 +213,26 @@ extension Z80 {
             regs.f.resetBit(N)
             
         default:
-            break
+            result = operandA
         }
         
-        if ulaOp != .bit {
+        var testValueUndocumentedFlags = result
+        
+        if originalUlaOp != .bit {
             regs.f.bit(S, newVal: result.bit(7))
             if result == 0 {regs.f.setBit(Z)} else {regs.f.resetBit(Z)} // Z (Zero)
+            
+            if originalUlaOp == .cp {
+                testValueUndocumentedFlags = operandB
+            }
+        } else {
+            if self.id_opcode_table == table_XXCB {
+                testValueUndocumentedFlags = self.dataBus.lastAddress.high
+            }
         }
+        
+        self.regs.f.bit(3, newVal: testValueUndocumentedFlags.bit(3))
+        self.regs.f.bit(5, newVal: testValueUndocumentedFlags.bit(5))
         
         return result
     }

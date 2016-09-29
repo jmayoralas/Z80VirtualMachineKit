@@ -360,16 +360,16 @@ extension Z80 {
             self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xBC] = { // CP xxH
-            let _ = self.aluCall(self.regs.a, self.regs.xxh, ulaOp: .sub, ignoreCarry: false)
+            let _ = self.aluCall(self.regs.a, self.regs.xxh, ulaOp: .cp, ignoreCarry: false)
         }
         opcodes[0xBD] = { // CP xxL
-            let _ = self.aluCall(self.regs.a, self.regs.xxl, ulaOp: .sub, ignoreCarry: false)
+            let _ = self.aluCall(self.regs.a, self.regs.xxl, ulaOp: .cp, ignoreCarry: false)
         }
         opcodes[0xBE] = { // CP (xx+0)
             self.t_cycle += 11
             let displ = self.dataBus.read(self.regs.pc)
             let address = self.addRelative(displacement: displ, toAddress: self.regs.xx)
-            let _ = self.aluCall(self.regs.a, self.dataBus.read(address), ulaOp: .sub, ignoreCarry: false)
+            let _ = self.aluCall(self.regs.a, self.dataBus.read(address), ulaOp: .cp, ignoreCarry: false)
             self.regs.pc = self.regs.pc &+ 1
         }
         opcodes[0xCB] = {

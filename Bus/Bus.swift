@@ -9,6 +9,8 @@
 import Foundation
 
 class BusBase : BusComponent {
+    var lastAddress: UInt16 = 0xFFFF
+    
     var bus_components = [BusComponentBase]()
     var last_data: UInt8 = 0xFF
     
@@ -18,6 +20,16 @@ class BusBase : BusComponent {
     
     func deleteBusComponent(_ bus_component: BusComponentBase) {
 
+    }
+    
+    override func write(_ address: UInt16, value: UInt8) {
+        self.lastAddress = address
+        super.write(address, value: value)
+    }
+    
+    override func read(_ address: UInt16) -> UInt8 {
+        self.lastAddress = address
+        return super.read(address)
     }
 }
 
@@ -51,9 +63,13 @@ final class IoBus: BusBase {
     override func write(_ address: UInt16, value: UInt8) {
         // port addressed by low byte of address
         io_components[Int(address & 0x00FF)].write(address, value: value)
+        
+        super.write(address, value: value)
     }
     
     override func read(_ address: UInt16) -> UInt8 {
+        let _ = super.read(address)
+        
         // port addressed by low byte of address
         last_data = io_components[Int(address & 0x00FF)].read(address)
         
@@ -87,9 +103,12 @@ final class Bus16 : BusBase {
     override func write(_ address: UInt16, value: UInt8) {
         let index_component = Int(address) / 1024
         paged_components[index_component].write(address, value: value)
+        
+        super.write(address, value: value)
     }
     
     override func read(_ address: UInt16) -> UInt8 {
+        let _ = super.read(address)
         let index_component = (Int(address) & 0xFFFF) / 1024
         
         return paged_components[index_component].read(address)

@@ -249,6 +249,9 @@ extension Z80 {
         opcodes[0x46] = { // BIT 0,(HL)
             self.t_cycle += 4
             let _ = self.aluCall(self.dataBus.read(self.regs.hl), 0, ulaOp: .bit, ignoreCarry: false)
+            
+            self.regs.f.bit(3, newVal: self.regs.hl.high.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.hl.high.bit(5))
         }
         opcodes[0x47] = { // BIT 0,A
             let _ = self.aluCall(self.regs.a, 0, ulaOp: .bit, ignoreCarry: false)
@@ -274,6 +277,9 @@ extension Z80 {
         opcodes[0x4E] = { // BIT 1,(HL)
             self.t_cycle += 4
             let _ = self.aluCall(self.dataBus.read(self.regs.hl), 1, ulaOp: .bit, ignoreCarry: false)
+            
+            self.regs.f.bit(3, newVal: self.regs.hl.high.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.hl.high.bit(5))
         }
         opcodes[0x4F] = { // BIT 1,A
             let _ = self.aluCall(self.regs.a, 1, ulaOp: .bit, ignoreCarry: false)
@@ -299,6 +305,9 @@ extension Z80 {
         opcodes[0x56] = { // BIT 2,(HL)
             self.t_cycle += 4
             let _ = self.aluCall(self.dataBus.read(self.regs.hl), 2, ulaOp: .bit, ignoreCarry: false)
+            
+            self.regs.f.bit(3, newVal: self.regs.hl.high.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.hl.high.bit(5))
         }
         opcodes[0x57] = { // BIT 2,A
             let _ = self.aluCall(self.regs.a, 2, ulaOp: .bit, ignoreCarry: false)
@@ -324,6 +333,9 @@ extension Z80 {
         opcodes[0x5E] = { // BIT 3,(HL)
             self.t_cycle += 4
             let _ = self.aluCall(self.dataBus.read(self.regs.hl), 3, ulaOp: .bit, ignoreCarry: false)
+            
+            self.regs.f.bit(3, newVal: self.regs.hl.high.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.hl.high.bit(5))
         }
         opcodes[0x5F] = { // BIT 3,A
             let _ = self.aluCall(self.regs.a, 3, ulaOp: .bit, ignoreCarry: false)
@@ -349,6 +361,9 @@ extension Z80 {
         opcodes[0x66] = { // BIT 4,(HL)
             self.t_cycle += 4
             let _ = self.aluCall(self.dataBus.read(self.regs.hl), 4, ulaOp: .bit, ignoreCarry: false)
+            
+            self.regs.f.bit(3, newVal: self.regs.hl.high.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.hl.high.bit(5))
         }
         opcodes[0x67] = { // BIT 4,A
             let _ = self.aluCall(self.regs.a, 4, ulaOp: .bit, ignoreCarry: false)
@@ -374,6 +389,9 @@ extension Z80 {
         opcodes[0x6E] = { // BIT 5,(HL)
             self.t_cycle += 4
             let _ = self.aluCall(self.dataBus.read(self.regs.hl), 5, ulaOp: .bit, ignoreCarry: false)
+            
+            self.regs.f.bit(3, newVal: self.regs.hl.high.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.hl.high.bit(5))
         }
         opcodes[0x6F] = { // BIT 5,A
             let _ = self.aluCall(self.regs.a, 5, ulaOp: .bit, ignoreCarry: false)
@@ -399,6 +417,9 @@ extension Z80 {
         opcodes[0x76] = { // BIT 6,(HL)
             self.t_cycle += 4
             let _ = self.aluCall(self.dataBus.read(self.regs.hl), 6, ulaOp: .bit, ignoreCarry: false)
+            
+            self.regs.f.bit(3, newVal: self.regs.hl.high.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.hl.high.bit(5))
         }
         opcodes[0x77] = { // BIT 6,A
             let _ = self.aluCall(self.regs.a, 6, ulaOp: .bit, ignoreCarry: false)
@@ -424,6 +445,9 @@ extension Z80 {
         opcodes[0x7E] = { // BIT 7,(HL)
             self.t_cycle += 4
             let _ = self.aluCall(self.dataBus.read(self.regs.hl), 7, ulaOp: .bit, ignoreCarry: false)
+            
+            self.regs.f.bit(3, newVal: self.regs.hl.high.bit(3))
+            self.regs.f.bit(5, newVal: self.regs.hl.high.bit(5))
         }
         opcodes[0x7F] = { // BIT 7,A
             let _ = self.aluCall(self.regs.a, 7, ulaOp: .bit, ignoreCarry: false)
