@@ -17,6 +17,11 @@ class BusComponent : BusComponentBase {
         self.block_size = block_size
     }
     
+    // high impedance read
+    func read() -> UInt8 {
+        return 0xFF
+    }
+    
     func read(_ address: UInt16) -> UInt8 {
         return 0xFF
     }
