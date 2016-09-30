@@ -49,12 +49,9 @@ private struct UlaUpdateData {
     public var delegate: Z80VirtualMachineStatus?
     
     private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
-    private var instructions = 0
     private var ula: Ula
     private let rom = Rom(base_address: 0x0000, block_size: 0x4000)
     private var t_cycles: Int = 0
-    
-    private var irq_enabled = true
     
     private struct KeyboardRow {
         let address: UInt8
@@ -109,7 +106,6 @@ private struct UlaUpdateData {
         tape.close()
 
         cpu.reset()
-        instructions = 0
         t_cycles = 0
     }
     
@@ -135,8 +131,6 @@ private struct UlaUpdateData {
     public func step() {
         var IRQ = false
         
-        instructions += 1
-        
         cpu.t_cycle = 0
 
         if self.instantLoad && cpu.regs.pc == 0x056B && self.tape.tapeAvailable {
@@ -160,9 +154,7 @@ private struct UlaUpdateData {
         t_cycles = cpu.t_cycle
         
         if IRQ {
-            if irq_enabled {
                 cpu.irq(kind: .soft)
-            }
             
             IRQ = false
             if ula.screen.changed {
@@ -172,7 +164,7 @@ private struct UlaUpdateData {
     }
     
     public func getInstructionsCount() -> Int {
-        return instructions < 0 ? 0 : instructions
+        return 0
     }
     
     public func addIoDevice(_ port: UInt8) {
