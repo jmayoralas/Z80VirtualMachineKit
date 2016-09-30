@@ -284,7 +284,10 @@ extension Z80 {
     
     func irq(kind: IrqKind) {
         // Acknowledge an interrupt
-        // NSLog("Screen Interrupt %d", t_cycle)
+        self.irq_kind = nil
+        
+        self.t_cycle += 4
+        
         switch kind {
         case .nmi:
             halted = false
@@ -294,13 +297,21 @@ extension Z80 {
             regs.IFF1 = false
             
         case .soft:
+            self.t_cycle += 2
+            
             if regs.IFF1 {
                 halted = false
                 
                 switch regs.int_mode {
+                case 0:
+                    // read next instruction from dataBus
+                    self.id_opcode_table = table_NONE
+                    self.opcode_tables[self.id_opcode_table][Int(self.dataBus.read())]()
                 case 1:
                     call(0x0038)
                 case 2:
+                    self.t_cycle += 6
+                    
                     let vector_address = addressFromPair(regs.i, dataBus.last_data & 0xFE) // reset bit 0 of the byte in dataBus to make sure we get an even address
                     let routine_address = addressFromPair(dataBus.read(vector_address + 1), dataBus.read(vector_address))
                     

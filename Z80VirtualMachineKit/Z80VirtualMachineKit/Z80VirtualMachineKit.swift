@@ -154,9 +154,10 @@ private struct UlaUpdateData {
         t_cycles = cpu.t_cycle
         
         if IRQ {
-                cpu.irq(kind: .soft)
+            cpu.irq_kind = .soft
             
             IRQ = false
+            
             if ula.screen.changed {
                 delegate?.Z80VMScreenRefresh?()
             }
