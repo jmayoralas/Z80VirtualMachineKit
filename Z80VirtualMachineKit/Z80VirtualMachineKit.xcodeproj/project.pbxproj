@@ -132,16 +132,16 @@
 		1DD722D81C35857B00178421 /* Z80VirtualMachineKit */ = {
 			isa = PBXGroup;
 			children = (
-				1D89DD1A1D884C3500282518 /* Tape */,
 				1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */,
 				1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */,
 				1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */,
 				1D5A76851D57BFD800346583 /* VmScreen.swift */,
 				1D05A7241DA8FA4C00410979 /* Clock.swift */,
 				1DD722DB1C35857B00178421 /* Info.plist */,
-				1DBABA901D09BDBF00E631D5 /* Ula */,
 				1D2D38191CD50A8500DA69B6 /* Bus */,
 				1DD723061C35871800178421 /* Cpu */,
+				1DBABA901D09BDBF00E631D5 /* Ula */,
+				1D89DD1A1D884C3500282518 /* Tape */,
 			);
 			path = Z80VirtualMachineKit;
 			sourceTree = "<group>";
