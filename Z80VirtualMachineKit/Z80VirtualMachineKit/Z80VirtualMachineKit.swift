@@ -48,7 +48,7 @@ private struct UlaUpdateData {
     // MARK: Properties
     public var delegate: Z80VirtualMachineStatus?
     
-    private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
+    private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus(), clock: Clock())
     private var ula: Ula
     private let rom = Rom(base_address: 0x0000, block_size: 0x4000)
     private var t_cycles: Int = 0
@@ -78,8 +78,8 @@ private struct UlaUpdateData {
     
     // MARK: Constructor
     public init(_ screen: VmScreen) {
-        ula = Ula(screen: screen)
-        self.tape = Tape(ula: ula)
+        self.ula = Ula(screen: screen, clock: self.cpu.clock)
+        self.tape = Tape(ula: self.ula)
         
         super.init()
         
@@ -131,7 +131,7 @@ private struct UlaUpdateData {
     public func step() {
         var IRQ = false
         
-        cpu.t_cycle = 0
+        self.cpu.clock.tCycle = 0
 
         if self.instantLoad && cpu.regs.pc == 0x056B && self.tape.tapeAvailable {
             do {
@@ -148,10 +148,10 @@ private struct UlaUpdateData {
         }
 
         cpu.step()
-        ula.step(t_cycle: cpu.t_cycle, &IRQ)
-        tape.step(tCycle: cpu.t_cycle)
+        ula.step(&IRQ)
+        tape.step()
         
-        t_cycles = cpu.t_cycle
+        t_cycles = self.cpu.clock.tCycle
         
         if IRQ {
             cpu.irq_kind = .soft

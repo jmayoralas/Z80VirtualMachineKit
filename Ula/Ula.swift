@@ -20,6 +20,8 @@ final class Ula: InternalUlaOperationDelegate {
     
     var screen: VmScreen
     
+    let clock: Clock
+    
     private var borderColor: PixelData = kWhiteColor
     
     private var newFrame = true
@@ -39,24 +41,26 @@ final class Ula: InternalUlaOperationDelegate {
     
     private var tapeLevel: Int = 0
     
-    init(screen: VmScreen) {
+    init(screen: VmScreen, clock: Clock) {
         self.screen = screen
-        audioStreamer = AudioStreamer()
+        self.clock = clock
         
-        memory = ULAMemory(delegate: self)
-        io = ULAIo(delegate: self)
+        self.audioStreamer = AudioStreamer()
         
-        screen.memory = memory
+        self.memory = ULAMemory(delegate: self)
+        self.io = ULAIo(delegate: self)
+        
+        self.screen.memory = memory
     }
     
-    func step(t_cycle: Int, _ IRQ: inout Bool) {
+    func step(_ IRQ: inout Bool) {
         if newFrame {
             newFrame = false
             screen.beginFrame()
         }
         
-        lineTics += t_cycle
-        frameTics += t_cycle
+        self.frameTics += self.clock.tCycle
+        self.lineTics += self.clock.tCycle
         
         if audioEnabled {
             // sample ioData plus tape signal to compute new audio data

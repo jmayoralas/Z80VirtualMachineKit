@@ -267,7 +267,7 @@ extension Z80 {
     }
 
     func call(_ address: UInt16) {
-        t_cycle += 7
+        self.clock.tCycle += 7
         var sp = regs.sp &- 1
         dataBus.write(sp, value: regs.pc.high)
         sp = regs.sp &- 2
@@ -277,7 +277,7 @@ extension Z80 {
     }
 
     func ret() {
-        t_cycle += 6
+        self.clock.tCycle += 6
         regs.pc = addressFromPair(dataBus.read(regs.sp &+ 1), dataBus.read(regs.sp))
         regs.sp = regs.sp &+ 2
     }
@@ -286,7 +286,7 @@ extension Z80 {
         // Acknowledge an interrupt
         self.irq_kind = nil
         
-        self.t_cycle += 4
+        self.clock.tCycle += 4
         
         switch kind {
         case .nmi:
@@ -297,7 +297,7 @@ extension Z80 {
             regs.IFF1 = false
             
         case .soft:
-            self.t_cycle += 2
+            self.clock.tCycle += 2
             
             if regs.IFF1 {
                 halted = false
@@ -310,7 +310,7 @@ extension Z80 {
                 case 1:
                     call(0x0038)
                 case 2:
-                    self.t_cycle += 6
+                    self.clock.tCycle += 6
                     
                     let vector_address = addressFromPair(regs.i, dataBus.last_data & 0xFE) // reset bit 0 of the byte in dataBus to make sure we get an even address
                     let routine_address = addressFromPair(dataBus.read(vector_address + 1), dataBus.read(vector_address))

@@ -13,7 +13,8 @@ class Z80 {
     
     var regs : Registers
     
-    var t_cycle = 0
+    let clock: Clock
+    
     var halted: Bool = true
     
     var irq_kind : IrqKind?
@@ -29,10 +30,11 @@ class Z80 {
     
     var stopped = true
     
-    init(dataBus: Bus16, ioBus: IoBus) {
+    init(dataBus: Bus16, ioBus: IoBus, clock: Clock) {
         self.regs = Registers()
         self.dataBus = dataBus
         self.ioBus = ioBus
+        self.clock = clock
         
         id_opcode_table = table_NONE
         
@@ -78,7 +80,7 @@ class Z80 {
         regs.de_ = 0xFFFF
         regs.hl_ = 0xFFFF
         
-        t_cycle = 0
+        self.clock.tCycle = 0
         
         halted = false
     }
@@ -120,7 +122,7 @@ class Z80 {
     }
     
     func getNextOpcode() {
-        t_cycle += 4
+        self.clock.tCycle += 4
         
         if halted {
             // cpu halted, always execute NOP
