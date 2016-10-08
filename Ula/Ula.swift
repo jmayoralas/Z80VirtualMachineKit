@@ -9,6 +9,7 @@
 import Foundation
 
 protocol InternalUlaOperationDelegate {
+    func memoryRead()
     func memoryWrite(_ address: UInt16, value: UInt8)
     func ioWrite(_ address: UInt16, value: UInt8)
     func ioRead(_ address: UInt16) -> UInt8
@@ -41,6 +42,8 @@ final class Ula: InternalUlaOperationDelegate {
     
     private var tapeLevel: Int = 0
     
+    private var contentionDelayTable = [Int](repeatElement(0, count: 128))
+    
     init(screen: VmScreen, clock: Clock) {
         self.screen = screen
         self.clock = clock
@@ -51,6 +54,8 @@ final class Ula: InternalUlaOperationDelegate {
         self.io = ULAIo(delegate: self)
         
         self.screen.memory = memory
+        
+        self.initContentionTable()
     }
     
     func step(_ IRQ: inout Bool) {
@@ -130,7 +135,13 @@ final class Ula: InternalUlaOperationDelegate {
     }
     
     // MARK: InternalUlaOperation delegate
+    func memoryRead() {
+        self.computeContention()
+    }
+    
     func memoryWrite(_ address: UInt16, value: UInt8) {
+        self.computeContention()
+        
         let local_address = address & 0x3FFF
         if local_address > 0x1AFF {
             return
@@ -166,5 +177,27 @@ final class Ula: InternalUlaOperationDelegate {
         
         // get the border color from value
         borderColor = colorTable[Int(value) & 0x07]
+    }
+    
+    private func computeContention() {
+        if 14335 <= self.frameTics && self.frameTics < 57344 {
+            let index: Int = (self.frameTics - ((self.frameTics + 1) / kTicsPerLine) * kTicsPerLine) + 1
+            self.clock.tCycle += index < 128 ? self.contentionDelayTable[index] : 0
+        }
+    }
+    
+    private func initContentionTable() {
+        var delay = 7
+        
+        for i in 0 ..< self.contentionDelayTable.count {
+            delay -= 1
+            
+            if delay >= 0 {
+                self.contentionDelayTable[i] = delay
+            } else {
+                delay = 7
+            }
+            
+        }
     }
 }
