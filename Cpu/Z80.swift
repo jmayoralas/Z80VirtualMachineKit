@@ -108,8 +108,9 @@ class Z80 {
         // save flags register before execute the opcode
         let fBackup = self.regs.f
         
-        if let irq = self.irq_kind {
-            self.irq(kind: irq)
+        // only accepts an interrupt if previous opcode wasn't an EI
+        if self.regs.ir != 0xFB && self.irq_kind != nil {
+            self.irq(kind: self.irq_kind!)
         } else {
             getNextOpcode()
             opcode_tables[id_opcode_table][Int(regs.ir)]()
