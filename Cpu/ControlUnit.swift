@@ -286,10 +286,10 @@ extension Z80 {
         // Acknowledge an interrupt
         self.irq_kind = nil
         
-        self.clock.tCycle += 4
-        
         switch kind {
         case .nmi:
+            self.clock.tCycle += 8
+            
             halted = false
             
             call(0x0066)
@@ -297,9 +297,9 @@ extension Z80 {
             regs.IFF1 = false
             
         case .soft:
-            self.clock.tCycle += 2
-            
             if regs.IFF1 {
+                self.clock.tCycle += 6
+                
                 halted = false
                 
                 switch regs.int_mode {
