@@ -135,31 +135,31 @@ private struct UlaUpdateData {
 
         if self.instantLoad && cpu.regs.pc == 0x056B && self.tape.tapeAvailable {
             do {
-                try tapeLoaderHandler()
+                try self.tapeLoaderHandler()
                 
-                cpu.regs.bc = 0xB001
-                cpu.regs.af_ = 0x0145
-                cpu.regs.f.setBit(C)
+                self.cpu.regs.bc = 0xB001
+                self.cpu.regs.af_ = 0x0145
+                self.cpu.regs.f.setBit(C)
             } catch {
-                cpu.regs.f.resetBit(C)
+                self.cpu.regs.f.resetBit(C)
             }
             
-            cpu.regs.pc = 0x05E2
+            self.cpu.regs.pc = 0x05E2
         }
 
-        cpu.step()
-        ula.step(&IRQ)
-        tape.step()
+        self.cpu.step()
+        self.ula.step(&IRQ)
+        self.tape.step()
         
-        t_cycles = self.cpu.clock.tCycle
+        self.t_cycles = self.cpu.clock.tCycle
         
         if IRQ {
-            cpu.irq_kind = .soft
+            self.cpu.irq_kind = .soft
             
             IRQ = false
             
-            if ula.screen.changed {
-                delegate?.Z80VMScreenRefresh?()
+            if self.ula.screen.changed {
+                self.delegate?.Z80VMScreenRefresh?()
             }
         }
     }
