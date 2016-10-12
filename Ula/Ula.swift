@@ -26,7 +26,6 @@ final class Ula: InternalUlaOperationDelegate {
     private var borderColor: PixelData = kWhiteColor
     
     private var newFrame = true
-    private var frameTics: Int = 0
     private var lineTics: Int = 0
     private var screenLine: Int = 0
     
@@ -64,14 +63,14 @@ final class Ula: InternalUlaOperationDelegate {
             screen.beginFrame()
         }
         
-        self.frameTics += self.clock.tCycle
+        self.clock.frameTCycle += self.clock.tCycle
         self.lineTics += self.clock.tCycle
         
         if audioEnabled {
             // sample ioData plus tape signal to compute new audio data
             var signal = self.ioData
             signal.bit(6, newVal: self.tapeLevel)
-            self.audioStreamer.updateSample(tCycle: frameTics, value: signal)
+            self.audioStreamer.updateSample(tCycle: self.clock.frameTCycle, value: signal)
         }
 
         if lineTics > kTicsPerLine {
@@ -127,7 +126,7 @@ final class Ula: InternalUlaOperationDelegate {
             }
             
             newFrame = true
-            frameTics -= kTicsPerFrame
+            self.clock.frameTCycle -= kTicsPerFrame
             screenLine = 0
             
             IRQ = true
@@ -180,8 +179,8 @@ final class Ula: InternalUlaOperationDelegate {
     }
     
     private func computeContention() {
-        if 14335 <= self.frameTics && self.frameTics < 57344 {
-            let index: Int = (self.frameTics - ((self.frameTics + 1) / kTicsPerLine) * kTicsPerLine) + 1
+        if 14335 <= self.clock.frameTCycle && self.clock.frameTCycle < 57344 {
+            let index: Int = (self.clock.frameTCycle - ((self.clock.frameTCycle + 1) / kTicsPerLine) * kTicsPerLine) + 1
             self.clock.tCycle += index < 128 ? self.contentionDelayTable[index] : 0
         }
     }
