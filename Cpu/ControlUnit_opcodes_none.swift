@@ -561,6 +561,7 @@ extension Z80 {
         }
         opcodes[0x76] = { // HALT
             self.halted = true
+            self.regs.pc = self.regs.pc &- 1
         }
         opcodes[0x77] = { // LD (HL),A
             self.clock.tCycle += 3

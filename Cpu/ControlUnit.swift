@@ -284,7 +284,10 @@ extension Z80 {
     
     func irq() {
         // Acknowledge an interrupt
-        self.halted = false
+        if self.halted {
+            self.regs.pc = self.regs.pc &+ 1
+            self.halted = false
+        }
         
         switch self.irq_kind! {
         case .nmi:
