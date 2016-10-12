@@ -51,7 +51,7 @@ private struct UlaUpdateData {
     private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus(), clock: Clock())
     private var ula: Ula
     private let rom = Rom(base_address: 0x0000, block_size: 0x4000)
-    private var t_cycles: Int = 0
+    private var irqActiveTCycles: Int = 0
     
     private struct KeyboardRow {
         let address: UInt8
@@ -104,9 +104,7 @@ private struct UlaUpdateData {
     // MARK: Methods
     public func reset() {
         tape.close()
-
         cpu.reset()
-        t_cycles = 0
     }
     
     public func run() {
@@ -129,10 +127,6 @@ private struct UlaUpdateData {
     }
     
     public func step() {
-        var IRQ = false
-        
-        self.cpu.clock.tCycle = 0
-
         if self.instantLoad && cpu.regs.pc == 0x056B && self.tape.tapeAvailable {
             do {
                 try self.tapeLoaderHandler()
@@ -146,17 +140,24 @@ private struct UlaUpdateData {
             
             self.cpu.regs.pc = 0x05E2
         }
-
+        
+        var IRQ = false
+        
         self.cpu.step()
         self.ula.step(&IRQ)
         self.tape.step()
         
-        self.t_cycles = self.cpu.clock.tCycle
+        if let irqKind = self.cpu.irq_kind {
+            self.irqActiveTCycles += self.cpu.clock.tCycle
+            
+            // disables irq line if 32 tstates has passed since activation
+            self.cpu.irq_kind = self.irqActiveTCycles >= 32 ? nil : irqKind
+        }
         
         if IRQ {
             self.cpu.irq_kind = .soft
             
-            IRQ = false
+            self.irqActiveTCycles = self.cpu.clock.frameTCycle
             
             if self.ula.screen.changed {
                 self.delegate?.Z80VMScreenRefresh?()
@@ -187,7 +188,7 @@ private struct UlaUpdateData {
     }
     
     public func getTCycle() -> Int {
-        return t_cycles
+        return self.cpu.clock.tCycle
     }
     
     public func setPc(_ pc: UInt16) {
