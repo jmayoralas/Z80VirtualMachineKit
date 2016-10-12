@@ -282,48 +282,44 @@ extension Z80 {
         regs.sp = regs.sp &+ 2
     }
     
-    func irq(kind: IrqKind) {
+    func irq() {
         // Acknowledge an interrupt
-        self.irq_kind = nil
+        self.halted = false
         
-        switch kind {
+        switch self.irq_kind! {
         case .nmi:
             self.clock.tCycle += 8
             
-            halted = false
-            
             call(0x0066)
+            
             regs.IFF2 = regs.IFF1
-            regs.IFF1 = false
             
         case .soft:
-            if regs.IFF1 {
+            self.clock.tCycle += 6
+            
+            switch regs.int_mode {
+            case 0:
+                // read next instruction from dataBus
+                self.opcode_tables[self.id_opcode_table][Int(self.dataBus.read())]()
+            case 1:
+                // do a RST 38
+                self.opcode_tables[self.id_opcode_table][0xFF]()
+            case 2:
                 self.clock.tCycle += 6
                 
-                halted = false
+                let vector_address = addressFromPair(regs.i, dataBus.last_data & 0xFE) // reset bit 0 of the byte in dataBus to make sure we get an even address
+                let routine_address = addressFromPair(dataBus.read(vector_address + 1), dataBus.read(vector_address))
                 
-                switch regs.int_mode {
-                case 0:
-                    // read next instruction from dataBus
-                    self.id_opcode_table = table_NONE
-                    self.opcode_tables[self.id_opcode_table][Int(self.dataBus.read())]()
-                case 1:
-                    call(0x0038)
-                case 2:
-                    self.clock.tCycle += 6
-                    
-                    let vector_address = addressFromPair(regs.i, dataBus.last_data & 0xFE) // reset bit 0 of the byte in dataBus to make sure we get an even address
-                    let routine_address = addressFromPair(dataBus.read(vector_address + 1), dataBus.read(vector_address))
-                    
-                    call(routine_address)
-                default:
-                    break
-                }
-                
-                regs.IFF1 = false
-                regs.IFF2 = false
+                call(routine_address)
+            default:
+                break
             }
+            
+            regs.IFF2 = false
+
         }
+        
+        regs.IFF1 = false
     }
     
     func addRelative(displacement: UInt8, toAddress address: UInt16) -> UInt16 {

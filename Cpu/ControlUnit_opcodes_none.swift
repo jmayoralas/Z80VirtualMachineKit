@@ -838,7 +838,6 @@ extension Z80 {
         }
         opcodes[0xC7] = { // RST &00
             self.call(0x0000)
-            self.irq_kind = nil
         }
         opcodes[0xC8] = { // RET Z
             self.clock.tCycle += 1
@@ -885,7 +884,6 @@ extension Z80 {
         }
         opcodes[0xCF] = { // RST &08
             self.call(0x0008)
-            self.irq_kind = nil
         }
         opcodes[0xD0] = { // RET NC
             self.clock.tCycle += 1
@@ -935,7 +933,6 @@ extension Z80 {
         }
         opcodes[0xD7] = { // RST &10
             self.call(0x0010)
-            self.irq_kind = nil
         }
         opcodes[0xD8] = { // RET C
             self.clock.tCycle += 1
@@ -992,7 +989,6 @@ extension Z80 {
         }
         opcodes[0xDF] = { // RST &18
             self.call(0x0018)
-            self.irq_kind = nil
         }
         opcodes[0xE0] = { // RET PO
             self.clock.tCycle += 1
@@ -1044,7 +1040,6 @@ extension Z80 {
         }
         opcodes[0xE7] = { // RST &20
             self.call(0x0020)
-            self.irq_kind = nil
         }
         opcodes[0xE8] = { // RET PE
             self.clock.tCycle += 1
@@ -1093,7 +1088,6 @@ extension Z80 {
         }
         opcodes[0xEF] = { // RST &28
             self.call(0x0028)
-            self.irq_kind = nil
         }
         opcodes[0xF0] = { // RET P
             self.clock.tCycle += 1
@@ -1142,7 +1136,6 @@ extension Z80 {
         }
         opcodes[0xF7] = { // RST &30
             self.call(0x0030)
-            self.irq_kind = nil
         }
         opcodes[0xF8] = { // RET M
             self.clock.tCycle += 1
@@ -1163,6 +1156,7 @@ extension Z80 {
             }
         }
         opcodes[0xFB] = { // EI
+            self.eiExecuted = true
             self.regs.IFF1 = true
             self.regs.IFF2 = true
         }
@@ -1190,7 +1184,6 @@ extension Z80 {
         }
         opcodes[0xFF] = { // RST &38
             self.call(0x0038)
-            self.irq_kind = nil
         }
     }
 }
