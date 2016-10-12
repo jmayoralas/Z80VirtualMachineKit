@@ -73,7 +73,7 @@ final class Ula: InternalUlaOperationDelegate {
             self.audioStreamer.updateSample(tCycle: self.clock.frameTCycle, value: signal)
         }
 
-        if lineTics > kTicsPerLine {
+        if lineTics >= kTicsPerLine {
             screenLineCompleted(&IRQ)
         }
     }
@@ -113,7 +113,7 @@ final class Ula: InternalUlaOperationDelegate {
         
         screen.updateBorder(line: screenLine, color: borderColor)
         
-        if screenLine >= kScreenLines {
+        if screenLine == kScreenLines {
             if audioEnabled {
                 self.audioStreamer.endFrame()
             }
