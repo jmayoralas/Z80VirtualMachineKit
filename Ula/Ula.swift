@@ -74,8 +74,10 @@ final class Ula: InternalUlaOperationDelegate {
         }
 
         if lineTics >= kTicsPerLine {
-            screenLineCompleted(&IRQ)
+            screenLineCompleted()
         }
+        
+        IRQ = self.screenLine == 0 && self.clock.frameTCycle < 32
     }
     
     func toggleAudio() {
@@ -107,7 +109,7 @@ final class Ula: InternalUlaOperationDelegate {
     }
     
     // MARK: Screen management
-    private func screenLineCompleted(_ IRQ: inout Bool) {
+    private func screenLineCompleted() {
         screenLine += 1
         lineTics -= kTicsPerLine
         
@@ -128,8 +130,6 @@ final class Ula: InternalUlaOperationDelegate {
             newFrame = true
             self.clock.frameTCycle -= kTicsPerFrame
             screenLine = 0
-            
-            IRQ = true
         }
     }
     

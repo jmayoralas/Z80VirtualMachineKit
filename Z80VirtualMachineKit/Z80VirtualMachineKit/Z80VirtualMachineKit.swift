@@ -147,21 +147,14 @@ private struct UlaUpdateData {
         self.ula.step(&IRQ)
         self.tape.step()
         
-        if let irqKind = self.cpu.irq_kind {
-            self.irqActiveTCycles += self.cpu.clock.tCycle
-            
-            // disables irq line if 32 tstates has passed since activation
-            self.cpu.irq_kind = self.irqActiveTCycles >= 32 ? nil : irqKind
-        }
-        
         if IRQ {
             self.cpu.irq_kind = .soft
-            
-            self.irqActiveTCycles = self.cpu.clock.frameTCycle
             
             if self.ula.screen.changed {
                 self.delegate?.Z80VMScreenRefresh?()
             }
+        } else {
+            self.cpu.irq_kind = nil
         }
     }
     
