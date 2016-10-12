@@ -30,6 +30,8 @@ class Z80 {
     
     var stopped = true
     
+    var eiExecuted: Bool = false
+    
     init(dataBus: Bus16, ioBus: IoBus, clock: Clock) {
         self.regs = Registers()
         self.dataBus = dataBus
@@ -99,6 +101,8 @@ class Z80 {
     
     // gets next opcode from PC and executes it
     func step() {
+        self.clock.tCycle = 0
+        
         repeat {
             processInstruction()
         } while id_opcode_table != table_NONE
@@ -107,13 +111,23 @@ class Z80 {
     func processInstruction() {
         // save flags register before execute the opcode
         let fBackup = self.regs.f
+        var serveIrq = false
         
-        // only accepts an interrupt if previous opcode wasn't an EI
-        if self.regs.ir != 0xFB && self.irq_kind != nil {
-            self.irq(kind: self.irq_kind!)
+        // samples irq line to see if we have to serve an interrupt
+        if let irqKind = self.irq_kind {
+            // only accepts a maskable interrupt if previous opcode wasn't an EI and interrupts are enabled
+            if irqKind == .nmi || (self.regs.IFF1 && !self.eiExecuted) {
+                serveIrq = true
+            }
+        }
+        
+        self.eiExecuted = false
+        
+        if serveIrq {
+            self.irq()
         } else {
-            getNextOpcode()
-            opcode_tables[id_opcode_table][Int(regs.ir)]()
+            self.getNextOpcode()
+            self.opcode_tables[id_opcode_table][Int(regs.ir)]()
         }
         
         // test for flags changes and update q register acordingly
