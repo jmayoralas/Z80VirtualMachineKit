@@ -51,7 +51,6 @@ private struct UlaUpdateData {
     private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus(), clock: Clock())
     private var ula: Ula
     private let rom = Rom(base_address: 0x0000, block_size: 0x4000)
-    private var irqActiveTCycles: Int = 0
     
     private struct KeyboardRow {
         let address: UInt8
