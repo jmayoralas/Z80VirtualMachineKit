@@ -282,47 +282,64 @@ extension Z80 {
         regs.sp = regs.sp &+ 2
     }
     
-    func irq() {
+    func nonMaskableInterrupt() -> Bool {
+        guard self.nmi else {
+            return false
+        }
+        
         // Acknowledge an interrupt
         if self.halted {
             self.regs.pc = self.regs.pc &+ 1
             self.halted = false
         }
         
-        switch self.irq_kind! {
-        case .nmi:
-            self.clock.tCycle += 8
-            
-            call(0x0066)
-            
-            regs.IFF2 = regs.IFF1
-            
-        case .soft:
+        self.clock.tCycle += 8
+        
+        self.call(0x0066)
+        
+        self.regs.IFF2 = self.regs.IFF1
+        self.regs.IFF1 = false
+        
+        self.nmi = false
+        
+        return true
+    }
+    
+    func maskableInterrupt() -> Bool {
+        guard self.int && self.regs.IFF1 && !self.eiExecuted else {
+            return false
+        }
+        
+        // Acknowledge an interrupt
+        if self.halted {
+            self.regs.pc = self.regs.pc &+ 1
+            self.halted = false
+        }
+        
+        self.clock.tCycle += 6
+        
+        switch regs.int_mode {
+        case 0:
+            // read next instruction from dataBus
+            self.opcode_tables[self.id_opcode_table][Int(self.dataBus.read())]()
+        case 1:
+            // do a RST 38
+            self.opcode_tables[self.id_opcode_table][0xFF]()
+        case 2:
             self.clock.tCycle += 6
             
-            switch regs.int_mode {
-            case 0:
-                // read next instruction from dataBus
-                self.opcode_tables[self.id_opcode_table][Int(self.dataBus.read())]()
-            case 1:
-                // do a RST 38
-                self.opcode_tables[self.id_opcode_table][0xFF]()
-            case 2:
-                self.clock.tCycle += 6
-                
-                let vector_address = addressFromPair(regs.i, dataBus.last_data & 0xFE) // reset bit 0 of the byte in dataBus to make sure we get an even address
-                let routine_address = addressFromPair(dataBus.read(vector_address + 1), dataBus.read(vector_address))
-                
-                call(routine_address)
-            default:
-                break
-            }
+            let vector_address = addressFromPair(regs.i, dataBus.last_data & 0xFE) // reset bit 0 of the byte in dataBus to make sure we get an even address
+            let routine_address = addressFromPair(dataBus.read(vector_address + 1), dataBus.read(vector_address))
             
-            regs.IFF2 = false
-
+            self.call(routine_address)
+        default:
+            break
         }
         
         regs.IFF1 = false
+        regs.IFF2 = false
+        
+        return true
     }
     
     func addRelative(displacement: UInt8, toAddress address: UInt16) -> UInt16 {

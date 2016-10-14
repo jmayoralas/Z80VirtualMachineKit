@@ -140,20 +140,18 @@ private struct UlaUpdateData {
             self.cpu.regs.pc = 0x05E2
         }
         
-        var IRQ = false
-        
         self.cpu.step()
-        self.ula.step(&IRQ)
+        self.ula.step()
         self.tape.step()
         
-        if IRQ {
-            self.cpu.irq_kind = .soft
+        if self.cpu.clock.frameTCycle <= 32 {
+            self.cpu.int = true
             
             if self.ula.screen.changed {
                 self.delegate?.Z80VMScreenRefresh?()
             }
         } else {
-            self.cpu.irq_kind = nil
+            self.cpu.int = false
         }
     }
     

@@ -17,8 +17,6 @@ class Z80 {
     
     var halted: Bool = true
     
-    var irq_kind : IrqKind?
-    
     var opcode_tables : [OpcodeTable]!
     
     var id_opcode_table : Int
@@ -27,6 +25,9 @@ class Z80 {
     
     let dataBus : Bus16
     let ioBus : IoBus
+    
+    var nmi: Bool = false
+    var int: Bool = false
     
     var stopped = true
     
@@ -103,37 +104,31 @@ class Z80 {
     func step() {
         self.clock.tCycle = 0
         
-        repeat {
-            processInstruction()
-        } while id_opcode_table != table_NONE
-    }
-    
-    func processInstruction() {
-        // save flags register before execute the opcode
-        let fBackup = self.regs.f
-        var serveIrq = false
-        
-        // samples irq line to see if we have to serve an interrupt
-        if let irqKind = self.irq_kind {
-            // only accepts a maskable interrupt if previous opcode wasn't an EI and interrupts are enabled
-            if irqKind == .nmi || (self.regs.IFF1 && !self.eiExecuted) {
-                serveIrq = true
-            }
+        // check for non maskable interrupt
+        guard !self.nonMaskableInterrupt() else {
+            return
         }
         
-        self.eiExecuted = false
+        // save flags register before execute the opcode
+        let fBackup = self.regs.f
         
-        if serveIrq {
-            self.irq()
-        } else {
-            self.getNextOpcode()
-            self.opcode_tables[id_opcode_table][Int(regs.ir)]()
+        if !self.maskableInterrupt() {
+            self.eiExecuted = false
+            
+            repeat {
+                self.processInstruction()
+            } while id_opcode_table != table_NONE
         }
         
         // test for flags changes and update q register acordingly
         if id_opcode_table != table_NONE || (id_opcode_table == table_NONE && self.regs.ir != 0x37 && self.regs.ir != 0x3F) {
             self.regs.q = fBackup != self.regs.f ? 1 : 0
         }
+    }
+    
+    func processInstruction() {
+        self.getNextOpcode()
+        self.opcode_tables[id_opcode_table][Int(regs.ir)]()
     }
     
     func getNextOpcode() {
