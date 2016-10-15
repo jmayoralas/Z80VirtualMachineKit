@@ -179,8 +179,10 @@ final class Ula: InternalUlaOperationDelegate {
     }
     
     private func computeContention() {
-        if 14335 <= self.clock.frameTCycles && self.clock.frameTCycles < 57344 {
-            let index: Int = (self.clock.frameTCycles - ((self.clock.frameTCycles + 1) / kTicsPerLine) * kTicsPerLine) + 1
+        let frameTCycle = self.clock.frameTCycles - 1
+        
+        if 14335 <= frameTCycle && frameTCycle < 57344 {
+            let index: Int = (frameTCycle - ((frameTCycle + 1) / kTicsPerLine) * kTicsPerLine) + 1
             self.clock.tCycles += index < 128 ? self.contentionDelayTable[index] : 0
         }
     }
