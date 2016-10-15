@@ -144,7 +144,7 @@ private struct UlaUpdateData {
         self.ula.step()
         self.tape.step()
         
-        if self.cpu.clock.frameTCycle <= 32 {
+        if self.cpu.clock.frameTCycles <= 32 {
             self.cpu.int = true
             
             if self.ula.screen.changed {
@@ -178,7 +178,7 @@ private struct UlaUpdateData {
     }
     
     public func getTCycle() -> Int {
-        return self.cpu.clock.tCycle
+        return self.cpu.clock.tCycles
     }
     
     public func setPc(_ pc: UInt16) {

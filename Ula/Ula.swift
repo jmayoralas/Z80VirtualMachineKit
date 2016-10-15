@@ -26,7 +26,7 @@ final class Ula: InternalUlaOperationDelegate {
     private var borderColor: PixelData = kWhiteColor
     
     private var newFrame = true
-    private var lineTCycle: Int = 0
+    private var lineTCycles: Int = 0
     private var screenLine: Int = 0
     
     private var frames: Int = 0
@@ -63,22 +63,22 @@ final class Ula: InternalUlaOperationDelegate {
             screen.beginFrame()
         }
         
-        self.clock.frameTCycle += (self.clock.tCycle - 1)
-        self.lineTCycle += (self.clock.tCycle - 1)
+        self.clock.frameTCycles += (self.clock.tCycles - 1)
+        self.lineTCycles += (self.clock.tCycles - 1)
         
         if audioEnabled {
             // sample ioData plus tape signal to compute new audio data
             var signal = self.ioData
             signal.bit(6, newVal: self.tapeLevel)
             
-            self.audioStreamer.updateSample(tCycle: self.clock.frameTCycle, value: signal)
+            self.audioStreamer.updateSample(tCycle: self.clock.frameTCycles, value: signal)
         }
 
-        if self.lineTCycle >= kTicsPerLine {
+        if self.lineTCycles >= kTicsPerLine {
             self.screen.updateBorder(line: screenLine, color: borderColor)
             
             self.screenLine += 1
-            self.lineTCycle -= kTicsPerLine
+            self.lineTCycles -= kTicsPerLine
             
             if self.screenLine == kScreenLines {
                 self.frameCompleted()
@@ -130,7 +130,7 @@ final class Ula: InternalUlaOperationDelegate {
         }
         
         self.newFrame = true
-        self.clock.frameTCycle -= kTicsPerFrame
+        self.clock.frameTCycles -= kTicsPerFrame
     }
     
     // MARK: InternalUlaOperation delegate
@@ -179,9 +179,9 @@ final class Ula: InternalUlaOperationDelegate {
     }
     
     private func computeContention() {
-        if 14335 <= self.clock.frameTCycle && self.clock.frameTCycle < 57344 {
-            let index: Int = (self.clock.frameTCycle - ((self.clock.frameTCycle + 1) / kTicsPerLine) * kTicsPerLine) + 1
-            self.clock.tCycle += index < 128 ? self.contentionDelayTable[index] : 0
+        if 14335 <= self.clock.frameTCycles && self.clock.frameTCycles < 57344 {
+            let index: Int = (self.clock.frameTCycles - ((self.clock.frameTCycles + 1) / kTicsPerLine) * kTicsPerLine) + 1
+            self.clock.tCycles += index < 128 ? self.contentionDelayTable[index] : 0
         }
     }
     

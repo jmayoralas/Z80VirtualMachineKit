@@ -9,6 +9,6 @@
 import Foundation
 
 final class Clock {
-    var frameTCycle: Int = 0
-    var tCycle: Int = 0
+    var frameTCycles: Int = 0
+    var tCycles: Int = 0
 }

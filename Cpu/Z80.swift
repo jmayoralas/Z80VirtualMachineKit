@@ -83,7 +83,7 @@ class Z80 {
         regs.de_ = 0xFFFF
         regs.hl_ = 0xFFFF
         
-        self.clock.tCycle = 0
+        self.clock.tCycles = 0
         
         halted = false
     }
@@ -102,7 +102,7 @@ class Z80 {
     
     // gets next opcode from PC and executes it
     func step() {
-        self.clock.tCycle = 0
+        self.clock.tCycles = 0
         
         // check for non maskable interrupt
         guard !self.nonMaskableInterrupt() else {
@@ -132,7 +132,7 @@ class Z80 {
     }
     
     func getNextOpcode() {
-        self.clock.tCycle += 4
+        self.clock.tCycles += 4
         
         if halted {
             // cpu halted, always execute NOP

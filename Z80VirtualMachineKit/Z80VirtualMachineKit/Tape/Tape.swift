@@ -131,7 +131,7 @@ final class Tape {
             return
         }
         
-        self.tCycle += self.clock.tCycle
+        self.tCycle += self.clock.tCycles
         
         switch self.status {
         case .sendingPulses:
