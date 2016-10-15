@@ -27,7 +27,7 @@ final class Ula: InternalUlaOperationDelegate {
     
     private var newFrame = true
     private var lineTCycles: Int = 0
-    private var screenLine: Int = 0
+    private var screenLine: Int = 1
     
     private var frames: Int = 0
     
@@ -63,8 +63,8 @@ final class Ula: InternalUlaOperationDelegate {
             screen.beginFrame()
         }
         
-        self.clock.frameTCycles += (self.clock.tCycles - 1)
-        self.lineTCycles += (self.clock.tCycles - 1)
+        self.clock.frameTCycles += self.clock.tCycles
+        self.lineTCycles += self.clock.tCycles
         
         if audioEnabled {
             // sample ioData plus tape signal to compute new audio data
@@ -74,15 +74,15 @@ final class Ula: InternalUlaOperationDelegate {
             self.audioStreamer.updateSample(tCycle: self.clock.frameTCycles, value: signal)
         }
 
-        if self.lineTCycles >= kTicsPerLine {
+        if self.lineTCycles > kTicsPerLine {
             self.screen.updateBorder(line: screenLine, color: borderColor)
             
             self.screenLine += 1
             self.lineTCycles -= kTicsPerLine
             
-            if self.screenLine == kScreenLines {
+            if self.screenLine > kScreenLines {
                 self.frameCompleted()
-                self.screenLine = 0
+                self.screenLine = 1
             }
         }
     }
