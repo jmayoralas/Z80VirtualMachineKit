@@ -22,6 +22,7 @@ final class Tape {
     var tapeAvailable: Bool = false
     var isPlaying: Bool = false
     
+    private let clock: Clock
     private let ula: Ula
     private let loader: TapeLoader
     
@@ -45,6 +46,7 @@ final class Tape {
     init(ula: Ula) {
         self.ula = ula
         self.loader = TapeLoader()
+        self.clock = self.ula.clock
     }
     
     func open(path: String) throws {
@@ -124,12 +126,12 @@ final class Tape {
         self.isPlaying = false
     }
     
-    func step(tCycle: Int) {
+    func step() {
         guard self.isPlaying else {
             return
         }
         
-        self.tCycle += tCycle
+        self.tCycle += self.clock.tCycles
         
         switch self.status {
         case .sendingPulses:

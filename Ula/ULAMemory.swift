@@ -18,6 +18,11 @@ final class ULAMemory : Ram {
     
     override func write(_ address: UInt16, value: UInt8) {
         super.write(address, value: value)
-        ulaDelegate.memoryWrite(address, value: value)
+        self.ulaDelegate.memoryWrite(address, value: value)
+    }
+    
+    override func read(_ address: UInt16) -> UInt8 {
+        self.ulaDelegate.memoryRead()
+        return super.read(address)
     }
 }

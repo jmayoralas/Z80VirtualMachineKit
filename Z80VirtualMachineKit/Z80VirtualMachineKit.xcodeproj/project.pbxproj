@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D05A7251DA8FA4C00410979 /* Clock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D05A7241DA8FA4C00410979 /* Clock.swift */; };
 		1D24EACF1D3553D7003BA41E /* AudioStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */; };
 		1D2975391D896D4B00DF20EA /* Tape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2975361D896D4B00DF20EA /* Tape.swift */; };
 		1D29753A1D896D4B00DF20EA /* TapeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2975371D896D4B00DF20EA /* TapeData.swift */; };
@@ -36,6 +37,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1D05A7241DA8FA4C00410979 /* Clock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Clock.swift; sourceTree = "<group>"; };
 		1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioStreamer.swift; sourceTree = "<group>"; };
 		1D2975361D896D4B00DF20EA /* Tape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tape.swift; sourceTree = "<group>"; };
 		1D2975371D896D4B00DF20EA /* TapeData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TapeData.swift; sourceTree = "<group>"; };
@@ -130,15 +132,16 @@
 		1DD722D81C35857B00178421 /* Z80VirtualMachineKit */ = {
 			isa = PBXGroup;
 			children = (
-				1D89DD1A1D884C3500282518 /* Tape */,
 				1D24EACE1D3553D7003BA41E /* AudioStreamer.swift */,
 				1DD722D91C35857B00178421 /* Z80VirtualMachineKit.h */,
 				1DD722E11C3585A800178421 /* Z80VirtualMachineKit.swift */,
 				1D5A76851D57BFD800346583 /* VmScreen.swift */,
+				1D05A7241DA8FA4C00410979 /* Clock.swift */,
 				1DD722DB1C35857B00178421 /* Info.plist */,
-				1DBABA901D09BDBF00E631D5 /* Ula */,
 				1D2D38191CD50A8500DA69B6 /* Bus */,
 				1DD723061C35871800178421 /* Cpu */,
+				1DBABA901D09BDBF00E631D5 /* Ula */,
+				1D89DD1A1D884C3500282518 /* Tape */,
 			);
 			path = Z80VirtualMachineKit;
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 				1D2D381B1CD5102D00DA69B6 /* BusComponentBase.swift in Sources */,
 				1DD7231E1C35871800178421 /* Z80.swift in Sources */,
 				1DD723161C35871800178421 /* ControlUnit_opcodes_xxcb.swift in Sources */,
+				1D05A7251DA8FA4C00410979 /* Clock.swift in Sources */,
 				1DD7231B1C35871800178421 /* extensions.swift in Sources */,
 				1D2D381F1CD6570E00DA69B6 /* BusComponent.swift in Sources */,
 				1D2D381D1CD655C200DA69B6 /* Ram.swift in Sources */,

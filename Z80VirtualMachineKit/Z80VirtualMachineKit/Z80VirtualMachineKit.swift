@@ -48,13 +48,9 @@ private struct UlaUpdateData {
     // MARK: Properties
     public var delegate: Z80VirtualMachineStatus?
     
-    private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus())
-    private var instructions = 0
+    private let cpu = Z80(dataBus: Bus16(), ioBus: IoBus(), clock: Clock())
     private var ula: Ula
     private let rom = Rom(base_address: 0x0000, block_size: 0x4000)
-    private var t_cycles: Int = 0
-    
-    private var irq_enabled = true
     
     private struct KeyboardRow {
         let address: UInt8
@@ -81,8 +77,8 @@ private struct UlaUpdateData {
     
     // MARK: Constructor
     public init(_ screen: VmScreen) {
-        ula = Ula(screen: screen)
-        self.tape = Tape(ula: ula)
+        self.ula = Ula(screen: screen, clock: self.cpu.clock)
+        self.tape = Tape(ula: self.ula)
         
         super.init()
         
@@ -107,10 +103,7 @@ private struct UlaUpdateData {
     // MARK: Methods
     public func reset() {
         tape.close()
-
         cpu.reset()
-        instructions = 0
-        t_cycles = 0
     }
     
     public func run() {
@@ -133,46 +126,37 @@ private struct UlaUpdateData {
     }
     
     public func step() {
-        var IRQ = false
-        
-        instructions += 1
-        
-        cpu.t_cycle = 0
-
         if self.instantLoad && cpu.regs.pc == 0x056B && self.tape.tapeAvailable {
             do {
-                try tapeLoaderHandler()
+                try self.tapeLoaderHandler()
                 
-                cpu.regs.bc = 0xB001
-                cpu.regs.af_ = 0x0145
-                cpu.regs.f.setBit(C)
+                self.cpu.regs.bc = 0xB001
+                self.cpu.regs.af_ = 0x0145
+                self.cpu.regs.f.setBit(C)
             } catch {
-                cpu.regs.f.resetBit(C)
+                self.cpu.regs.f.resetBit(C)
             }
             
-            cpu.regs.pc = 0x05E2
+            self.cpu.regs.pc = 0x05E2
         }
-
-        cpu.step()
-        ula.step(t_cycle: cpu.t_cycle, &IRQ)
-        tape.step(tCycle: cpu.t_cycle)
         
-        t_cycles = cpu.t_cycle
+        self.cpu.step()
+        self.ula.step()
+        self.tape.step()
         
-        if IRQ {
-            if irq_enabled {
-                cpu.irq(kind: .soft)
-            }
+        if self.cpu.clock.frameTCycles <= 32 {
+            self.cpu.int = true
             
-            IRQ = false
-            if ula.screen.changed {
-                delegate?.Z80VMScreenRefresh?()
+            if self.ula.screen.changed {
+                self.delegate?.Z80VMScreenRefresh?()
             }
+        } else {
+            self.cpu.int = false
         }
     }
     
     public func getInstructionsCount() -> Int {
-        return instructions < 0 ? 0 : instructions
+        return 0
     }
     
     public func addIoDevice(_ port: UInt8) {
@@ -194,7 +178,7 @@ private struct UlaUpdateData {
     }
     
     public func getTCycle() -> Int {
-        return t_cycles
+        return self.cpu.clock.tCycles
     }
     
     public func setPc(_ pc: UInt16) {

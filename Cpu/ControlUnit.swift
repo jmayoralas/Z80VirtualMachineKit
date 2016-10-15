@@ -267,7 +267,7 @@ extension Z80 {
     }
 
     func call(_ address: UInt16) {
-        t_cycle += 7
+        self.clock.tCycles += 7
         var sp = regs.sp &- 1
         dataBus.write(sp, value: regs.pc.high)
         sp = regs.sp &- 2
@@ -277,42 +277,69 @@ extension Z80 {
     }
 
     func ret() {
-        t_cycle += 6
+        self.clock.tCycles += 6
         regs.pc = addressFromPair(dataBus.read(regs.sp &+ 1), dataBus.read(regs.sp))
         regs.sp = regs.sp &+ 2
     }
     
-    func irq(kind: IrqKind) {
-        // Acknowledge an interrupt
-        // NSLog("Screen Interrupt %d", t_cycle)
-        switch kind {
-        case .nmi:
-            halted = false
-            
-            call(0x0066)
-            regs.IFF2 = regs.IFF1
-            regs.IFF1 = false
-            
-        case .soft:
-            if regs.IFF1 {
-                halted = false
-                
-                switch regs.int_mode {
-                case 1:
-                    call(0x0038)
-                case 2:
-                    let vector_address = addressFromPair(regs.i, dataBus.last_data & 0xFE) // reset bit 0 of the byte in dataBus to make sure we get an even address
-                    let routine_address = addressFromPair(dataBus.read(vector_address + 1), dataBus.read(vector_address))
-                    
-                    call(routine_address)
-                default:
-                    break
-                }
-                
-                regs.IFF1 = false
-                regs.IFF2 = false
-            }
+    func nonMaskableInterrupt() -> Bool {
+        guard self.nmi else {
+            return false
         }
+        
+        // Acknowledge an interrupt
+        if self.halted {
+            self.regs.pc = self.regs.pc &+ 1
+            self.halted = false
+        }
+        
+        self.clock.tCycles += 8
+        
+        self.call(0x0066)
+        
+        self.regs.IFF2 = self.regs.IFF1
+        self.regs.IFF1 = false
+        
+        self.nmi = false
+        
+        return true
+    }
+    
+    func maskableInterrupt() -> Bool {
+        guard self.int && self.regs.IFF1 && !self.eiExecuted else {
+            return false
+        }
+        
+        // Acknowledge an interrupt
+        if self.halted {
+            self.regs.pc = self.regs.pc &+ 1
+            self.halted = false
+        }
+        
+        self.clock.tCycles += 6
+        
+        switch regs.int_mode {
+        case 0:
+            // read next instruction from dataBus
+            self.opcode_tables[self.id_opcode_table][Int(self.dataBus.read())]()
+        case 1:
+            // do a RST 38
+            self.opcode_tables[self.id_opcode_table][0xFF]()
+        case 2:
+            self.clock.tCycles += 6
+            
+            let vector_address = addressFromPair(regs.i, dataBus.last_data & 0xFE) // reset bit 0 of the byte in dataBus to make sure we get an even address
+            let routine_address = addressFromPair(dataBus.read(vector_address + 1), dataBus.read(vector_address))
+            
+            self.call(routine_address)
+        default:
+            break
+        }
+        
+        regs.IFF1 = false
+        regs.IFF2 = false
+        
+        return true
     }
     
     func addRelative(displacement: UInt8, toAddress address: UInt16) -> UInt16 {

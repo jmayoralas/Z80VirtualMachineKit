@@ -13,10 +13,9 @@ class Z80 {
     
     var regs : Registers
     
-    var t_cycle = 0
-    var halted: Bool = true
+    let clock: Clock
     
-    var irq_kind : IrqKind?
+    var halted: Bool = true
     
     var opcode_tables : [OpcodeTable]!
     
@@ -27,12 +26,18 @@ class Z80 {
     let dataBus : Bus16
     let ioBus : IoBus
     
+    var nmi: Bool = false
+    var int: Bool = false
+    
     var stopped = true
     
-    init(dataBus: Bus16, ioBus: IoBus) {
+    var eiExecuted: Bool = false
+    
+    init(dataBus: Bus16, ioBus: IoBus, clock: Clock) {
         self.regs = Registers()
         self.dataBus = dataBus
         self.ioBus = ioBus
+        self.clock = clock
         
         id_opcode_table = table_NONE
         
@@ -78,7 +83,7 @@ class Z80 {
         regs.de_ = 0xFFFF
         regs.hl_ = 0xFFFF
         
-        t_cycle = 0
+        self.clock.tCycles = 0
         
         halted = false
     }
@@ -97,17 +102,23 @@ class Z80 {
     
     // gets next opcode from PC and executes it
     func step() {
-        repeat {
-            processInstruction()
-        } while id_opcode_table != table_NONE
-    }
-    
-    func processInstruction() {
-        getNextOpcode()
+        self.clock.tCycles = 0
+        
+        // check for non maskable interrupt
+        guard !self.nonMaskableInterrupt() else {
+            return
+        }
         
         // save flags register before execute the opcode
         let fBackup = self.regs.f
-        opcode_tables[id_opcode_table][Int(regs.ir)]()
+        
+        if !self.maskableInterrupt() {
+            self.eiExecuted = false
+            
+            repeat {
+                self.processInstruction()
+            } while id_opcode_table != table_NONE
+        }
         
         // test for flags changes and update q register acordingly
         if id_opcode_table != table_NONE || (id_opcode_table == table_NONE && self.regs.ir != 0x37 && self.regs.ir != 0x3F) {
@@ -115,8 +126,13 @@ class Z80 {
         }
     }
     
+    func processInstruction() {
+        self.getNextOpcode()
+        self.opcode_tables[id_opcode_table][Int(regs.ir)]()
+    }
+    
     func getNextOpcode() {
-        t_cycle += 4
+        self.clock.tCycles += 4
         
         if halted {
             // cpu halted, always execute NOP
